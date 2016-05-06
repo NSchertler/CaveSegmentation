@@ -1,0 +1,12 @@
+Debug
+Release
+bin
+obj
+*.opensdf
+*.sdf
+*.suo
+*.ipch
+*.pdb
+*.user
+*.db
+*.opendb
