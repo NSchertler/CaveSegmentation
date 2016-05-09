@@ -5,7 +5,7 @@
 
 // -----  CaveSizeCalculatorVoronoi  -----
 
-double CaveSizeCalculatorVoronoi::CalculateDistance(const RegularUniformSphereSampling & sphereSampling, const std::vector<std::vector<double>>& sphereDistances, const std::vector<std::vector<Vector>>& distanceGradient, const std::vector<PositionValue>& sphereDistanceMaxima, const std::vector<PositionValue>& sphereDistanceMinima, SphereVisualizer& visualizer, int iVert, const std::wstring& tempDirectory)
+double CaveSizeCalculatorVoronoi::CalculateDistance(const RegularUniformSphereSampling & sphereSampling, const std::vector<std::vector<double>>& sphereDistances, const std::vector<std::vector<Vector>>& distanceGradient, const std::vector<PositionValue>& sphereDistanceMaxima, const std::vector<PositionValue>& sphereDistanceMinima, SphereVisualizer& visualizer, int iVert)
 {
 	double voronoiEdgeArea = 0.0;
 	double voronoiDistance = 0.0;
@@ -74,7 +74,7 @@ double CaveSizeCalculatorVoronoi::CalculateDistance(const RegularUniformSphereSa
 
 // -----  CaveSizeCalculatorLineFlow  -----
 
-double CaveSizeCalculatorLineFlow::CalculateDistance(const RegularUniformSphereSampling & sphereSampling, const std::vector<std::vector<double>>& sphereDistances, const std::vector<std::vector<Vector>>& distanceGradient, const std::vector<PositionValue>& sphereDistanceMaxima, const std::vector<PositionValue>& sphereDistanceMinima, SphereVisualizer& visualizer, int iVert, const std::wstring& tempDirectory)
+double CaveSizeCalculatorLineFlow::CalculateDistance(const RegularUniformSphereSampling & sphereSampling, const std::vector<std::vector<double>>& sphereDistances, const std::vector<std::vector<Vector>>& distanceGradient, const std::vector<PositionValue>& sphereDistanceMaxima, const std::vector<PositionValue>& sphereDistanceMinima, SphereVisualizer& visualizer, int iVert)
 {
 	const int SEPARATING_CIRCLE_SAMPLE_RESOLUTION = 36;
 
@@ -370,7 +370,7 @@ double CaveSizeCalculatorLineFlow::CalculateDistance(const RegularUniformSphereS
 	return averageSize;	
 }
 
-double CaveSizeCalculatorVoid::CalculateDistance(const RegularUniformSphereSampling & sphereSampling, const std::vector<std::vector<double>>& sphereDistances, const std::vector<std::vector<Vector>>& distanceGradient, const std::vector<PositionValue>& sphereDistanceMaxima, const std::vector<PositionValue>& sphereDistanceMinima, SphereVisualizer & visualizer, int iVert, const std::wstring& tempDirectory)
+double CaveSizeCalculatorVoid::CalculateDistance(const RegularUniformSphereSampling & sphereSampling, const std::vector<std::vector<double>>& sphereDistances, const std::vector<std::vector<Vector>>& distanceGradient, const std::vector<PositionValue>& sphereDistanceMaxima, const std::vector<PositionValue>& sphereDistanceMinima, SphereVisualizer & visualizer, int iVert)
 {
 	return 0.0;
 }

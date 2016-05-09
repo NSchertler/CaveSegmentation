@@ -12,6 +12,7 @@ class SphereVisualizer
 	const int imWidth = 1280;
 	const int imHeight = imWidth / 2;
 
+	std::wstring outputDirectoryW;
 public:
 	static const Gdiplus::Color SAMPLE_COLOR;
 	static const Gdiplus::Color VORONOI_COLOR;
@@ -23,6 +24,8 @@ public:
 	SphereVisualizer();
 	SphereVisualizer(const SphereVisualizer&);
 	~SphereVisualizer();
+
+	void SetOutputDirectory(const std::wstring&);
 
 	void FillRect(int x, int y, int w, int h, const Gdiplus::Color& color);
 	void FillCircle(int x, int y, int radius, const Gdiplus::Color& color);

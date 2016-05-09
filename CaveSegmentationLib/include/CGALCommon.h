@@ -8,6 +8,7 @@ typedef K::Vector_3 Vector;
 typedef K::Triangle_3 Triangle;
 typedef K::Vector_2 Vector2;
 
+typedef std::vector<Triangle> TriangleList;
 
 struct IndexedTriangle
 {

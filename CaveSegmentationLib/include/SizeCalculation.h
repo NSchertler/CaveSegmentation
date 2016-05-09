@@ -26,8 +26,7 @@ public:
 		const std::vector<PositionValue>& sphereDistanceMaxima,
 		const std::vector<PositionValue>& sphereDistanceMinima,
 		SphereVisualizer& visualizer,
-		int iVert,
-		const std::wstring& tempDirectory) = 0;
+		int iVert) = 0;
 };
 
 class CaveSizeCalculatorVoronoi : public CaveSizeCalculator
@@ -48,8 +47,7 @@ public:
 		const std::vector<PositionValue>& sphereDistanceMaxima,
 		const std::vector<PositionValue>& sphereDistanceMinima,
 		SphereVisualizer& visualizer,
-		int iVert,
-		const std::wstring& tempDirectory);
+		int iVert);
 };
 
 class CaveSizeCalculatorLineFlow : public CaveSizeCalculator
@@ -61,8 +59,7 @@ public:
 		const std::vector<PositionValue>& sphereDistanceMaxima,
 		const std::vector<PositionValue>& sphereDistanceMinima,
 		SphereVisualizer& visualizer,
-		int iVert,
-		const std::wstring& tempDirectory);
+		int iVert);
 
 private:
 	MeanAverageWorkspace meanAverageWorkspace;
@@ -77,6 +74,5 @@ public:
 		const std::vector<PositionValue>& sphereDistanceMaxima,
 		const std::vector<PositionValue>& sphereDistanceMinima,
 		SphereVisualizer& visualizer,
-		int iVert,
-		const std::wstring& tempDirectory);
+		int iVert);
 };

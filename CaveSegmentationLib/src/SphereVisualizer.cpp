@@ -26,6 +26,7 @@ SphereVisualizer::SphereVisualizer(const SphereVisualizer& clone)
 	bitmap = new Bitmap(imWidth, imHeight, PixelFormat24bppRGB);
 	graphics = new Graphics(bitmap);
 	graphics->DrawImage(clone.bitmap, 0, 0, imWidth, imHeight);
+	outputDirectoryW = clone.outputDirectory;
 #endif
 }
 
@@ -35,6 +36,11 @@ SphereVisualizer::~SphereVisualizer()
 	delete graphics;
 	delete bitmap;
 #endif
+}
+
+void SphereVisualizer::SetOutputDirectory(const std::wstring & p)
+{
+	outputDirectoryW = p + L"/";
 }
 
 void SphereVisualizer::FillRect(int x, int y, int w, int h, const Gdiplus::Color& color)
@@ -135,6 +141,6 @@ void SphereVisualizer::DrawGradientField(const RegularUniformSphereSampling& sph
 void SphereVisualizer::Save(const std::wstring& filename)
 {
 #ifdef DRAW_DEBUG_IMAGES
-	SavePNG(bitmap, filename.c_str());
+	SavePNG(bitmap, outputDirectoryW + filename.c_str());
 #endif
 }

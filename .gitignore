@@ -1,4 +1,5 @@
 Debug
+DebugNSight
 Release
 bin
 obj
@@ -10,3 +11,4 @@ obj
 *.user
 *.db
 *.opendb
+GeneratedFiles
