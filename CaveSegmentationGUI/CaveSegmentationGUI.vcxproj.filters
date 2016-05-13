@@ -70,23 +70,29 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Dateien</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_GLView.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_GLView.cpp">
       <Filter>Generierte Dateien\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_GLView.cpp">
       <Filter>Generierte Dateien\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_cavesegmentationgui.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_cavesegmentationgui.cpp">
       <Filter>Generierte Dateien\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_cavesegmentationgui.cpp">
       <Filter>Generierte Dateien\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_GLView.cpp">
+      <Filter>Generierte Dateien\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_CaveGLData.cpp">
+      <Filter>Generierte Dateien\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_cavesegmentationgui.cpp">
+      <Filter>Generierte Dateien\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GLUtils.cpp">
+      <Filter>Source Dateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,6 +125,15 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
+    <ClInclude Include="CameraProvider.h">
+      <Filter>Header Dateien</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenGLContextProvider.h">
+      <Filter>Header Dateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GLUtils.h">
+      <Filter>Header Dateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="cave.geom">
@@ -128,6 +143,36 @@
       <Filter>Resource Dateien</Filter>
     </None>
     <None Include="cave.frag">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="skeleton.vert">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="skeleton.frag">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="correspondence.vert">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="correspondence.frag">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="correspondence.geom">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="clear.vert">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="clear.frag">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="skeletonPoint.vert">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="skeletonPoint.frag">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="skeletonPointSelection.frag">
       <Filter>Resource Dateien</Filter>
     </None>
   </ItemGroup>

@@ -117,7 +117,8 @@ void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, 
 }
 
 CaveData::CaveData()
-	: sphereSampling(SPHERE_SAMPLING_RESOLUTION),
+	: skeleton(nullptr),
+	  sphereSampling(SPHERE_SAMPLING_RESOLUTION),
 	  caveSizeCalculator(std::unique_ptr<CaveSizeCalculator>(new CaveSizeCalculatorLineFlow()))
 {
 }

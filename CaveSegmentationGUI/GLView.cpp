@@ -7,8 +7,11 @@
 #include <gl\GLU.h>
 #include <QWheelEvent>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-GLView::GLView(QWidget* parent) : QGLWidget(parent)
+#include <iostream>
+
+GLView::GLView(QWidget* parent) : QOpenGLWidget(parent)
 {
 	fovy = 45;
 	znear = 1;
@@ -16,57 +19,74 @@ GLView::GLView(QWidget* parent) : QGLWidget(parent)
 	focusLength = 5;
 	focus = glm::vec3(0);
 
-	pan = 0;
+	pan = M_PI / 4;
 	tilt = 0;
 
 	panningTilting = false;
 	tracking = false;
+
+	QSurfaceFormat fmt;
+	fmt.setVersion(4, 3);
+	fmt.setProfile(QSurfaceFormat::CoreProfile);
+	fmt.setOptions(QSurfaceFormat::DebugContext);
+	//fmt.setSamples(16);
+	setFormat(fmt);
+}
+
+const glm::mat4 & GLView::GetViewMatrix()
+{
+	return view;
+}
+
+const glm::mat4 & GLView::GetProjectionMatrix()
+{
+	return proj;
+}
+
+void GLView::MakeOpenGLContextCurrent()
+{
+	makeCurrent();
 }
 
 void GLView::initializeGL()
 {
-	glClearColor(0, 0.1f, 0.3f, 0);
-
 	glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_CULL_FACE);
 
 	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_MULTISAMPLE);
 
-	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat mat_shininess[] = { 50.0 };
-
-	GLfloat light_color[] = { 1, 1, 1, 1.0 };
-	GLfloat light_ambient[] = { 0.2, 0.2, 0.2, 1.0 };
-	GLfloat light_direction1[] = { 1.0, -1.0, -1.0, 0.0 };
-	GLfloat light_direction2[] = { -1.0, -1.0, 1.0, 0.0 };
-
-	glShadeModel(GL_SMOOTH);
-
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-	glLightfv(GL_LIGHT0, GL_POSITION, light_direction1);
-	glLightfv(GL_LIGHT1, GL_POSITION, light_direction2);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_color);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_color);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_color);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, light_color);
-
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	recalculateView();
+
+#ifdef _DEBUG
+	bool loggerInitialized = glLogger.initialize();
+	bool hasDebugCapability = context()->hasExtension(QByteArrayLiteral("GL_KHR_debug"));
+
+	if (hasDebugCapability && loggerInitialized)
+	{
+		connect(&glLogger, &QOpenGLDebugLogger::messageLogged, this, &GLView::handleLoggedMessage);
+		glLogger.disableMessages(QOpenGLDebugMessage::AnySource, QOpenGLDebugMessage::AnyType, QOpenGLDebugMessage::NotificationSeverity);
+		glLogger.startLogging(QOpenGLDebugLogger::SynchronousLogging);
+	}
+#endif
 
 	emit inited(this);
 }
 
 void GLView::recalculateView()
 {
-	glm::vec3 dir(sin(tilt) * cos(pan), sin(pan), cos(tilt) * cos(pan));
+	glm::vec3 dir(cos(tilt) * cos(pan), sin(tilt) * cos(pan), sin(pan));
 	glm::vec3 eye = focus + focusLength * dir;
-	glLoadIdentity();
-	gluLookAt(eye.x, eye.y, eye.z, focus.x, focus.y, focus.z, 0, 1, 0);
+	view = glm::lookAtRH(eye, focus, glm::vec3(0, 0, 1));
 	repaint();
+}
+
+void GLView::handleLoggedMessage(const QOpenGLDebugMessage & message)
+{
+	qDebug() << message;
 }
 
 void GLView::wheelEvent(QWheelEvent* e)
@@ -99,8 +119,8 @@ void GLView::mouseMoveEvent(QMouseEvent* e)
 {
 	if (tracking)
 	{
-		glm::vec3 dir(sin(tilt) * cos(pan), sin(pan), cos(tilt) * cos(pan));
-		glm::vec3 right = glm::cross(dir, glm::vec3(0, 1, 0));
+		glm::vec3 dir(cos(tilt) * cos(pan), sin(tilt) * cos(pan), sin(pan));
+		glm::vec3 right = glm::cross(dir, glm::vec3(0, 0, 1));
 		glm::vec3 up = glm::cross(right, dir);
 		right = glm::normalize(right);
 		up = glm::normalize(up);
@@ -128,6 +148,7 @@ void GLView::mouseReleaseEvent(QMouseEvent* e)
 
 void GLView::resizeGL(int width, int height)
 {
+	QOpenGLWidget::resizeGL(width, height);
 	glViewport(0, 0, width, height);
 
 	recalculateProjection();
@@ -135,12 +156,9 @@ void GLView::resizeGL(int width, int height)
 
 void GLView::recalculateProjection()
 {
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 	float n = std::max(0.01f, znear);
 	float f = std::max(znear + 0.01f, zfar);
-	gluPerspective(fovy, (double)width() / height(), n, f);
-	glMatrixMode(GL_MODELVIEW);
+	proj = glm::perspectiveFovRH<float>(fovy, width(), height(), n, f);
 }
 
 void GLView::align_to_bounding_box(glm::vec3 min, glm::vec3 max)
