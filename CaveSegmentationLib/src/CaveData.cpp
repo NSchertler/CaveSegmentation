@@ -119,7 +119,8 @@ void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, 
 CaveData::CaveData()
 	: skeleton(nullptr),
 	  sphereSampling(SPHERE_SAMPLING_RESOLUTION),
-	  caveSizeCalculator(std::unique_ptr<CaveSizeCalculator>(new CaveSizeCalculatorLineFlow()))
+	  caveSizeCalculator(std::unique_ptr<CaveSizeCalculator>(new CaveSizeCalculatorLineFlow())),
+	  CAVE_SCALE_KERNEL_FACTOR(10.0), CAVE_SIZE_KERNEL_FACTOR(0.2), CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR(0.2)
 {
 }
 
@@ -128,6 +129,7 @@ void CaveData::LoadMesh(const std::string & offFile)
 	ReadOff(offFile, _meshVertices, _meshTriangles, _meshTriIndices);
 	ResizeMeshAttributes(_meshVertices.size());
 
+	_meshAABBTree.clear();
 	_meshAABBTree.insert(_meshTriangles.begin(), _meshTriangles.end());
 	_meshAABBTree.build();
 }
@@ -135,8 +137,13 @@ void CaveData::LoadMesh(const std::string & offFile)
 void CaveData::SetSkeleton(CurveSkeleton * skeleton)
 {
 	this->skeleton = skeleton;
-	ResizeSkeletonAttributes(skeleton->vertices.size(), skeleton->edges.size());
-	CalculateBasicSkeletonData();
+	if (skeleton)
+	{
+		ResizeSkeletonAttributes(skeleton->vertices.size(), skeleton->edges.size());
+		CalculateBasicSkeletonData();
+	}
+	else
+		ResizeSkeletonAttributes(0, 0);
 }
 
 void CaveData::CalculateDistances()
@@ -264,7 +271,7 @@ void CaveData::CalculateDistances()
 
 		//sphereVisualizer.DrawGradientField(sphereSampling, distanceGradient);		
 
-		caveSizes.at(iVert) = caveSizeCalculator->CalculateDistance(sphereSampling, sphereDistances, distanceGradient, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer, iVert);
+		caveSizeUnsmoothed.at(iVert) = caveSizeCalculator->CalculateDistance(sphereSampling, sphereDistances, distanceGradient, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer, iVert);
 
 		sphereVisualizer.Save(L"sphereVis" + std::to_wstring(iVert) + L".png");
 
@@ -288,7 +295,7 @@ void CaveData::LoadDistances(const std::string & file)
 	distanceFile.read(reinterpret_cast<char*>(&maxDistances[0]), sizeof(double) * maxDistances.size());
 	distanceFile.read(reinterpret_cast<char*>(&minDistances[0]), sizeof(double) * minDistances.size());
 	distanceFile.read(reinterpret_cast<char*>(&meanDistances[0]), sizeof(double) * meanDistances.size());
-	distanceFile.read(reinterpret_cast<char*>(&caveSizes[0]), sizeof(double) * caveSizes.size());
+	distanceFile.read(reinterpret_cast<char*>(&caveSizeUnsmoothed[0]), sizeof(double) * caveSizeUnsmoothed.size());
 	distanceFile.close();
 }
 
@@ -298,34 +305,37 @@ void CaveData::SaveDistances(const std::string & file) const
 	distanceFile.write(reinterpret_cast<const char*>(&maxDistances[0]), sizeof(double) * maxDistances.size());
 	distanceFile.write(reinterpret_cast<const char*>(&minDistances[0]), sizeof(double) * minDistances.size());
 	distanceFile.write(reinterpret_cast<const char*>(&meanDistances[0]), sizeof(double) * meanDistances.size());
-	distanceFile.write(reinterpret_cast<const char*>(&caveSizes[0]), sizeof(double) * caveSizes.size());
+	distanceFile.write(reinterpret_cast<const char*>(&caveSizeUnsmoothed[0]), sizeof(double) * caveSizeUnsmoothed.size());
 	distanceFile.close();
 }
 
 void CaveData::SmoothAndDeriveDistances()
 {
+	if (skeleton == nullptr)
+		return;
+
 	std::cout << "Smoothing distances..." << std::endl;
 
 	std::vector<double> smoothWorkDouble(std::max(skeleton->vertices.size(), skeleton->edges.size()));
 
 	//Calculate cave scale by smoothing with a very large window
-	smooth(skeleton->vertices, adjacency, [this](int iVert) { return 10.0 * caveSizes.at(iVert); }, caveSizes, caveScale);
+	smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
 
 	//Derive per vertex
-	smooth(skeleton->vertices, adjacency, [this](int iVert) { return 0.2 * caveScale.at(iVert); }, caveSizes, smoothWorkDouble);
-	memcpy(&caveSizes[0], &smoothWorkDouble[0], caveSizes.size() * sizeof(double));
+	smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SIZE_KERNEL_FACTOR * caveScale.at(iVert); }, caveSizeUnsmoothed, caveSizes);
+	//memcpy(&caveSizes[0], &smoothWorkDouble[0], caveSizes.size() * sizeof(double));
 
-	derive(rootVertex, skeleton->vertices, children, caveSizes, smoothWorkDouble);
+	/*derive(rootVertex, skeleton->vertices, children, caveSizes, smoothWorkDouble);
 	smooth(skeleton->vertices, adjacency, [this](int iVert) { return 0.2 * caveScale.at(iVert); }, smoothWorkDouble, caveSizeDerivatives);
 
-	derive(rootVertex, skeleton->vertices, children, caveSizeDerivatives, caveSizeCurvatures);
+	derive(rootVertex, skeleton->vertices, children, caveSizeDerivatives, caveSizeCurvatures);*/
 
 	//Derive per edge
 	derivePerEdgeFromVertices(skeleton, caveSizes, smoothWorkDouble);
 	smoothPerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, [this](int iEdge)
 	{
 		auto edge = skeleton->edges.at(iEdge);
-		return 0.2 * 0.5 * (caveScale.at(edge.first) + caveScale.at(edge.second));
+		return CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR * 0.5 * (caveScale.at(edge.first) + caveScale.at(edge.second));
 	}, smoothWorkDouble, caveSizeDerivativesPerEdge);
 
 	derivePerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, caveSizeDerivativesPerEdge, caveSizeCurvaturesPerEdge);
@@ -431,8 +441,44 @@ void CaveData::ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount)
 	caveScale.resize(vertexCount);	
 	adjacency.resize(vertexCount);
 
+	caveSizeUnsmoothed.resize(caveSizes.size());	
+
 	caveSizeDerivativesPerEdge.resize(edgeCount);
 	caveSizeCurvaturesPerEdge.resize(edgeCount);
+}
+
+void CaveData::WriteSegmentationColoredOff(const std::string & path, const std::vector<int32_t>& segmentation)
+{
+	int colors[10][3] =
+	{
+		{ 166, 206, 227 },
+		{ 31,120,180 },
+		{ 251,154,153 },
+		{ 227,26,28 },
+		{ 253,191,111 },
+		{ 255,127,0 },
+		{ 202,178,214 },
+		{ 106,61,154 },
+		{ 255,255,153 },
+		{ 177,89,40 }
+	};
+
+	auto colorFunc = [&](int i, int& r, int& g, int& b)
+	{
+		if (segmentation[i] < 0)
+		{
+			r = 0; g = 175; b = 0;
+		}
+		else
+		{
+			int* color = colors[segmentation[i] % 10];
+			r = color[0];
+			g = color[1];
+			b = color[2];
+		}
+	};
+
+	WriteOff(path.c_str(), meshVertices(), meshTriIndices(), [&](int i, int& r, int& g, int& b) {colorFunc(meshVertexCorrespondsTo[i], r, g, b); });
 }
 
 void CaveData::CalculateBasicSkeletonData()
@@ -459,8 +505,47 @@ void CaveData::CalculateBasicSkeletonData()
 
 	buildTree(rootVertex, skeleton->vertices.size(), adjacency, parents, children);
 
-	//calculate correspondences and node radii
+	//Clean correspondences (use the closer skeleton vertex of local neighbors)
+	std::vector<std::vector<int>> cleanedCorrespondences(skeleton->vertices.size());
+
 	int iVert = -1;
+	for (auto& vert : skeleton->vertices)
+	{
+		++iVert;
+
+		for (int c : vert.correspondingOriginalVertices)
+		{
+			auto meshVertex = _meshVertices.at(c);
+			int closestSkeletonVertex = iVert;
+			double closestDistance = (meshVertex - vert.position).norm();
+
+			bool changed = false;
+			do
+			{
+				changed = false;
+				auto& adj = adjacency.at(closestSkeletonVertex);
+				for (auto n : adj)
+				{
+					double currentDistance = (meshVertex - skeleton->vertices.at(n).position).norm();
+					if (currentDistance < closestDistance)
+					{
+						closestDistance = currentDistance;
+						closestSkeletonVertex = n;
+						changed = true;
+					}
+				}
+			} while (changed);
+			cleanedCorrespondences.at(closestSkeletonVertex).push_back(c);
+		}
+	}
+	for (int iVert = 0; iVert < skeleton->vertices.size(); ++iVert)
+	{
+		auto& v = skeleton->vertices.at(iVert);
+		v.correspondingOriginalVertices = std::move(cleanedCorrespondences.at(iVert));
+	}
+
+	//calculate correspondences and node radii
+	iVert = -1;
 	for (auto& vert : skeleton->vertices)
 	{
 		++iVert;
@@ -471,13 +556,10 @@ void CaveData::CalculateBasicSkeletonData()
 			meshVertexCorrespondsTo[c] = iVert;
 		}
 
-		double nodeRadius = 0.0;
-		std::vector <int> correspondences;
-		correspondences.insert(correspondences.end(), vert.correspondingOriginalVertices.begin(), vert.correspondingOriginalVertices.end());
+		double nodeRadius = 0.0;		
 		for (auto adjV : adj)
 		{
 			auto& v = skeleton->vertices.at(adjV);
-			correspondences.insert(correspondences.end(), v.correspondingOriginalVertices.begin(), v.correspondingOriginalVertices.end());
 			nodeRadius += (vert.position - v.position).norm() / 2.0;
 		}
 		nodeRadii.at(iVert) = nodeRadius / adj.size();

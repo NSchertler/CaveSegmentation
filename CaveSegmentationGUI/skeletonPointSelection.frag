@@ -1,8 +1,4 @@
 #version 420 compatibility
-#define lowp
-#define mediump
-#define highp
-#line 2
 
 layout(location=0) out vec4 result;
 

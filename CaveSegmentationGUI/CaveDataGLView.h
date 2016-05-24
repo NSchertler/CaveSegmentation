@@ -2,14 +2,15 @@
 #include "GLView.h"
 #include <qglfunctions.h>
 #include "CaveGLData.hpp"
+#include "ViewModel.h"
 #include <QTimer>
-#include <QOpenGLFunctions_4_3_Core>
+#include <QOpenGLFunctions_3_3_Core>
 
-class CaveDataGLView : public GLView, QOpenGLFunctions_4_3_Core {
+class CaveDataGLView : public GLView, QOpenGLFunctions_3_3_Core {
 	
 
 public:
-	CaveDataGLView(CaveGLData& data, QWidget * parent = Q_NULLPTR);
+	CaveDataGLView(ViewModel& vm, QWidget * parent = Q_NULLPTR);
 	~CaveDataGLView();
 
 protected:
@@ -19,7 +20,10 @@ protected:
 
 protected slots:
 	void meshChanged();
+	void issueRepaint();
 	void skeletonChanged();
+	void markerChanged();
+	void segmentationChanged();
 #ifdef NSIGHT_COMPATIBLE
 	void render();
 #endif
@@ -29,17 +33,17 @@ private:
 	virtual void initializeGL();
 
 	std::unique_ptr<QOpenGLShaderProgram> clearProgram;
+	std::unique_ptr<QOpenGLShaderProgram> markerProgram;
 	QOpenGLVertexArrayObject clearVAO;
 	GLuint pickingTexture;
 	GLint fbo;
 	int32_t hoveredElement;
 
-	int selectedVertex;
-	std::vector<int> path;
+	int selectedVertex;	
 
 	bool recreatePickingResources;
 
-	CaveGLData& data;
+	ViewModel& vm;
 #ifdef NSIGHT_COMPATIBLE
 	QTimer timer;
 #endif

@@ -9,6 +9,7 @@
 #include "LineProc.h"
 #include "ChamberAnalyzation/CurvatureBasedAStar.h"
 #include "ChamberAnalyzation/CurvatureBasedQPBO.h"
+#include "ChamberAnalyzation/Utils.h"
 #include "SizeCalculation.h"
 #include "GraphProc.h"
 #include "CaveData.h"
@@ -122,6 +123,7 @@ int main()
 #else
 	data.LoadDistances(distancesFile);	
 #endif
+	data.SmoothAndDeriveDistances();
 	
 
 
@@ -134,34 +136,8 @@ int main()
 	std::vector<int> segmentation;
 	CurvatureBasedQPBO::FindChambers(data, segmentation);
 
-	//assign unique chamber indices
-	int nextSegment = 0;
-	std::vector<bool> assignedNewIndex(segmentation.size(), false);
-	for (int i = 0; i < segmentation.size(); ++i)
-	{
-		if (segmentation[i] < 0) //passage
-			continue;
-		if (assignedNewIndex[i])
-			continue;
-
-		std::stack<int> traversalStack;
-		traversalStack.push(i);
-		while (!traversalStack.empty())
-		{
-			int currentVertex = traversalStack.top();
-			traversalStack.pop();
-			if (segmentation[currentVertex] < 0)
-				continue;
-			if (assignedNewIndex[currentVertex])
-				continue;
-			assignedNewIndex[currentVertex] = true;
-			segmentation[currentVertex] = nextSegment;
-			for (auto n : data.adjacency[currentVertex])
-				traversalStack.push(n);
-		}
-		++nextSegment;
-	}
-
+	AssignUniqueChamberIndices(data, segmentation);
+	
 	WriteSegmentation(segmentationFile, segmentation);
 
 	int colors[10][3] = 

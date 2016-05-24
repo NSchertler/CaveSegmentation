@@ -4,7 +4,8 @@
 #include <QtWidgets/QMainWindow>
 #include <QDir>
 #include "ui_cavesegmentationgui.h"
-#include "CaveGLData.hpp"
+#include "ViewModel.h"
+#include "DataPlot.h"
 
 class CaveSegmentationGUI : public QMainWindow
 {
@@ -15,13 +16,28 @@ public:
 	~CaveSegmentationGUI();
 
 private slots:
-	void loadOff(bool);
+	void loadOff(bool);	
 	void loadSkeleton(bool);
+	void loadDistances(bool);
+	void runSegmentation(bool);
+	void loadSegmentation(bool);
+
+	void lookThroughChanged(int state);
+
+	void segmentationParametersChanged();
+
+	void resetToDefaults();
+
+	void saveSegmentation();
+
+	void saveSegmentedMesh();
 
 private:
 	Ui::CaveSegmentationGUIClass ui;
-	CaveGLData data;
+	std::unique_ptr<DataPlot> plot;
+	ViewModel vm;
 
+	QString getFilepath(QString defaultFile, QString title, QString filter);
 	QDir dataDirectory;
 };
 

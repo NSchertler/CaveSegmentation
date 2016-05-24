@@ -104,11 +104,11 @@ void GLView::wheelEvent(QWheelEvent* e)
 
 void GLView::mousePressEvent(QMouseEvent* e)
 {
-	if (e->buttons() == Qt::MiddleButton)
+	if (e->buttons() == Qt::RightButton)
 	{
 		tracking = true;
 	}
-	else if (e->buttons() == Qt::RightButton)
+	else if (e->buttons() == Qt::LeftButton)
 	{
 		panningTilting = true;
 	}

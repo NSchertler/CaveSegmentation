@@ -6,11 +6,16 @@
 
 #include <QMouseEvent>
 #include <unordered_set>
+#include <glm/gtc/type_ptr.hpp>
 
-CaveDataGLView::CaveDataGLView(CaveGLData& data, QWidget * parent) : GLView(parent), data(data), fbo(-1), hoveredElement(0), selectedVertex(-1)
+CaveDataGLView::CaveDataGLView(ViewModel& vm, QWidget * parent) : GLView(parent), vm(vm), fbo(-1), hoveredElement(0), selectedVertex(-1)
 {
-	connect(&data, &CaveGLData::meshChanged, this, &CaveDataGLView::meshChanged);
-	connect(&data, &CaveGLData::skeletonChanged, this, &CaveDataGLView::skeletonChanged);
+	connect(&vm.caveData, &CaveGLData::meshChanged, this, &CaveDataGLView::meshChanged);
+	connect(&vm.caveData, &CaveGLData::skeletonChanged, this, &CaveDataGLView::issueRepaint);
+	connect(&vm, &ViewModel::markerChanged, this, &CaveDataGLView::issueRepaint);
+
+	connect(&vm.caveData, &CaveGLData::segmentationChanged, this, &CaveDataGLView::issueRepaint);
+	connect(&vm, &ViewModel::lookThroughChanged, this, &CaveDataGLView::issueRepaint);
 
 	setMouseTracking(true);
 
@@ -51,9 +56,9 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 			if (e->modifiers() == 0)
 			{
 				selectedVertex = hoveredElement - 1;
-				data.ResetColorLayer();
-				data.UpdateColorLayer();
-				path.clear();
+				vm.caveData.ResetColorLayer();
+				vm.caveData.UpdateColorLayer();
+				vm.selectedPath.clear();
 				e->accept();
 				repaint();
 			}
@@ -63,34 +68,45 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 				{
 					std::deque<int> additionalPath;
 					std::unordered_set<int> verticesInPath;
-					for (int vertex : path)
+					for (int vertex : vm.selectedPath)
 					{
 						verticesInPath.insert(vertex);
 					}
 
-					data.FindPath(selectedVertex, hoveredElement - 1, additionalPath);
+					vm.caveData.FindPath(selectedVertex, hoveredElement - 1, additionalPath);
 					for (auto vertex : additionalPath)
 					{
-						if (path.size() > 0 && path.back() == vertex)
+						if (vm.selectedPath.size() > 0 && vm.selectedPath.back() == vertex)
 							continue;
-						path.push_back(vertex);
+						vm.selectedPath.push_back(vertex);
 						verticesInPath.insert(vertex);
 					}
 
-					for (int i = 0; i < path.size(); ++i)
+					for (int i = 0; i < vm.selectedPath.size(); ++i)
 					{
-						float c = 0.4f + 0.5f * i / (path.size() - 1);
-						data.colorLayer.at(path.at(i)) = glm::vec4(1, c, c, 1.0);						
+						float c = 0.4f + 0.5f * i / (vm.selectedPath.size() - 1);
+						vm.caveData.colorLayer.at(vm.selectedPath.at(i)) = glm::vec4(1, c, c, 1.0);
 					}
-					for (int i = 0; i < data.colorLayer.size(); ++i)
+					for (int i = 0; i < vm.caveData.colorLayer.size(); ++i)
 					{
 						if(verticesInPath.find(i) == verticesInPath.end())
-							data.colorLayer.at(i) = glm::vec4(0.5f, 0.5f, 0.5f, 1.0);
+							vm.caveData.colorLayer.at(i) = glm::vec4(0.5f, 0.5f, 0.5f, 1.0);
 					}
-					data.UpdateColorLayer();
+					emit vm.selectedPathChanged();
+					vm.caveData.UpdateColorLayer();
 					e->accept();
 					selectedVertex = hoveredElement - 1;
 					repaint();
+
+					//Debug output
+					for (int i = 0; i < vm.selectedPath.size() - 1; ++i)
+					{
+						int v1 = vm.selectedPath.at(i);
+						int v2 = vm.selectedPath.at(i + 1);
+						auto edgeId = vm.caveData.vertexPairToEdge.at(std::pair<int, int>(v1, v2));
+						auto edge = vm.caveData.skeleton->edges.at(edgeId);
+						std::cout << "Edge " << edgeId << ": " << edge.first << " -> " << edge.second << " (" << vm.caveData.caveSizeDerivativesPerEdge.at(edgeId) << ")" << std::endl;
+					}
 				}
 			}			
 		}
@@ -107,11 +123,26 @@ void CaveDataGLView::resizeGL(int width, int height)
 
 void CaveDataGLView::meshChanged()
 {
-	align_to_bounding_box(data.getMin(), data.getMax());
+	align_to_bounding_box(vm.caveData.getMin(), vm.caveData.getMax());
+	repaint();
+}
+
+void CaveDataGLView::issueRepaint()
+{
 	repaint();
 }
 
 void CaveDataGLView::skeletonChanged()
+{
+	repaint();
+}
+
+void CaveDataGLView::markerChanged()
+{
+	repaint();
+}
+
+void CaveDataGLView::segmentationChanged()
 {
 	repaint();
 }
@@ -126,11 +157,12 @@ void CaveDataGLView::render()
 void CaveDataGLView::initializeGL()
 {
 	GLView::initializeGL();
-	data.initGL(this);
+	vm.caveData.initGL(this);
 
 	initializeOpenGLFunctions();
 
 	clearProgram = MakeProgram("clear.vert", "clear.frag");
+	markerProgram = MakeProgram("marker.vert", "marker.frag");
 	clearVAO.create();
 
 	//Generate picking render targets
@@ -166,23 +198,52 @@ void CaveDataGLView::paintGL()
 	glDepthMask(GL_TRUE);
 	glDrawBuffers(1, bufs);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glCullFace(GL_FRONT);
-	data.drawCave(this);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-	glCullFace(GL_BACK);
-	data.drawCave(this);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (vm.getLookThrough())
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glCullFace(GL_FRONT);
+		vm.caveData.drawCave(this);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		glCullFace(GL_BACK);
+		vm.caveData.drawCave(this);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	else
+	{
+		glCullFace(GL_BACK);
+		vm.caveData.drawCave(this);
+	}
 	
+	vm.caveData.drawSkeleton(this);
 	glDrawBuffers(2, bufs);
-	data.drawSkeleton(this);
+	vm.caveData.drawSkeletonPoints(this);
 	glDrawBuffers(1, bufs);
 
 	if(hoveredElement > 0)
-		data.drawCorrespondence(this, hoveredElement - 1);
+		vm.caveData.drawCorrespondence(this, hoveredElement - 1);
 
 	if (selectedVertex >= 0)
-		data.drawSelectedSkeletonVertex(this, selectedVertex);
+		vm.caveData.drawSelectedSkeletonVertex(this, selectedVertex);
 
+	if (!std::isnan(vm.getMarker().x))
+	{
+		auto MVP = glm::transpose(GetProjectionMatrix() * GetViewMatrix());
+		auto m = QMatrix4x4(glm::value_ptr(MVP));
+
+		markerProgram->bind();
+		clearVAO.bind();
+		int viewport[4];
+		glGetIntegerv(GL_VIEWPORT, viewport);
+		markerProgram->setUniformValue("mvp", m);
+		markerProgram->setUniformValue("viewportDiagonal", sqrtf(viewport[2] * viewport[2] + viewport[3] * viewport[3]));
+		markerProgram->setUniformValue("sizeMultiplier", 0.7f);
+		markerProgram->setUniformValue("position", vm.getMarker().x, vm.getMarker().y, vm.getMarker().z, 1);
+		markerProgram->setUniformValue("color", 0.8, 0.7, 0.5, 1.0);
+
+		glDrawArrays(GL_POINTS, 0, 1);
+
+		markerProgram->release();
+		clearVAO.release();
+	}
 }
 

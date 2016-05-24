@@ -81,6 +81,7 @@
     <ClInclude Include="include\ChamberAnalyzation\energies.h" />
     <ClInclude Include="include\ChamberAnalyzation\MaximumDescent.h" />
     <ClInclude Include="include\ChamberAnalyzation\SizeBasedQPBO.h" />
+    <ClInclude Include="include\ChamberAnalyzation\Utils.h" />
     <ClInclude Include="include\FileInputOutput.h" />
     <ClInclude Include="include\GraphProc.h" />
     <ClInclude Include="include\ImageProc.h" />
@@ -93,7 +94,9 @@
     <ClInclude Include="include\SphereVisualizer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="include\ChamberAnalyzation\energies.cpp" />
     <ClCompile Include="src\CaveData.cpp" />
+    <ClCompile Include="src\ChamberAnalyzation\Utils.cpp" />
     <ClCompile Include="src\FileInputOutput.cpp" />
     <ClCompile Include="src\GraphProc.cpp" />
     <ClCompile Include="src\ImageProc.cpp" />

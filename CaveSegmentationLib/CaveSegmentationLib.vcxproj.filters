@@ -16,6 +16,9 @@
     <Filter Include="Headerdateien\ChamberAnalyzation">
       <UniqueIdentifier>{a2e0dd26-e515-415e-9a6a-bb94a5cc5272}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Quelldateien\ChamberAnalyzation">
+      <UniqueIdentifier>{589dac67-cafe-400c-9362-89b44ffe76e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CaveData.h">
@@ -69,6 +72,9 @@
     <ClInclude Include="include\ChamberAnalyzation\CurvatureBasedQPBO.h">
       <Filter>Headerdateien\ChamberAnalyzation</Filter>
     </ClInclude>
+    <ClInclude Include="include\ChamberAnalyzation\Utils.h">
+      <Filter>Headerdateien\ChamberAnalyzation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\RegularUniformSphereSampling.cpp">
@@ -94,6 +100,12 @@
     </ClCompile>
     <ClCompile Include="src\MeshProc.cpp">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChamberAnalyzation\Utils.cpp">
+      <Filter>Quelldateien\ChamberAnalyzation</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ChamberAnalyzation\energies.cpp">
+      <Filter>Quelldateien\ChamberAnalyzation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

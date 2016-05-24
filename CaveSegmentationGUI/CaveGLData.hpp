@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <QObject>
-#include <QOpenGLFunctions_4_3_Core>
+#include <QOpenGLFunctions_3_3_Core>
 #include <qopenglbuffer.h>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
@@ -12,7 +12,7 @@
 #include "CameraProvider.h"
 #include "OpenGLContextProvider.h"
 
-class CaveGLData : public QObject, public CaveData, QOpenGLFunctions_4_3_Core, public IHasBoundingBox {
+class CaveGLData : public QObject, public CaveData, QOpenGLFunctions_3_3_Core, public IHasBoundingBox {
 	Q_OBJECT
 
 public:
@@ -21,11 +21,14 @@ public:
 
 	virtual void LoadMesh(const std::string& offFile);
 	virtual void SetSkeleton(CurveSkeleton* skeleton);
+	virtual void SmoothAndDeriveDistances();
 
 	void drawCave(CameraProvider*);
 	void ResetColorLayer();
 	void UpdateColorLayer();
 	void drawSkeleton(CameraProvider*);
+
+	void drawSkeletonPoints(CameraProvider * cam);
 
 	void drawSelectedSkeletonVertex(CameraProvider * cam, int selected);
 
@@ -36,17 +39,26 @@ public:
 
 	void FindPath(int startVertex, int targetVertex, std::deque<int>& resultPath);
 
-	std::vector<glm::vec4> colorLayer;
+	std::vector<glm::vec4> colorLayer;	
+
+	std::vector<int32_t> segmentation;
+	void RunSegmentation();
+	void LoadSegmentation(const std::string & path);	
 
 signals:
 	void meshChanged();
 	void skeletonChanged();
+	void distancesChanged();
+	void segmentationChanged();
 
 private:
-	QOpenGLBuffer meshVB, meshIB;
+	glm::vec4 segmentColor(int32_t segment);
+	void segmentationChangedHandler();
+
+	QOpenGLBuffer meshVB, meshIB, meshSegColor;
 	QOpenGLVertexArrayObject meshVAO;
 
-	QOpenGLBuffer skeletonVB, skeletonIB, correspondenceVB, colorLayerVBO;
+	QOpenGLBuffer skeletonVB, skeletonIB, correspondenceVB, colorLayerVBO, skeletonSegColor;
 	QOpenGLVertexArrayObject skeletonVAO, correspondenceVAO;
 
 	OpenGLContextProvider* ctx;	

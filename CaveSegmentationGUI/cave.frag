@@ -1,10 +1,10 @@
 #version 420 compatibility
 
-in vec3 color;
+in vec4 color;
 
 out vec4 result;
 
 void main(void)
 {
-	result = vec4(color, 1.0);	
+	result = color;	
 }

@@ -35,7 +35,7 @@ std::unique_ptr<QOpenGLShaderProgram> MakeProgram(QString vsPath, QString fsPath
 	success = program->link();
 	if (!success)
 	{
-		QMessageBox::critical(nullptr, "Shader Linking Error", program->log());
+		QMessageBox::critical(nullptr, "Shader Linking Error", "VS: " + vsPath + "; GS: " + gsPath + "; FS: " + fsPath + "\n" + program->log());
 		return nullptr;
 	}
 

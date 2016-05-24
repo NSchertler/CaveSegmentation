@@ -26,6 +26,8 @@ struct CaveData
 
 	void ResizeMeshAttributes(size_t vertexCount);
 	void ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount);
+
+	void WriteSegmentationColoredOff(const std::string& path, const std::vector<int32_t>& segmentation);
 	
 	RegularUniformSphereSampling sphereSampling;
 	std::unique_ptr<CaveSizeCalculator> caveSizeCalculator;
@@ -48,12 +50,18 @@ struct CaveData
 	std::map<std::pair<int, int>, int> vertexPairToEdge;
 	int rootVertex;	
 
+	std::vector<double> caveSizeUnsmoothed;
+
 	SphereVisualizer sphereVisualizer;
 
 	const std::vector<Eigen::Vector3f>& meshVertices() { return _meshVertices; }
 	const TriangleList& meshTriangles(){ return _meshTriangles; }
 	const std::vector<IndexedTriangle>& meshTriIndices(){ return _meshTriIndices; }
 	const Tree& meshAABBTree(){ return _meshAABBTree; }
+
+	double CAVE_SCALE_KERNEL_FACTOR; //kernel deviation for calculating cave scale (multiplied by local cave size)
+	double CAVE_SIZE_KERNEL_FACTOR; //kernel deviation for smoothing cave size (multiplied by cave scale)
+	double CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR; //kernel deviation for smoothing cave size derivative (multiplied by cave scale)
 
 protected:
 	//Calculates basic derived data from the stored skeleton, such as adjacency, node radii, etc.

@@ -38,6 +38,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="QCustomPlot">
+      <UniqueIdentifier>{b82720f2-b7be-4d6f-a941-dd60a76edd50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -94,6 +97,54 @@
     <ClCompile Include="GLUtils.cpp">
       <Filter>Source Dateien</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_qcustomplot.cpp">
+      <Filter>Generierte Dateien\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_qcustomplot.cpp">
+      <Filter>Generierte Dateien\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_qcustomplot.cpp">
+      <Filter>Generierte Dateien\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="QCustomPlot\qcustomplot.cpp">
+      <Filter>QCustomPlot</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_ViewModel.cpp">
+      <Filter>Generierte Dateien\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ViewModel.cpp">
+      <Filter>Generierte Dateien\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ViewModel.cpp">
+      <Filter>Generierte Dateien\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_DataPlot.cpp">
+      <Filter>Generierte Dateien\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DataPlot.cpp">
+      <Filter>Generierte Dateien\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DataPlot.cpp">
+      <Filter>Generierte Dateien\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ViewModel.cpp">
+      <Filter>Source Dateien</Filter>
+    </ClCompile>
+    <ClCompile Include="DataPlot.cpp">
+      <Filter>Source Dateien</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_ObservableVariable.cpp">
+      <Filter>Generierte Dateien\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ObservableVariable.cpp">
+      <Filter>Generierte Dateien\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ObservableVariable.cpp">
+      <Filter>Generierte Dateien\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_gui.cpp">
+      <Filter>Generierte Dateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="cavesegmentationgui.h">
@@ -110,6 +161,21 @@
     </CustomBuild>
     <CustomBuild Include="CaveGLData.hpp">
       <Filter>Header Dateien</Filter>
+    </CustomBuild>
+    <CustomBuild Include="QCustomPlot\qcustomplot.h">
+      <Filter>QCustomPlot</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ViewModel.h">
+      <Filter>Header Dateien</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DataPlot.h">
+      <Filter>Header Dateien</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ObservableVariable.h">
+      <Filter>Header Dateien</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Resources\gui.qrc">
+      <Filter>Resource Dateien</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -175,5 +241,16 @@
     <None Include="skeletonPointSelection.frag">
       <Filter>Resource Dateien</Filter>
     </None>
+    <None Include="marker.vert">
+      <Filter>Resource Dateien</Filter>
+    </None>
+    <None Include="marker.frag">
+      <Filter>Resource Dateien</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Icon\main.ico">
+      <Filter>Resource Dateien</Filter>
+    </Image>
   </ItemGroup>
 </Project>
