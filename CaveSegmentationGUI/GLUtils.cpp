@@ -8,7 +8,7 @@ std::unique_ptr<QOpenGLShaderProgram> MakeProgram(QString vsPath, QString fsPath
 	auto program = std::make_unique<QOpenGLShaderProgram>();
 
 	bool success;
-	success = program->addShaderFromSourceFile(QOpenGLShader::Vertex, vsPath);
+	success = program->addShaderFromSourceFile(QOpenGLShader::Vertex, "glsl/" + vsPath);
 	if (!success)
 	{
 		QMessageBox::critical(nullptr, vsPath + " Compile Error", program->log());
@@ -17,7 +17,7 @@ std::unique_ptr<QOpenGLShaderProgram> MakeProgram(QString vsPath, QString fsPath
 
 	if (!gsPath.isEmpty())
 	{
-		success = program->addShaderFromSourceFile(QOpenGLShader::Geometry, gsPath);
+		success = program->addShaderFromSourceFile(QOpenGLShader::Geometry, "glsl/" + gsPath);
 		if (!success)
 		{
 			QMessageBox::critical(nullptr, gsPath + " Compile Error", program->log());
@@ -25,7 +25,7 @@ std::unique_ptr<QOpenGLShaderProgram> MakeProgram(QString vsPath, QString fsPath
 		}
 	}
 
-	success = program->addShaderFromSourceFile(QOpenGLShader::Fragment, fsPath);
+	success = program->addShaderFromSourceFile(QOpenGLShader::Fragment, "glsl/" + fsPath);
 	if (!success)
 	{
 		QMessageBox::critical(nullptr, fsPath + " Compile Error", program->log());

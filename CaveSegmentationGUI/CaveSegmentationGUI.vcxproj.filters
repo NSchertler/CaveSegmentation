@@ -41,6 +41,9 @@
     <Filter Include="QCustomPlot">
       <UniqueIdentifier>{b82720f2-b7be-4d6f-a941-dd60a76edd50}</UniqueIdentifier>
     </Filter>
+    <Filter Include="glsl">
+      <UniqueIdentifier>{e16246b3-7fb5-4fd4-94d4-40766a08f442}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -48,9 +51,6 @@
     </ClCompile>
     <ClCompile Include="cavesegmentationgui.cpp">
       <Filter>Source Dateien</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_cavesegmentationgui.cpp">
-      <Filter>Generierte Dateien</Filter>
     </ClCompile>
     <ClCompile Include="GLView.cpp">
       <Filter>Source Dateien</Filter>
@@ -153,9 +153,6 @@
     <CustomBuild Include="cavesegmentationgui.ui">
       <Filter>Form Dateien</Filter>
     </CustomBuild>
-    <CustomBuild Include="cavesegmentationgui.qrc">
-      <Filter>Resource Dateien</Filter>
-    </CustomBuild>
     <CustomBuild Include="GLView.h">
       <Filter>Header Dateien</Filter>
     </CustomBuild>
@@ -177,6 +174,9 @@
     <CustomBuild Include="Resources\gui.qrc">
       <Filter>Resource Dateien</Filter>
     </CustomBuild>
+    <CustomBuild Include="CameraProvider.h">
+      <Filter>Header Dateien</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_cavesegmentationgui.h">
@@ -191,9 +191,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
-    <ClInclude Include="CameraProvider.h">
-      <Filter>Header Dateien</Filter>
-    </ClInclude>
     <ClInclude Include="OpenGLContextProvider.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
@@ -202,55 +199,67 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="cave.geom">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="cave.vert">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="cave.frag">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="skeleton.vert">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="skeleton.frag">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="correspondence.vert">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="correspondence.frag">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="correspondence.geom">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="clear.vert">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="clear.frag">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="skeletonPoint.vert">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="skeletonPoint.frag">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="skeletonPointSelection.frag">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="marker.vert">
-      <Filter>Resource Dateien</Filter>
-    </None>
-    <None Include="marker.frag">
-      <Filter>Resource Dateien</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Resources\Icon\main.ico">
       <Filter>Resource Dateien</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="glsl\correspondence.geom">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\correspondence.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\cursor.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\cursor.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\marker.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\marker.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\skeleton.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\skeleton.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\skeletonPoint.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\skeletonPoint.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\skeletonPointSelection.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\sky.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\sky.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\cave.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\cave.geom">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\cave.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\clear.frag">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\clear.vert">
+      <Filter>glsl</Filter>
+    </None>
+    <None Include="glsl\correspondence.frag">
+      <Filter>glsl</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,20 +1,22 @@
 #include "stdafx.h"
 
 #include "cavesegmentationgui.h"
-#include "CaveDataGLView.h"
 #include <qmessagebox.h>
 #include <qfiledialog.h>
 
 #include <FileInputOutput.h>
 
-QString initialDirectory = "E:\\Data\\CaveSegmentation\\data";
+QString initialDirectory;// = "E:\\Data\\CaveSegmentation\\data";
 
-CaveSegmentationGUI::CaveSegmentationGUI(QWidget *parent)
+CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 	: QMainWindow(parent)
 {
+	options = o;
+
 	ui.setupUi(this);	
 
-	auto glView = new CaveDataGLView(vm, this);
+	glView = new CaveDataGLView(vm, (o.stereo ? -1 : 0), this);
+	glView->setVirtualAspectMultiplier(o.aspectMultiplier);
 	this->setCentralWidget(glView);
 
 	plot = std::make_unique<DataPlot>(vm, ui.grpData);
@@ -52,7 +54,78 @@ CaveSegmentationGUI::CaveSegmentationGUI(QWidget *parent)
 	connect(ui.btnSaveSegmentation, &QPushButton::clicked, this, &CaveSegmentationGUI::saveSegmentation);
 	connect(ui.btnSaveSegmentedMesh, &QPushButton::clicked, this, &CaveSegmentationGUI::saveSegmentedMesh);
 
-	setWindowState(windowState() | Qt::WindowMaximized);
+	if (!o.stereo)
+	{
+		setWindowState(windowState() | Qt::WindowMaximized);
+		connect(glView, &GLView::inited, this, &CaveSegmentationGUI::preloadData);
+	}
+	else
+	{
+		secondary = std::make_unique<Secondary>(ui.dockWidget, this);
+		secondary->setWindowTitle(this->windowTitle());
+		secondary->show();
+
+		secondarySynchronizationTimer.setInterval(40);
+		connect(&secondarySynchronizationTimer, &QTimer::timeout, this, &CaveSegmentationGUI::synchronizeSecondary);
+		secondarySynchronizationTimer.start();
+
+		connect(glView, &GLView::inited, this, &CaveSegmentationGUI::glViewInited);
+
+		QRect rec = QApplication::desktop()->availableGeometry(o.screenNumber);
+		setGeometry(rec.x(), rec.y(), rec.width() / 2, rec.height());
+	}	
+}
+
+void CaveSegmentationGUI::glViewInited()
+{
+	if (options.stereo)
+	{
+		secondaryGlView = std::make_unique<CaveDataGLView>(vm, 1, secondary.get(), glView);
+		secondaryGlView->setVirtualAspectMultiplier(options.aspectMultiplier);
+		secondary->setCentralWidget(secondaryGlView.get());
+
+		connect(secondaryGlView.get(), &GLView::inited, this, &CaveSegmentationGUI::preloadData);
+	}	
+}
+
+void CaveSegmentationGUI::preloadData()
+{
+	if (!options.dataDir.isEmpty())
+	{
+		dataDirectory = QDir(options.dataDir);
+
+		QString modelPath = dataDirectory.absoluteFilePath("model.off");
+
+		if (QFile(modelPath).exists())
+			vm.caveData.LoadMesh(modelPath.toStdString());
+		else
+			return;
+
+		QString skeletonPath = dataDirectory.absoluteFilePath("model.skel");
+		if (QFile(modelPath).exists())
+			vm.caveData.SetSkeleton(LoadCurveSkeleton(skeletonPath.toStdString().c_str()));
+		else
+			return;
+
+		QString distancesPath = dataDirectory.absoluteFilePath("distances.bin");
+		if (QFile(distancesPath).exists())
+		{
+			vm.caveData.LoadDistances(distancesPath.toStdString());
+			vm.caveData.SmoothAndDeriveDistances();
+		}
+		else
+			return;
+	}
+}
+
+void CaveSegmentationGUI::synchronizeSecondary()
+{
+	secondary->setGeometry(QRect(this->geometry().x() + QApplication::desktop()->availableGeometry(this).width() / 2, this->geometry().y(), this->geometry().width(), this->geometry().height()));
+
+	secondary->CopyFromPrimary();
+
+	if(secondaryGlView)
+		secondaryGlView->setGeometry(glView->geometry());
 }
 
 CaveSegmentationGUI::~CaveSegmentationGUI()

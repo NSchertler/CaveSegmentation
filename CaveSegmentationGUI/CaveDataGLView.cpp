@@ -8,7 +8,12 @@
 #include <unordered_set>
 #include <glm/gtc/type_ptr.hpp>
 
-CaveDataGLView::CaveDataGLView(ViewModel& vm, QWidget * parent) : GLView(parent), vm(vm), fbo(-1), hoveredElement(0), selectedVertex(-1)
+std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::clearProgram(nullptr);
+std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::skyProgram(nullptr);
+std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::markerProgram(nullptr);
+std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::cursorProgram(nullptr);
+
+CaveDataGLView::CaveDataGLView(ViewModel& vm, float eyeOffset, QWidget * parent, GLView* masterCam) : GLView(parent, eyeOffset, masterCam), vm(vm), fbo(-1), useSoftwareCursor(eyeOffset != 0)
 {
 	connect(&vm.caveData, &CaveGLData::meshChanged, this, &CaveDataGLView::meshChanged);
 	connect(&vm.caveData, &CaveGLData::skeletonChanged, this, &CaveDataGLView::issueRepaint);
@@ -16,8 +21,19 @@ CaveDataGLView::CaveDataGLView(ViewModel& vm, QWidget * parent) : GLView(parent)
 
 	connect(&vm.caveData, &CaveGLData::segmentationChanged, this, &CaveDataGLView::issueRepaint);
 	connect(&vm, &ViewModel::lookThroughChanged, this, &CaveDataGLView::issueRepaint);
+	connect(&vm, &ViewModel::selectedPathChanged, this, &CaveDataGLView::issueRepaint);
+	connect(&vm.hoveredElement, &ObservableVariable<int32_t>::changed, this, &CaveDataGLView::issueRepaint);
+	connect(&vm.selectedVertex, &ObservableVariable<int32_t>::changed, this, &CaveDataGLView::issueRepaint);
+
+	if (useSoftwareCursor)
+	{
+		connect(&vm.cursorPos, &ObservableVariable<glm::vec2>::changed, this, &CaveDataGLView::issueRepaint);
+		setCursor(QCursor(Qt::BlankCursor));
+	}
 
 	setMouseTracking(true);
+
+	connect(this, &GLView::CameraChanged, this, &CaveDataGLView::issueRepaint);
 
 #ifdef NSIGHT_COMPATIBLE
 	timer.setInterval(0);
@@ -27,35 +43,52 @@ CaveDataGLView::CaveDataGLView(ViewModel& vm, QWidget * parent) : GLView(parent)
 #endif
 }
 
-CaveDataGLView::~CaveDataGLView() {
-	
+CaveDataGLView::~CaveDataGLView()
+{
 }
 
 void CaveDataGLView::mouseMoveEvent(QMouseEvent *e)
 {
 	GLView::mouseMoveEvent(e);
 
+	if (!isPrimary)
+		return;
+
 	if (fbo >= 0)
 	{
+#ifndef NSIGHT_COMPATIBLE
 		makeCurrent();
-		auto oldHovered = hoveredElement;
+		auto oldHovered = vm.hoveredElement.get();
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 		glReadBuffer(GL_COLOR_ATTACHMENT0 + 1);
-		glReadPixels(e->x(), height() - e->y(), 1, 1, GL_RED_INTEGER, GL_INT, &hoveredElement);
-		if (hoveredElement != oldHovered)
-			repaint();
+		int32_t newHovered;
+		glReadPixels(e->x() + cursorOffset * width() / 2, height() - e->y(), 1, 1, GL_RED_INTEGER, GL_INT, &newHovered);
+		if (newHovered != oldHovered)
+			vm.hoveredElement.set(newHovered);
+#else
+		hoveredElement = 1;
+#endif
 	}
+
+	auto localCursorPos = e->localPos();
+	vm.cursorPos.set(glm::vec2(2.0f * localCursorPos.x() / width() - 1.0f, -2.0f * localCursorPos.y() / height() + 1.0f));
+}
+
+void CaveDataGLView::leaveEvent(QEvent *)
+{
+	if (isPrimary)
+		vm.cursorPos.set(glm::vec2(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()));
 }
 
 void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 {
 	if (e->buttons() == Qt::LeftButton)
 	{
-		if (hoveredElement > 0)
+		if (vm.hoveredElement.get() > 0 && vm.caveData.skeleton)
 		{
 			if (e->modifiers() == 0)
 			{
-				selectedVertex = hoveredElement - 1;
+				vm.selectedVertex.set(vm.hoveredElement.get() - 1);
 				vm.caveData.ResetColorLayer();
 				vm.caveData.UpdateColorLayer();
 				vm.selectedPath.clear();
@@ -64,7 +97,7 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 			}
 			else if(e->modifiers() == Qt::ShiftModifier)
 			{
-				if (selectedVertex >= 0 && selectedVertex != hoveredElement - 1)
+				if (vm.selectedVertex.get() >= 0 && vm.selectedVertex.get() != vm.hoveredElement.get() - 1)
 				{
 					std::deque<int> additionalPath;
 					std::unordered_set<int> verticesInPath;
@@ -73,7 +106,7 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 						verticesInPath.insert(vertex);
 					}
 
-					vm.caveData.FindPath(selectedVertex, hoveredElement - 1, additionalPath);
+					vm.caveData.FindPath(vm.selectedVertex.get(), vm.hoveredElement.get() - 1, additionalPath);
 					for (auto vertex : additionalPath)
 					{
 						if (vm.selectedPath.size() > 0 && vm.selectedPath.back() == vertex)
@@ -95,8 +128,7 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 					emit vm.selectedPathChanged();
 					vm.caveData.UpdateColorLayer();
 					e->accept();
-					selectedVertex = hoveredElement - 1;
-					repaint();
+					vm.selectedVertex.set(vm.hoveredElement.get() - 1);
 
 					//Debug output
 					for (int i = 0; i < vm.selectedPath.size() - 1; ++i)
@@ -121,14 +153,19 @@ void CaveDataGLView::resizeGL(int width, int height)
 	recreatePickingResources = true;
 }
 
+template <typename T> int sgn(T val) {
+	return (T(0) < val) - (val < T(0));
+}
+
 void CaveDataGLView::meshChanged()
 {
 	align_to_bounding_box(vm.caveData.getMin(), vm.caveData.getMax());
-	repaint();
-}
-
-void CaveDataGLView::issueRepaint()
-{
+	if (eyeOffset != 0)
+	{
+		eyeOffset = (vm.caveData.getMax() - vm.caveData.getMin()).length() * 0.3f * sgn(eyeOffset);
+		recalculateView();
+		recalculateProjection();
+	}
 	repaint();
 }
 
@@ -155,20 +192,29 @@ void CaveDataGLView::render()
 #endif
 
 void CaveDataGLView::initializeGL()
-{
-	GLView::initializeGL();
-	vm.caveData.initGL(this);
+{	
+	vm.caveData.initGL(this, isPrimary);
 
 	initializeOpenGLFunctions();
 
-	clearProgram = MakeProgram("clear.vert", "clear.frag");
-	markerProgram = MakeProgram("marker.vert", "marker.frag");
+	if (clearProgram == nullptr)
+	{
+		clearProgram = MakeProgram("clear.vert", "clear.frag");
+		markerProgram = MakeProgram("marker.vert", "marker.frag");
+		skyProgram = MakeProgram("sky.vert", "sky.frag");
+		cursorProgram = MakeProgram("cursor.vert", "cursor.frag");
+	}
+
 	clearVAO.create();
 
 	//Generate picking render targets
 	glGenTextures(1, &pickingTexture);
 
 	recreatePickingResources = true;
+
+	cursorTexture = new QOpenGLTexture(QImage(":/icon/cursor.png").mirrored());
+
+	GLView::initializeGL();
 }
 
 void CaveDataGLView::paintGL()
@@ -195,8 +241,19 @@ void CaveDataGLView::paintGL()
 	clearProgram->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	clearProgram->release();
-	glDepthMask(GL_TRUE);
 	glDrawBuffers(1, bufs);
+
+	skyProgram->bind();
+	glEnable(GL_DEPTH_CLAMP);
+	auto MVP = glm::transpose(GetProjectionMatrix() * GetViewRotationMatrix());
+	auto mvp = QMatrix4x4(glm::value_ptr(MVP));
+	skyProgram->setUniformValue("mvp", mvp);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
+	skyProgram->release();
+	glDisable(GL_DEPTH_CLAMP);
+
+	glDepthMask(GL_TRUE);
+	
 
 	if (vm.getLookThrough())
 	{
@@ -219,11 +276,11 @@ void CaveDataGLView::paintGL()
 	vm.caveData.drawSkeletonPoints(this);
 	glDrawBuffers(1, bufs);
 
-	if(hoveredElement > 0)
-		vm.caveData.drawCorrespondence(this, hoveredElement - 1);
+	if(vm.hoveredElement.get() > 0)
+		vm.caveData.drawCorrespondence(this, vm.hoveredElement.get() - 1);
 
-	if (selectedVertex >= 0)
-		vm.caveData.drawSelectedSkeletonVertex(this, selectedVertex);
+	if (vm.selectedVertex.get() >= 0)
+		vm.caveData.drawSelectedSkeletonVertex(this, vm.selectedVertex.get());
 
 	if (!std::isnan(vm.getMarker().x))
 	{
@@ -244,6 +301,17 @@ void CaveDataGLView::paintGL()
 
 		markerProgram->release();
 		clearVAO.release();
+	}
+
+	if (useSoftwareCursor && !std::isnan(vm.cursorPos.get().x))
+	{
+		clearVAO.bind();
+		cursorProgram->bind();
+		cursorTexture->bind();
+		cursorProgram->setUniformValue("posSize", vm.cursorPos.get().x + cursorOffset, vm.cursorPos.get().y, 2.0f / virtualAspectMultiplier * 32 / width(), 2.0f * 32 / height());
+		cursorProgram->setUniformValue("depth", cursorDepth);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		cursorProgram->release();
 	}
 }
 

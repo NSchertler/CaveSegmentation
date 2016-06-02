@@ -11,14 +11,29 @@ class GLView : public QOpenGLWidget, public CameraProvider, public OpenGLContext
 {
 	Q_OBJECT
 public:
-	GLView(QWidget* parent);
+	GLView(QWidget* parent, float eyeOffset = 0.0f, GLView* masterCam = nullptr);
+
+	~GLView();
 
 	const glm::mat4& GetViewMatrix();
+	glm::mat4 GetViewRotationMatrix();
 	const glm::mat4& GetProjectionMatrix();
 	void MakeOpenGLContextCurrent();
 
+	void setVirtualAspectMultiplier(float multiplier);
+
+protected slots:
+	void issueRepaint();
+
+	void setCameraParameters(float pan, float tilt, const glm::vec3& focus, float focusLength);
+	void setZRange(float znear, float zfar, float zeroParallaxInterpoll, float cursorDepthInterpol);
+
 signals:
 	void inited(GLView* sender);
+	void CameraChanged();
+
+	void camParamsChanged(float pan, float tilt, const glm::vec3& focus, float focusLength);
+	void zRangeChanged(float znear, float zfar, float zeroParallaxInterpol, float cursorDepthInterpol);
 
 protected:
 	virtual void paintGL() = 0;
@@ -40,6 +55,8 @@ protected:
 protected:
 	double fovy;
 	float znear, zfar;
+	float zeroParallaxInterpol; //Interpolation between znear and zfar
+	float cursorDepthInterpol; //Interpolation between znear and focus
 
 	double pan, tilt;
 	float focusLength;
@@ -52,5 +69,11 @@ protected:
 	glm::mat4 view, proj;
 
 	QOpenGLDebugLogger glLogger;
+	bool isPrimary;
+
+	float eyeOffset;
+	float cursorOffset, cursorDepth;
+
+	float virtualAspectMultiplier;
 };
 

@@ -5,22 +5,22 @@
 #include "ViewModel.h"
 #include <QTimer>
 #include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLTexture>
 
-class CaveDataGLView : public GLView, QOpenGLFunctions_3_3_Core {
-	
-
+class CaveDataGLView : public GLView, QOpenGLFunctions_3_3_Core 
+{
 public:
-	CaveDataGLView(ViewModel& vm, QWidget * parent = Q_NULLPTR);
+	CaveDataGLView(ViewModel& vm, float eyeOffset = 0.0f, QWidget * parent = Q_NULLPTR, GLView* masterCam = nullptr);
 	~CaveDataGLView();
 
 protected:
 	virtual void mouseMoveEvent(QMouseEvent*);
+	virtual void leaveEvent(QEvent *);
 	virtual void mousePressEvent(QMouseEvent*);
 	virtual void resizeGL(int width, int height);
 
 protected slots:
-	void meshChanged();
-	void issueRepaint();
+	void meshChanged();	
 	void skeletonChanged();
 	void markerChanged();
 	void segmentationChanged();
@@ -32,16 +32,19 @@ private:
 	virtual void paintGL();
 	virtual void initializeGL();
 
-	std::unique_ptr<QOpenGLShaderProgram> clearProgram;
-	std::unique_ptr<QOpenGLShaderProgram> markerProgram;
+	static std::unique_ptr<QOpenGLShaderProgram> clearProgram;
+	static std::unique_ptr<QOpenGLShaderProgram> skyProgram;
+	static std::unique_ptr<QOpenGLShaderProgram> markerProgram;
+	static std::unique_ptr<QOpenGLShaderProgram> cursorProgram;
+
 	QOpenGLVertexArrayObject clearVAO;
 	GLuint pickingTexture;
 	GLint fbo;
-	int32_t hoveredElement;
-
-	int selectedVertex;	
 
 	bool recreatePickingResources;
+	bool useSoftwareCursor;
+
+	QOpenGLTexture* cursorTexture;
 
 	ViewModel& vm;
 #ifdef NSIGHT_COMPATIBLE

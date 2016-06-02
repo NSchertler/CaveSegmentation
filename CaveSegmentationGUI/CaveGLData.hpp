@@ -34,7 +34,7 @@ public:
 
 	void drawCorrespondence(CameraProvider * cam, int specificSkeletonVertex = -1);
 
-	void initGL(OpenGLContextProvider*);
+	void initGL(OpenGLContextProvider*, bool primary);
 	static void init_shaders();
 
 	void FindPath(int startVertex, int targetVertex, std::deque<int>& resultPath);
@@ -55,11 +55,18 @@ private:
 	glm::vec4 segmentColor(int32_t segment);
 	void segmentationChangedHandler();
 
-	QOpenGLBuffer meshVB, meshIB, meshSegColor;
-	QOpenGLVertexArrayObject meshVAO;
+	QOpenGLBuffer meshVB, meshIB, meshSegColor;	
+	QOpenGLBuffer skeletonVB, skeletonIB, correspondenceVB, colorLayerVBO, skeletonSegColor;	
 
-	QOpenGLBuffer skeletonVB, skeletonIB, correspondenceVB, colorLayerVBO, skeletonSegColor;
-	QOpenGLVertexArrayObject skeletonVAO, correspondenceVAO;
+	struct ContextSpecificData
+	{
+		QOpenGLVertexArrayObject meshVAO;
+		QOpenGLVertexArrayObject skeletonVAO, correspondenceVAO;
+
+		OpenGLContextProvider* provider;
+	};
+
+	std::map<QOpenGLContext*, ContextSpecificData> contextSpecificData;
 
 	OpenGLContextProvider* ctx;	
 

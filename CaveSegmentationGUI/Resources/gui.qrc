@@ -1,5 +1,6 @@
 <RCC>
-  <qresource prefix="icon">
-    <file>Icon/main.ico</file>
-  </qresource>
+    <qresource prefix="/icon">
+        <file>Icon/main.ico</file>
+        <file>cursor.png</file>
+    </qresource>
 </RCC>

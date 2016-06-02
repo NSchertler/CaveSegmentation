@@ -11,7 +11,7 @@
 
 #include <iostream>
 
-GLView::GLView(QWidget* parent) : QOpenGLWidget(parent)
+GLView::GLView(QWidget* parent, float eyeOffset, GLView* masterCam) : QOpenGLWidget(parent), eyeOffset(eyeOffset), zeroParallaxInterpol(0.33f), cursorDepthInterpol(0.4f)
 {
 	fovy = 45;
 	znear = 1;
@@ -19,7 +19,7 @@ GLView::GLView(QWidget* parent) : QOpenGLWidget(parent)
 	focusLength = 5;
 	focus = glm::vec3(0);
 
-	pan = M_PI / 4;
+	pan = 0.3;
 	tilt = 0;
 
 	panningTilting = false;
@@ -31,11 +31,65 @@ GLView::GLView(QWidget* parent) : QOpenGLWidget(parent)
 	fmt.setOptions(QSurfaceFormat::DebugContext);
 	//fmt.setSamples(16);
 	setFormat(fmt);
+
+	isPrimary = masterCam == nullptr;
+	if (masterCam != nullptr)
+	{
+		connect(masterCam, &GLView::camParamsChanged, this, &GLView::setCameraParameters);
+		connect(masterCam, &GLView::zRangeChanged, this, &GLView::setZRange);
+
+		setCameraParameters(masterCam->pan, masterCam->tilt, masterCam->focus, masterCam->focusLength);
+		setZRange(masterCam->znear, masterCam->zfar, masterCam->zeroParallaxInterpol, masterCam->cursorDepthInterpol);
+	}
+
+	virtualAspectMultiplier = 1.0f;
+}
+
+GLView::~GLView()
+{
+}
+
+void GLView::issueRepaint()
+{
+	repaint();
+}
+
+void GLView::setCameraParameters(float pan, float tilt, const glm::vec3& focus, float focusLength)
+{
+	this->pan = pan;
+	this->tilt = tilt;
+	this->focus = focus;
+	this->focusLength = focusLength;
+	recalculateView();
+}
+
+void GLView::setZRange(float znear, float zfar, float zeroParallaxInterpol, float cursorDepthInterpol)
+{
+	this->znear = znear;
+	this->zfar = zfar;
+	this->zeroParallaxInterpol = zeroParallaxInterpol;
+	this->cursorDepthInterpol = cursorDepthInterpol;
+	recalculateProjection();
+}
+
+void GLView::setVirtualAspectMultiplier(float multiplier)
+{
+	virtualAspectMultiplier = multiplier;
+	recalculateProjection();
 }
 
 const glm::mat4 & GLView::GetViewMatrix()
 {
 	return view;
+}
+
+glm::mat4 GLView::GetViewRotationMatrix()
+{
+	glm::mat4 rot = view;
+	rot[3][0] = 0.0f;
+	rot[3][1] = 0.0f;
+	rot[3][2] = 0.0f;
+	return rot;
 }
 
 const glm::mat4 & GLView::GetProjectionMatrix()
@@ -62,14 +116,17 @@ void GLView::initializeGL()
 	recalculateView();
 
 #ifdef _DEBUG
-	bool loggerInitialized = glLogger.initialize();
-	bool hasDebugCapability = context()->hasExtension(QByteArrayLiteral("GL_KHR_debug"));
-
-	if (hasDebugCapability && loggerInitialized)
+	if (isPrimary)
 	{
-		connect(&glLogger, &QOpenGLDebugLogger::messageLogged, this, &GLView::handleLoggedMessage);
-		glLogger.disableMessages(QOpenGLDebugMessage::AnySource, QOpenGLDebugMessage::AnyType, QOpenGLDebugMessage::NotificationSeverity);
-		glLogger.startLogging(QOpenGLDebugLogger::SynchronousLogging);
+		bool loggerInitialized = glLogger.initialize();
+		bool hasDebugCapability = context()->hasExtension(QByteArrayLiteral("GL_KHR_debug"));
+
+		if (hasDebugCapability && loggerInitialized)
+		{
+			connect(&glLogger, &QOpenGLDebugLogger::messageLogged, this, &GLView::handleLoggedMessage);			
+			glLogger.disableMessages(QOpenGLDebugMessage::AnySource, QOpenGLDebugMessage::AnyType, QOpenGLDebugMessage::NotificationSeverity);
+			glLogger.startLogging(QOpenGLDebugLogger::SynchronousLogging);
+		}
 	}
 #endif
 
@@ -80,8 +137,9 @@ void GLView::recalculateView()
 {
 	glm::vec3 dir(cos(tilt) * cos(pan), sin(tilt) * cos(pan), sin(pan));
 	glm::vec3 eye = focus + focusLength * dir;
-	view = glm::lookAtRH(eye, focus, glm::vec3(0, 0, 1));
-	repaint();
+	view = glm::translate(glm::mat4(), glm::vec3(-eyeOffset, 0, 0)) * glm::lookAtRH(eye, focus, glm::vec3(0, 0, 1));
+	emit CameraChanged();
+	emit camParamsChanged(pan, tilt, focus, focusLength);
 }
 
 void GLView::handleLoggedMessage(const QOpenGLDebugMessage & message)
@@ -91,15 +149,35 @@ void GLView::handleLoggedMessage(const QOpenGLDebugMessage & message)
 
 void GLView::wheelEvent(QWheelEvent* e)
 {
-	auto factor = pow(0.999, e->delta());
-	auto oldLength = focusLength;
-	focusLength *= factor;
-	auto diff = focusLength - oldLength;
-	znear += diff;
-	zfar += diff;
-	recalculateView();
-	recalculateProjection();
-	repaint();
+	if (e->modifiers() == Qt::ControlModifier)
+	{
+		zeroParallaxInterpol += 0.0001 * e->delta();
+		if (zeroParallaxInterpol < 0)
+			zeroParallaxInterpol = 0;
+		if (zeroParallaxInterpol > 1)
+			zeroParallaxInterpol = 1;
+	}
+	else if (e->modifiers() == Qt::ShiftModifier)
+	{
+		cursorDepthInterpol += 0.0001 * e->delta();
+		if (cursorDepthInterpol < 0)
+			cursorDepthInterpol = 0;
+		if (cursorDepthInterpol > 1)
+			cursorDepthInterpol = 1;
+	}
+	else
+	{
+		auto factor = pow(0.999, e->delta());
+		auto oldLength = focusLength;
+		focusLength *= factor;
+		auto diff = focusLength - oldLength;
+		znear += diff;
+		zfar += diff;
+		recalculateView();
+		emit CameraChanged();
+	}
+	recalculateProjection();	
+	emit zRangeChanged(znear, zfar, zeroParallaxInterpol, cursorDepthInterpol);
 }
 
 void GLView::mousePressEvent(QMouseEvent* e)
@@ -154,24 +232,48 @@ void GLView::resizeGL(int width, int height)
 	recalculateProjection();
 }
 
+glm::mat4 StereoFrustumScreen(float eyeOffset, float fovy,
+	float aspect,
+	float zZeroParallax,
+	float zNear, float zFar)
+{
+	float top = zNear * tan(fovy / 2);
+	float bottom = -top;
+	float left = bottom * aspect - eyeOffset * zNear /zZeroParallax;
+	float right = top*aspect - eyeOffset * zNear / zZeroParallax;
+	return glm::frustum(left, right, bottom, top, zNear, zFar);
+}
+
 void GLView::recalculateProjection()
 {
-	float n = std::max(0.01f, znear);
-	float f = std::max(znear + 0.01f, zfar);
-	proj = glm::perspectiveFovRH<float>(fovy, width(), height(), n, f);
+	float n = std::max(0.1f, znear);
+	float f = std::max(znear + 0.1f, zfar);
+	//proj = glm::perspectiveFovRH<float>(fovy, width(), height(), n, f);
+	float zeroParallax = (1 - zeroParallaxInterpol) * n + zeroParallaxInterpol * f;
+	float aspect = width() * virtualAspectMultiplier / height();
+	proj = StereoFrustumScreen(eyeOffset, fovy, aspect, zeroParallax, n, f);
+
+	float cursorZ = (1.0f - cursorDepthInterpol) * n + cursorDepthInterpol * focusLength;
+	cursorOffset = eyeOffset * (1.0f - zeroParallax / cursorZ) / (tan(fovy / 2) * zeroParallax * aspect);	
+	cursorDepth = (-cursorZ * proj[2][2] + proj[3][2]) / (-cursorZ * proj[2][3] + proj[3][3]);
+
+	emit CameraChanged();
 }
 
 void GLView::align_to_bounding_box(glm::vec3 min, glm::vec3 max)
 {
+	if (!isPrimary)
+		return;
 	focus = 0.5f * (min + max);
 	fovy = 45;
 	glm::vec3 halfDiff = 0.5f * (max - min);
 	double radius = sqrt(halfDiff.x * halfDiff.x + halfDiff.y * halfDiff.y + halfDiff.z * halfDiff.z);
-	float fov = fovy * std::min(1.0f, (float)width() / height());
+	float fov = fovy * std::min(1.0f, (float)width() * virtualAspectMultiplier / height());
 	float d = radius / sin(fov / 2.0f * 3.1415926f / 180);
 	focusLength = d;
 	znear = d - radius;
 	zfar = d + radius;
 	recalculateProjection();
 	recalculateView();
+	emit zRangeChanged(znear, zfar, zeroParallaxInterpol, cursorDepthInterpol);
 }

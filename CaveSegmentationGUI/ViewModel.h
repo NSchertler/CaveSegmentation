@@ -26,16 +26,21 @@ public:
 	ObservableVariable<double> caveScaleKernelFactor;
 	ObservableVariable<double> caveSizeKernelFactor;
 	ObservableVariable<double> caveSizeDerivativeKernelFactor;
+	ObservableVariable<glm::vec2> cursorPos;
 
+	ObservableVariable<int32_t> hoveredElement;
+	ObservableVariable<int32_t> selectedVertex;
 signals:
 	void selectedPathChanged();
 	void markerChanged();	
 	void lookThroughChanged();	
 	
 private:
-
+	int32_t _hoveredElement;
+	int32_t _selectedVertex;
 	glm::vec3 marker;
 
 	bool lookThrough;
+	glm::vec2 _cursorPos;
 	
 };

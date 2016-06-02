@@ -118,8 +118,6 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 	segmentation.resize(0);
 
 	ctx->MakeOpenGLContextCurrent();
-	meshVAO.create();
-	meshVAO.bind();
 
 	meshVB.create();
 	meshVB.bind();
@@ -128,14 +126,10 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 		positions[i] = glm::vec4(_meshVertices.at(i).x(), _meshVertices.at(i).y(), _meshVertices.at(i).z(), 1);
 
 	meshVB.allocate(&positions[0], sizeof(glm::vec4) * positions.size());
-	meshProgram->enableAttributeArray("in_position");
-	meshProgram->setAttributeBuffer("in_position", GL_FLOAT, 0, 4);
-
+	
 	meshSegColor.create();
 	meshSegColor.bind();
-	meshSegColor.allocate(sizeof(glm::vec4) * positions.size());
-	meshProgram->enableAttributeArray("segColor");
-	meshProgram->setAttributeBuffer("segColor", GL_FLOAT, 0, 4);
+	meshSegColor.allocate(sizeof(glm::vec4) * positions.size());	
 	
 	meshIB.create();
 	meshIB.bind();
@@ -143,7 +137,24 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 	int indexCount = sizeof(IndexedTriangle) * _meshTriIndices.size();
 	meshIB.allocate(indices, indexCount);
 
-	meshVAO.release();	
+	for (auto& c : contextSpecificData)
+	{
+		c.second.provider->MakeOpenGLContextCurrent();
+		c.second.meshVAO.create();
+		c.second.meshVAO.bind();
+
+		meshVB.bind();
+		meshProgram->enableAttributeArray("in_position");
+		meshProgram->setAttributeBuffer("in_position", GL_FLOAT, 0, 4);
+
+		meshSegColor.bind();
+		meshProgram->enableAttributeArray("segColor");
+		meshProgram->setAttributeBuffer("segColor", GL_FLOAT, 0, 4);
+
+		meshIB.bind();
+
+		c.second.meshVAO.release();
+	}
 
 	reset_bounding_box();
 	for (auto& v : _meshVertices)
@@ -154,11 +165,13 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 
 void CaveGLData::drawCave(CameraProvider* cam)
 {
-	if (!meshVAO.isCreated())
+	ContextSpecificData& data = contextSpecificData.at(QOpenGLContext::currentContext());
+
+	if (!data.meshVAO.isCreated())
 		return;
 
-	meshVAO.bind();
-	meshProgram->bind();
+	data.meshVAO.bind();
+	bool result = meshProgram->bind();
 
 	auto MVP = glm::transpose(cam->GetProjectionMatrix() * cam->GetViewMatrix());
 	auto mvp = QMatrix4x4(glm::value_ptr(MVP));	
@@ -173,7 +186,7 @@ void CaveGLData::drawCave(CameraProvider* cam)
 	glDrawElements(GL_TRIANGLES, _meshTriIndices.size() * 3, GL_UNSIGNED_INT, 0);
 
 	meshProgram->release();
-	meshVAO.release();
+	data.meshVAO.release();
 }
 
 void CaveGLData::ResetColorLayer()
@@ -194,18 +207,24 @@ void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 	CaveData::SetSkeleton(skeleton);
 	if (skeleton)
 	{
-		ctx->MakeOpenGLContextCurrent();
-		skeletonVAO.create();
-		skeletonVAO.bind();
+		ctx->MakeOpenGLContextCurrent();		
 
 		skeletonVB.create();
 		skeletonVB.bind();
 		std::vector<glm::vec4> skeletonPositions(skeleton->vertices.size());
 		for (size_t i = 0; i < skeleton->vertices.size(); ++i)
 			skeletonPositions.at(i) = glm::vec4(skeleton->vertices.at(i).position.x(), skeleton->vertices.at(i).position.y(), skeleton->vertices.at(i).position.z(), 1);
-		skeletonVB.allocate(&skeletonPositions[0], sizeof(glm::vec4) * skeletonPositions.size());
-		skeletonProgram->enableAttributeArray("in_position");
-		skeletonProgram->setAttributeBuffer("in_position", GL_FLOAT, 0, 4);
+		skeletonVB.allocate(&skeletonPositions[0], sizeof(glm::vec4) * skeletonPositions.size());		
+
+		//color layer
+		colorLayer.resize(skeleton->vertices.size(), glm::vec4(1, 1, 1, 1));
+		colorLayerVBO.create();
+		colorLayerVBO.bind();
+		colorLayerVBO.allocate(&colorLayer[0], sizeof(glm::vec4) * colorLayer.size());		
+
+		skeletonSegColor.create();
+		skeletonSegColor.bind();
+		skeletonSegColor.allocate(sizeof(glm::vec4) * colorLayer.size());		
 
 		skeletonIB.create();
 		skeletonIB.bind();
@@ -213,31 +232,32 @@ void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 		int indexCount = sizeof(std::pair<int, int>) * skeleton->edges.size();
 		skeletonIB.allocate(indices, indexCount);
 
-		//color layer
-		colorLayer.resize(skeleton->vertices.size(), glm::vec4(1, 1, 1, 1));
-		colorLayerVBO.create();
-		colorLayerVBO.bind();
-		colorLayerVBO.allocate(&colorLayer[0], sizeof(glm::vec4) * colorLayer.size());
-		skeletonPointProgram->enableAttributeArray("colorLayer");
-		skeletonPointProgram->setAttributeBuffer("colorLayer", GL_FLOAT, 0, 4);
+		for (auto& c : contextSpecificData)
+		{
+			c.second.provider->MakeOpenGLContextCurrent();
+			c.second.skeletonVAO.create();
+			c.second.skeletonVAO.bind();
 
-		skeletonSegColor.create();
-		skeletonSegColor.bind();
-		skeletonSegColor.allocate(sizeof(glm::vec4) * colorLayer.size());
-		skeletonPointProgram->enableAttributeArray("segColor");
-		skeletonPointProgram->setAttributeBuffer("segColor", GL_FLOAT, 0, 4);
+			skeletonVB.bind();
+			skeletonProgram->enableAttributeArray("in_position");
+			skeletonProgram->setAttributeBuffer("in_position", GL_FLOAT, 0, 4);
 
-		skeletonVAO.release();
+			colorLayerVBO.bind();
+			skeletonPointProgram->enableAttributeArray("colorLayer");
+			skeletonPointProgram->setAttributeBuffer("colorLayer", GL_FLOAT, 0, 4);
+
+			skeletonSegColor.bind();
+			skeletonPointProgram->enableAttributeArray("segColor");
+			skeletonPointProgram->setAttributeBuffer("segColor", GL_FLOAT, 0, 4);
+
+			skeletonIB.bind();
+
+			c.second.skeletonVAO.release();
+		}
 
 		if (correspondenceProgram != nullptr)
 		{
-			//Create correspondences
-			correspondenceVAO.create();
-			correspondenceVAO.bind();
-
-			meshVB.bind();
-			correspondenceProgram->enableAttributeArray("in_position");
-			skeletonProgram->setAttributeBuffer("in_position", GL_FLOAT, 0, 4);
+			//Create correspondences											
 
 			uint32_t* correspondingSkeletonVertices = new uint32_t[_meshVertices.size()];
 			for (int v = 0; v < skeleton->vertices.size(); ++v)
@@ -245,20 +265,37 @@ void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 					correspondingSkeletonVertices[corr] = v;
 			correspondenceVB.create();
 			correspondenceVB.bind();
-			correspondenceVB.allocate(correspondingSkeletonVertices, _meshVertices.size() * sizeof(uint32_t));
-			correspondenceProgram->enableAttributeArray("in_correspondence");
-			glVertexAttribIPointer(correspondenceProgram->attributeLocation("in_correspondence"), 1, GL_UNSIGNED_INT, 0, 0);
+			correspondenceVB.allocate(correspondingSkeletonVertices, _meshVertices.size() * sizeof(uint32_t));			
 
 			delete[] correspondingSkeletonVertices;
 
-			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, skeletonVB.bufferId());
+			for (auto& c : contextSpecificData)
+			{
+				c.second.provider->MakeOpenGLContextCurrent();
+				c.second.correspondenceVAO.create();
+				c.second.correspondenceVAO.bind();
 
-			correspondenceVAO.release();
+				meshVB.bind();
+				correspondenceProgram->enableAttributeArray("in_position");
+				skeletonProgram->setAttributeBuffer("in_position", GL_FLOAT, 0, 4);
+
+				correspondenceVB.bind();
+				correspondenceProgram->enableAttributeArray("in_correspondence");
+				glVertexAttribIPointer(correspondenceProgram->attributeLocation("in_correspondence"), 1, GL_UNSIGNED_INT, 0, 0);
+
+				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, skeletonVB.bufferId());
+
+				c.second.correspondenceVAO.release();
+			}			
 		}
 	}
 	else
 	{
-		skeletonVAO.destroy();
+		for (auto& c : contextSpecificData)
+		{
+			c.second.provider->MakeOpenGLContextCurrent();
+			c.second.skeletonVAO.destroy();
+		}
 	}
 
 	emit skeletonChanged();
@@ -272,10 +309,12 @@ void CaveGLData::SmoothAndDeriveDistances()
 
 void CaveGLData::drawSkeleton(CameraProvider* cam)
 {
-	if (!skeletonVAO.isCreated())
+	ContextSpecificData& data = contextSpecificData.at(QOpenGLContext::currentContext());
+
+	if (!data.skeletonVAO.isCreated())
 		return;
 
-	skeletonVAO.bind();
+	data.skeletonVAO.bind();
 	skeletonProgram->bind();
 	
 	auto MVP = glm::transpose(cam->GetProjectionMatrix() * cam->GetViewMatrix());
@@ -284,15 +323,17 @@ void CaveGLData::drawSkeleton(CameraProvider* cam)
 	glDrawElements(GL_LINES, skeleton->edges.size() * 2, GL_UNSIGNED_INT, 0);
 
 	skeletonProgram->release();
-	skeletonVAO.release();
+	data.skeletonVAO.release();
 }
 
 void CaveGLData::drawSkeletonPoints(CameraProvider* cam)
 {
-	if (!skeletonVAO.isCreated())
+	ContextSpecificData& data = contextSpecificData.at(QOpenGLContext::currentContext());
+
+	if (!data.skeletonVAO.isCreated())
 		return;
 
-	skeletonVAO.bind();
+	data.skeletonVAO.bind();
 
 	auto MVP = glm::transpose(cam->GetProjectionMatrix() * cam->GetViewMatrix());
 	auto m = QMatrix4x4(glm::value_ptr(MVP));
@@ -308,15 +349,17 @@ void CaveGLData::drawSkeletonPoints(CameraProvider* cam)
 	glDrawArrays(GL_POINTS, 0, skeleton->vertices.size());
 
 	skeletonPointProgram->release();
-	skeletonVAO.release();
+	data.skeletonVAO.release();
 }
 
 void CaveGLData::drawSelectedSkeletonVertex(CameraProvider* cam, int selected)
 {
-	if (!skeletonVAO.isCreated())
+	ContextSpecificData& data = contextSpecificData.at(QOpenGLContext::currentContext());
+
+	if (!data.skeletonVAO.isCreated())
 		return;
 
-	skeletonVAO.bind();
+	data.skeletonVAO.bind();
 	
 	auto MVP = glm::transpose(cam->GetProjectionMatrix() * cam->GetViewMatrix());
 	auto m = QMatrix4x4(glm::value_ptr(MVP));
@@ -331,15 +374,17 @@ void CaveGLData::drawSelectedSkeletonVertex(CameraProvider* cam, int selected)
 	glDrawArrays(GL_POINTS, selected, 1);
 
 	skeletonPointSelectionProgram->release();
-	skeletonVAO.release();
+	data.skeletonVAO.release();
 }
 
 void CaveGLData::drawCorrespondence(CameraProvider* cam, int specificSkeletonVertex)
 {
-	if (!correspondenceVAO.isCreated() || correspondenceProgram == nullptr)
+	ContextSpecificData& data = contextSpecificData.at(QOpenGLContext::currentContext());
+
+	if (!data.correspondenceVAO.isCreated() || correspondenceProgram == nullptr)
 		return;
 
-	correspondenceVAO.bind();
+	data.correspondenceVAO.bind();
 	correspondenceProgram->bind();
 
 	auto MVP = glm::transpose(cam->GetProjectionMatrix() * cam->GetViewMatrix());
@@ -350,17 +395,21 @@ void CaveGLData::drawCorrespondence(CameraProvider* cam, int specificSkeletonVer
 	glDrawArrays(GL_POINTS, 0, _meshVertices.size());
 
 	correspondenceProgram->release();
-	correspondenceVAO.release();
+	data.correspondenceVAO.release();
 }
 
-void CaveGLData::initGL(OpenGLContextProvider* ctx)
+void CaveGLData::initGL(OpenGLContextProvider* ctx, bool primary)
 {	
-	this->ctx = ctx;
-
-	initializeOpenGLFunctions();
+	if (primary)
+	{
+		this->ctx = ctx;
+		initializeOpenGLFunctions();
+	}
 
 	if (meshProgram == nullptr)
 		init_shaders();
+
+	contextSpecificData[QOpenGLContext::currentContext()].provider = ctx;
 }
 
 void CaveGLData::init_shaders()
