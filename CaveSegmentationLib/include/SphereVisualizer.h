@@ -12,7 +12,7 @@ class SphereVisualizer
 	const int imWidth = 1280;
 	const int imHeight = imWidth / 2;
 
-	std::wstring outputDirectoryW;
+	const std::wstring& outputDirectoryW;
 public:
 	static const Gdiplus::Color SAMPLE_COLOR;
 	static const Gdiplus::Color VORONOI_COLOR;
@@ -21,23 +21,34 @@ public:
 	static const Gdiplus::Color SEPARATING_CIRCLE_COLOR;
 	static const Gdiplus::Color SEPARATING_LINE_COLOR;
 
-	SphereVisualizer();
+	SphereVisualizer(const std::wstring& outputDirectory);
 	SphereVisualizer(const SphereVisualizer&);
 	~SphereVisualizer();
 
-	void SetOutputDirectory(const std::wstring&);
+	void FillRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color& color);
+	void FillCircle(double theta, double phi, int radiusPixels, const Gdiplus::Color& color);
 
-	void FillRect(int x, int y, int w, int h, const Gdiplus::Color& color);
-	void FillCircle(int x, int y, int radius, const Gdiplus::Color& color);
-
-	void DrawRect(int x, int y, int w, int h, const Gdiplus::Color& color);
+	void DrawRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color& color);
 	void DrawGradientField(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<Vector>>& gradient);
 
 	void Save(const std::wstring& filename);
 
 private:
-#ifdef DRAW_DEBUG_IMAGES
 	Gdiplus::Bitmap* bitmap;
 	Gdiplus::Graphics* graphics;
-#endif
+};
+
+class VoidSphereVisualizer
+{
+public:
+	VoidSphereVisualizer(const std::wstring& outputDirectory);
+	VoidSphereVisualizer(const VoidSphereVisualizer&);
+
+	void FillRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color& color);
+	void FillCircle(double theta, double phi, int radiusPixels, const Gdiplus::Color& color);
+
+	void DrawRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color& color);
+	void DrawGradientField(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<Vector>>& gradient);
+
+	void Save(const std::wstring& filename);
 };

@@ -57,7 +57,7 @@ int main()
 
 	CaveData data;
 	data.LoadMesh(offFile);	
-	data.sphereVisualizer.SetOutputDirectory(outputDirectoryW);
+	data.SetOutputDirectory(outputDirectoryW);
 
 	StartImageProc();	
 

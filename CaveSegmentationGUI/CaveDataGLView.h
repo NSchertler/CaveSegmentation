@@ -37,7 +37,6 @@ private:
 	static std::unique_ptr<QOpenGLShaderProgram> markerProgram;
 	static std::unique_ptr<QOpenGLShaderProgram> cursorProgram;
 
-	QOpenGLVertexArrayObject clearVAO;
 	GLuint pickingTexture;
 	GLint fbo;
 

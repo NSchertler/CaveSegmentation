@@ -30,6 +30,12 @@ public:
 
 	ObservableVariable<int32_t> hoveredElement;
 	ObservableVariable<int32_t> selectedVertex;
+
+	ObservableVariable<float> edgeCollapseThreshold;
+	ObservableVariable<float> skeletonSmooth;
+	ObservableVariable<float> skeletonVelocity;
+	ObservableVariable<float> skeletonMedial;
+
 signals:
 	void selectedPathChanged();
 	void markerChanged();	
@@ -39,6 +45,8 @@ private:
 	int32_t _hoveredElement;
 	int32_t _selectedVertex;
 	glm::vec3 marker;
+
+	float _edgeCollapseThreshold, _skeletonSmooth, _skeletonVelocity, _skeletonMedial;
 
 	bool lookThrough;
 	glm::vec2 _cursorPos;

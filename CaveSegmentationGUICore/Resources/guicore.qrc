@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/glsl">
+        <file>sky.frag</file>
+        <file>sky.vert</file>
+    </qresource>
+</RCC>

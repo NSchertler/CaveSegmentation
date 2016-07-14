@@ -3,6 +3,7 @@ DebugNSight
 Release
 bin
 obj
+packages
 *.opensdf
 *.sdf
 *.suo

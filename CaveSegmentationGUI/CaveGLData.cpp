@@ -1,8 +1,9 @@
 ﻿#include "stdafx.h"
 
 #include "CaveGLData.hpp"
-#include "GLUtils.h"
+#include <GLUtils.h>
 #include <qmessagebox.h>
+#include <QDir>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <set>
@@ -114,6 +115,12 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 {
 	CaveData::LoadMesh(offFile);
 
+	QDir outDir(QString::fromStdString(offFile));
+	outDir.cdUp();
+	outDir.mkdir("output");
+	outDir.cd("output");
+	SetOutputDirectory(outDir.path().toStdWString());
+
 	SetSkeleton(nullptr);
 	segmentation.resize(0);
 
@@ -204,7 +211,7 @@ void CaveGLData::UpdateColorLayer()
 
 void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 {
-	CaveData::SetSkeleton(skeleton);
+	CaveData::SetSkeleton(skeleton);	
 	if (skeleton)
 	{
 		ctx->MakeOpenGLContextCurrent();		
@@ -299,12 +306,16 @@ void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 	}
 
 	emit skeletonChanged();
+	emit distancesChanged();
 }
 
 void CaveGLData::SmoothAndDeriveDistances()
 {	
-	CaveData::SmoothAndDeriveDistances();
-	emit distancesChanged();
+	if (caveSizeUnsmoothed.size() > 0 && caveSizeUnsmoothed.at(0) > 0)
+	{
+		CaveData::SmoothAndDeriveDistances();
+		emit distancesChanged();
+	}
 }
 
 void CaveGLData::drawSkeleton(CameraProvider* cam)
@@ -414,11 +425,11 @@ void CaveGLData::initGL(OpenGLContextProvider* ctx, bool primary)
 
 void CaveGLData::init_shaders()
 {
-	meshProgram = MakeProgram("cave.vert", "cave.frag", "cave.geom");
-	skeletonProgram = MakeProgram("skeleton.vert", "skeleton.frag");
-	skeletonPointProgram = MakeProgram("skeletonPoint.vert", "skeletonPoint.frag");
-	skeletonPointSelectionProgram = MakeProgram("skeletonPoint.vert", "skeletonPointSelection.frag");
-	correspondenceProgram = MakeProgram("correspondence.vert", "correspondence.frag", "correspondence.geom");
+	meshProgram = MakeProgram("glsl/cave.vert", "glsl/cave.frag", "glsl/cave.geom");
+	skeletonProgram = MakeProgram("glsl/skeleton.vert", "glsl/skeleton.frag");
+	skeletonPointProgram = MakeProgram("glsl/skeletonPoint.vert", "glsl/skeletonPoint.frag");
+	skeletonPointSelectionProgram = MakeProgram("glsl/skeletonPoint.vert", "glsl/skeletonPointSelection.frag");
+	correspondenceProgram = MakeProgram("glsl/correspondence.vert", "glsl/correspondence.frag", "glsl/correspondence.geom");
 }
 
 void CaveGLData::FindPath(int startVertex, int targetVertex, std::deque<int>& resultPath)

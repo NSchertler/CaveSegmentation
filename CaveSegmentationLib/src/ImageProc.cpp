@@ -1,9 +1,7 @@
 #include "ImageProc.h"
 
-#ifdef DRAW_DEBUG_IMAGES
 CLSID pngEncoder;
 ULONG_PTR gdiplusToken;
-#endif
 
 int GetEncoderClsid(const WCHAR * format, CLSID * pClsid)
 {
@@ -36,26 +34,26 @@ int GetEncoderClsid(const WCHAR * format, CLSID * pClsid)
 	return -1;  // Failure
 }
 
+bool started = false;
 void StartImageProc()
 {
-#ifdef DRAW_DEBUG_IMAGES
+	if (started)
+		return;
+
 	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
 	Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
 
 	GetEncoderClsid(L"image/png", &pngEncoder);
-#endif	
+
+	started = true;
 }
 
 void StopImageProc()
 {
-#ifdef DRAW_DEBUG_IMAGES
 	Gdiplus::GdiplusShutdown(gdiplusToken);
-#endif
 }
 
 void SavePNG(Gdiplus::Image * image, const wchar_t * filename)
 {
-#ifdef DRAW_DEBUG_IMAGES
 	image->Save(filename, &pngEncoder);
-#endif
 }

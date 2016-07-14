@@ -80,9 +80,6 @@
     <ClCompile Include="src\RegularUniformSphereSampling.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\SizeCalculation.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="src\SphereVisualizer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>

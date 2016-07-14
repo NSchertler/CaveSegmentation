@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="img">
+    <file>iconChamber.png</file>
+    <file>iconPassage.png</file>
+  </qresource>
+</RCC>

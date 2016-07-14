@@ -17,6 +17,7 @@ struct AppOptions
 	float aspectMultiplier;
 	int screenNumber;
 	QString dataDir;
+	QString initialDirectory;
 };
 
 class CaveSegmentationGUI : public QMainWindow
@@ -26,11 +27,24 @@ class CaveSegmentationGUI : public QMainWindow
 public:
 	CaveSegmentationGUI(const AppOptions& o, QWidget *parent = 0);		
 	~CaveSegmentationGUI();
-	
+
 private slots:
-	void loadOff(bool);	
+	void meshChanged();
+
+	void skeletonChanged();
+
+	void distancesChanged();
+
+	void loadOff(bool);
 	void loadSkeleton(bool);
+	void calculateSkeleton(bool);
+	void skeletonComputationFinished();
+	void abortSkeleton(bool);
+	void saveSkeleton(bool);
 	void loadDistances(bool);
+	void calculateDistances(bool);
+	void calculateSpecificVertexDistances(bool);
+	void saveDistances(bool);
 	void runSegmentation(bool);
 	void loadSegmentation(bool);
 
@@ -65,6 +79,12 @@ private:
 	QDir dataDirectory;
 
 	AppOptions options;
+
+	std::string modelFilename;
+
+	AbortHandle skeletonAbort;
+	QFutureWatcher<CurveSkeleton*> skeletonWatcher;
+	QFuture<CurveSkeleton*> skeletonComputation;
 };
 
 class Secondary : public QMainWindow

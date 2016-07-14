@@ -16,6 +16,10 @@ struct PositionGradient
 {
 	Vector position;
 	Vector gradient;
+
+	PositionGradient(){}
+	PositionGradient(const Vector& position) : position(position) {}
+	PositionGradient(const Vector& position, const Vector& gradient) : position(position), gradient(gradient) {}
 };
 
 template<bool CIRCULAR, typename T>
@@ -57,12 +61,8 @@ void FindLinkedListNeighbors(std::list<T>& list,
 	}
 }
 
-template<bool CIRCULAR>
-void LineFlow(std::list<PositionGradient>& linePoints, const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& potential, const std::vector<std::vector<Vector>>& potentialGradient, double direction, double& optimalAveragePotential, double& optimalLineLength, SphereVisualizer& visualizer
-#if defined(DRAW_DEBUG_IMAGES) || defined(WRITE_SPHERE_STATS)
-	, const std::wstring& baseFilename
-#endif
-	)
+template<bool CIRCULAR, typename TSphereVisualizer>
+void LineFlow(std::list<PositionGradient>& linePoints, const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& potential, const std::vector<std::vector<Vector>>& potentialGradient, double direction, double& optimalAveragePotential, double& optimalLineLength, TSphereVisualizer& visualizer, const std::wstring& baseFilename)
 {
 	int stopAfterIterations = 20;
 	optimalAveragePotential = std::numeric_limits<double>::infinity() * (- direction);
@@ -158,7 +158,7 @@ void LineFlow(std::list<PositionGradient>& linePoints, const RegularUniformSpher
 				{
 					Vector meanPosition = it->position + next->position;
 					meanPosition = meanPosition / sqrt(meanPosition.squared_length());
-					linePoints.insert(next, { meanPosition });
+					linePoints.insert(next, PositionGradient(meanPosition));
 				}
 
 				if (prev != it) //if this is not the first or last element
@@ -207,23 +207,18 @@ void LineFlow(std::list<PositionGradient>& linePoints, const RegularUniformSpher
 		lineTracingStats << iteration << ";" << averagePotential << ";" << maxGradientSquareMagnitude << std::endl;
 #endif
 
-#ifdef DRAW_DEBUG_IMAGES
 		//draw separate image
-		SphereVisualizer stateVis(visualizer);				
+		TSphereVisualizer stateVis(visualizer);				
 		for (auto& p : linePoints)
 		{
 			double phi, theta;
 			sphereSampling.ParametersFromPoint(p.position, phi, theta);
 
-			phi *= imHeight / M_PI;
-			theta *= imWidth / (2 * M_PI);
-
-			stateVis.FillCircle((int)theta, (int)phi, 3, SphereVisualizer::FLOW_OUTLINE_COLOR);
-			stateVis.FillCircle((int)theta, (int)phi, 2, SphereVisualizer::FLOW_COLOR);
+			stateVis.FillCircle(theta, phi, 3, SphereVisualizer::FLOW_OUTLINE_COLOR);
+			stateVis.FillCircle(theta, phi, 2, SphereVisualizer::FLOW_COLOR);
 		}
 		std::wstring filename = baseFilename + L"_" + std::to_wstring(iteration) + L".png";
 		stateVis.Save(filename);
-#endif
 	}
 
 #ifdef WRITE_SPHERE_STATS

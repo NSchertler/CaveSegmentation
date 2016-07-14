@@ -28,14 +28,14 @@ class CurvatureBasedQPBO
 public:
 	static void FindChambers(const CaveData& data, std::vector<int>& segmentation)
 	{
-		std::cout << "Calculating distances from ends" << std::endl;
+		/*std::cout << "Calculating distances from ends" << std::endl;
 
 		std::vector<double> distancesFromEnd(data.skeleton->vertices.size(), std::numeric_limits<double>::infinity());
 		for (int v = 0; v < data.skeleton->vertices.size(); ++v)
 			if (data.adjacency.at(v).size() == 1)
 			{
 				propagateDistance(data, v, 0, distancesFromEnd);
-			}			
+			}			*/
 
 		std::cout << "Building graphical model..." << std::endl;
 
@@ -64,8 +64,8 @@ public:
 			double directionProbability = ::directionProbability(derivative);
 
 			//only allow entrances that have a minimum distance to the cave end
-			if (distancesFromEnd.at(edge.first) < ENTRANCE_MIN_DISTANCE_TO_END && distancesFromEnd.at(edge.second) < ENTRANCE_MIN_DISTANCE_TO_END)
-				entranceProbability = 0;
+			/*if (distancesFromEnd.at(edge.first) < ENTRANCE_MIN_DISTANCE_TO_END && distancesFromEnd.at(edge.second) < ENTRANCE_MIN_DISTANCE_TO_END)
+				entranceProbability = 0;*/
 
 			auto pairwiseFunction = opengm::ExplicitFunction<double>(functionShapePairwise, functionShapePairwise + 2);			
 			pairwiseFunction(0, 0) = -log(1 - entranceProbability);

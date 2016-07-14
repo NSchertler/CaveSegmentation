@@ -66,6 +66,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT);$(OPENGM_ROOT)/include;$(MCFSKELETON_ROOT)/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,7 +103,6 @@
     <ClCompile Include="src\ImageProc.cpp" />
     <ClCompile Include="src\MeshProc.cpp" />
     <ClCompile Include="src\RegularUniformSphereSampling.cpp" />
-    <ClCompile Include="src\SizeCalculation.cpp" />
     <ClCompile Include="src\SphereVisualizer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

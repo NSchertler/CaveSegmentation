@@ -51,9 +51,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
-       <width>450</width>
-       <height>642</height>
+       <y>-77</y>
+       <width>433</width>
+       <height>882</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="rootLayout">
@@ -93,6 +93,134 @@
            </property>
           </widget>
          </item>
+         <item>
+          <layout class="QFormLayout" name="layoutSkeletonParameters">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="toolTip">
+              <string>% of bounding box diagonal</string>
+             </property>
+             <property name="text">
+              <string>Edge Collapse Threshold</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>w_smooth</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>w_velocity</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>w_medial</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QHBoxLayout" name="layoutEdgeCollapseThreshold">
+             <item>
+              <widget class="QSlider" name="sldEdgeCollapseThreshold">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lblEdgeCollapseThreshold">
+               <property name="text">
+                <string>##</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="1">
+            <layout class="QHBoxLayout" name="layoutSkeletonSmooth">
+             <item>
+              <widget class="QSlider" name="sldSkeletonSmooth">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lblSkeletonSmooth">
+               <property name="text">
+                <string>##</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="1">
+            <layout class="QHBoxLayout" name="layoutSkeletonVelocity">
+             <item>
+              <widget class="QSlider" name="sldSkeletonVelocity">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lblSkeletonVelocity">
+               <property name="text">
+                <string>##</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="1">
+            <layout class="QHBoxLayout" name="layoutSkeletonMedial">
+             <item>
+              <widget class="QSlider" name="sldSkeletonMedial">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lblSkeletonMedial">
+               <property name="text">
+                <string>##</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="4" column="1">
+            <widget class="QPushButton" name="btnCalculateSkeleton">
+             <property name="text">
+              <string>Calculate Skeleton</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QPushButton" name="btnAbortSkeleton">
+             <property name="text">
+              <string>Abort</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QPushButton" name="btnSaveSkeleton">
+             <property name="text">
+              <string>Save Skeleton</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </widget>
       </item>
@@ -106,6 +234,27 @@
           <widget class="QPushButton" name="btnLoadDistances">
            <property name="text">
             <string>Load Distances</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCalculateDistances">
+           <property name="text">
+            <string>Calculate Distances</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCalculateSpecificVertexDistance">
+           <property name="text">
+            <string>Calculate Distances for Selected Vertex</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnSaveDistances">
+           <property name="text">
+            <string>Save Distances</string>
            </property>
           </widget>
          </item>

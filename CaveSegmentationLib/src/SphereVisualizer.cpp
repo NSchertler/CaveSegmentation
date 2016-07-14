@@ -11,66 +11,68 @@ const Gdiplus::Color SphereVisualizer::FLOW_OUTLINE_COLOR = Gdiplus::Color(200, 
 const Gdiplus::Color SphereVisualizer::SEPARATING_CIRCLE_COLOR = Gdiplus::Color(127, 0, 0);
 const Gdiplus::Color SphereVisualizer::SEPARATING_LINE_COLOR = Gdiplus::Color(255, 0, 0);
 
-SphereVisualizer::SphereVisualizer()
+SphereVisualizer::SphereVisualizer(const std::wstring& outputDirectory)
+	: outputDirectoryW(outputDirectory)
 {
-#ifdef DRAW_DEBUG_IMAGES
+	StartImageProc();
+
 	bitmap = new Bitmap(imWidth, imHeight, PixelFormat24bppRGB);
 	graphics = new Graphics(bitmap);
 	graphics->Clear(Gdiplus::Color(0, 0, 0, 0));
-#endif
 }
 
 SphereVisualizer::SphereVisualizer(const SphereVisualizer& clone)
+	: outputDirectoryW(clone.outputDirectoryW)
 {
-#ifdef DRAW_DEBUG_IMAGES
 	bitmap = new Bitmap(imWidth, imHeight, PixelFormat24bppRGB);
 	graphics = new Graphics(bitmap);
-	graphics->DrawImage(clone.bitmap, 0, 0, imWidth, imHeight);
-	outputDirectoryW = clone.outputDirectory;
-#endif
+	graphics->DrawImage(clone.bitmap, 0, 0, imWidth, imHeight);	
 }
 
 SphereVisualizer::~SphereVisualizer()
 {
-#ifdef DRAW_DEBUG_IMAGES
 	delete graphics;
 	delete bitmap;
-#endif
 }
 
-void SphereVisualizer::SetOutputDirectory(const std::wstring & p)
+void SphereVisualizer::FillRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color& color)
 {
-	outputDirectoryW = p + L"/";
-}
-
-void SphereVisualizer::FillRect(int x, int y, int w, int h, const Gdiplus::Color& color)
-{
-#ifdef DRAW_DEBUG_IMAGES
 	SolidBrush brush(color);
+
+	int x = (int)(theta * imWidth / (2 * M_PI));
+	int w = (int)ceil((theta + sizeTheta) * imWidth / (2 * M_PI) - x);
+	int y = (int)(phi * imHeight / M_PI);
+	int h = (int)ceil((phi + sizePhi) * imHeight / M_PI - y);
+
 	graphics->FillRectangle(&brush, x, y, w, h);
-#endif
+
+	if (x < 0)
+		FillRect(theta + 2 * M_PI, phi, sizeTheta, sizePhi, color);
 }
 
-void SphereVisualizer::FillCircle(int x, int y, int radius, const Gdiplus::Color & color)
+void SphereVisualizer::FillCircle(double theta, double phi, int radiusPixels, const Gdiplus::Color & color)
 {
-#ifdef DRAW_DEBUG_IMAGES
 	SolidBrush brush(color);
-	graphics->FillEllipse(&brush, (int)(x - radius), (int)(y - radius), 2 * radius, 2 * radius);
-#endif
+	int x = (int)(theta * imWidth / (2 * M_PI)) - radiusPixels;
+	int y = (int)(phi * imHeight / M_PI) - radiusPixels;
+	graphics->FillEllipse(&brush, x, y, 2 * radiusPixels, 2 * radiusPixels);
 }
 
-void SphereVisualizer::DrawRect(int x, int y, int w, int h, const Gdiplus::Color & color)
+void SphereVisualizer::DrawRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color & color)
 {
-#ifdef DRAW_DEBUG_IMAGES
 	SolidBrush brush(color);
 	Pen pen(&brush);
+
+	int x = (int)(theta * imWidth / (2 * M_PI));
+	int w = (int)(sizeTheta * imWidth / (2 * M_PI));
+	int y = (int)(phi * imHeight / M_PI);
+	int h = (int)(sizePhi * imHeight / M_PI);
+
 	graphics->DrawRectangle(&pen, x, y, w, h);
-#endif
 }
 
 void SphereVisualizer::DrawGradientField(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<Vector>>& gradientField)
 {
-#ifdef DRAW_DEBUG_IMAGES
 	for (auto it = sphereSampling.begin(); it != sphereSampling.end(); ++it)
 	{
 		double theta, phi, wTheta, wPhi;
@@ -135,12 +137,38 @@ void SphereVisualizer::DrawGradientField(const RegularUniformSphereSampling& sph
 
 		graphics->DrawLine(pen, (int)(theta + wTheta / 2), (int)(phi + wPhi / 2), (int)(theta + wTheta / 2 + gradientTheta), (int)(phi + wPhi / 2 + gradientPhi));
 	}
-#endif
 }
 
 void SphereVisualizer::Save(const std::wstring& filename)
 {
-#ifdef DRAW_DEBUG_IMAGES
-	SavePNG(bitmap, outputDirectoryW + filename.c_str());
-#endif
+	auto path = outputDirectoryW + L'/' + filename;
+	SavePNG(bitmap, path.c_str());
+}
+
+VoidSphereVisualizer::VoidSphereVisualizer(const std::wstring & outputDirectory)
+{
+}
+
+VoidSphereVisualizer::VoidSphereVisualizer(const VoidSphereVisualizer &)
+{
+}
+
+void VoidSphereVisualizer::FillRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color & color)
+{
+}
+
+void VoidSphereVisualizer::FillCircle(double theta, double phi, int radiusPixels, const Gdiplus::Color & color)
+{
+}
+
+void VoidSphereVisualizer::DrawRect(double theta, double phi, double sizeTheta, double sizePhi, const Gdiplus::Color & color)
+{
+}
+
+void VoidSphereVisualizer::DrawGradientField(const RegularUniformSphereSampling & sphereSampling, const std::vector<std::vector<Vector>>& gradient)
+{
+}
+
+void VoidSphereVisualizer::Save(const std::wstring & filename)
+{
 }

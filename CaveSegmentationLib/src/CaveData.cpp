@@ -59,7 +59,8 @@ void CalculateGradient(const RegularUniformSphereSampling& sphereSampling, const
 	}
 }
 
-void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& sphereDistances, double extremumSearchRadius, std::vector<PositionValue>& maxima, std::vector<PositionValue>& minima, SphereVisualizer& visualizer)
+template <typename TSphereVisualizer>
+void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& sphereDistances, double extremumSearchRadius, std::vector<PositionValue>& maxima, std::vector<PositionValue>& minima, TSphereVisualizer& visualizer)
 {
 	for (auto it = sphereSampling.begin(); it != sphereSampling.end(); ++it)
 	{
@@ -85,7 +86,6 @@ void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, 
 			minima.push_back({ *it, dist });
 
 
-#ifdef DRAW_DEBUG_IMAGES
 		double x, y, w, h;
 		BYTE c = (BYTE)(std::min(255.0, dist * 255 / 20));
 		BYTE r = c, g = c, b = c;
@@ -100,26 +100,18 @@ void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, 
 			g >>= 1;
 		}
 		it.GetParameterSpaceRect(x, y, w, h);
-		x *= imWidth / (2 * M_PI);
-		w *= imWidth / (2 * M_PI);
-		y *= imHeight / M_PI;
-		h *= imHeight / M_PI;
 
 		double myX = x + w / 2;
 		double myY = y + h / 2;
 
-		visualizer.FillRect((int)x, (int)y, (int)ceil(x + w - (int)x), (int)ceil(y + h - (int)y), Gdiplus::Color(r, g, b));
-		if (x < 0)
-			visualizer.FillRect((int)(x + imWidth), (int)y, (int)ceil(w), (int)ceil(h), Gdiplus::Color(r, g, b));
-		//visualizer.FillCircle((int)myX, (int)myY, 2, SphereVisualizer::SAMPLE_COLOR);		
-#endif 			
+		visualizer.FillRect(x, y, w, h, Gdiplus::Color(r, g, b));		
+		//visualizer.FillCircle(myX, myY, 2, SphereVisualizer::SAMPLE_COLOR);					
 	}
 }
 
 CaveData::CaveData()
 	: skeleton(nullptr),
 	  sphereSampling(SPHERE_SAMPLING_RESOLUTION),
-	  caveSizeCalculator(std::unique_ptr<CaveSizeCalculator>(new CaveSizeCalculatorLineFlow())),
 	  CAVE_SCALE_KERNEL_FACTOR(10.0), CAVE_SIZE_KERNEL_FACTOR(0.2), CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR(0.2)
 {
 }
@@ -146,145 +138,195 @@ void CaveData::SetSkeleton(CurveSkeleton * skeleton)
 		ResizeSkeletonAttributes(0, 0);
 }
 
-void CaveData::CalculateDistances()
+template <typename TSphereVisualizer>
+bool CaveData::CalculateDistancesSingleVertex(int iVert)
 {
 	std::vector<std::vector<double>> sphereDistances;
 	std::vector<std::vector<Vector>> distanceGradient;
 	sphereSampling.PrepareDataContainer(sphereDistances);
 	sphereSampling.PrepareDataContainer(distanceGradient);
 
-	std::cout << "Calculating distances..." << std::endl;
+	caveSizeCalculatorCustomData.resize(1);
 
-	int iVert = -1;
-	for (auto& vert : skeleton->vertices)
+	return CalculateDistancesSingleVertex<TSphereVisualizer>(iVert, sphereDistances, distanceGradient);
+}
+
+template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert);
+template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert);
+
+template <typename TSphereVisualizer>
+bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
+{
+	auto& vert = skeleton->vertices.at(iVert);
+
+#ifdef WRITE_SPHERE_VIS
+	auto sphereVisFilename = outputDirectory + "/sphereVis" + std::to_string(iVert) + ".obj";
+	std::ofstream sphereVis(sphereVisFilename.c_str());
+#endif
+
+	int n = 0;
+	double meanSphereDistance = 0.0;
+	double maxSphereDistance = 0.0;
+	double minSphereDistance = std::numeric_limits<double>::infinity();
+	double M2 = 0.0;
+
+	const double MAXIMUM_SEARCH_RADIUS = 0.5;
+
+	//Record distances
+	for (auto it = sphereSampling.begin(); it != sphereSampling.end(); ++it)
 	{
-		++iVert;
-		//if (iVert != 69) continue;
-		std::cout << "\rProcessing skeleton vertex " << iVert;
-
-#ifdef WRITE_SPHERE_VIS
-		auto sphereVisFilename = outputDirectory + "/sphereVis" + std::to_string(iVert) + ".obj";
-		std::ofstream sphereVis(sphereVisFilename.c_str());
-#endif
-
-		int n = 0;
-		double meanSphereDistance = 0.0;
-		double maxSphereDistance = 0.0;
-		double minSphereDistance = std::numeric_limits<double>::infinity();
-		double M2 = 0.0;
-
-		const double MAXIMUM_SEARCH_RADIUS = 0.5;
-
-		//Record distances
-		for (auto it = sphereSampling.begin(); it != sphereSampling.end(); ++it)
+		double visDist = sqrt(GetSqrDistanceToMesh(Point(vert.position.x(), vert.position.y(), vert.position.z()), *it, _meshAABBTree));
+		if (isinf(visDist))
 		{
-			double visDist = sqrt(GetSqrDistanceToMesh(Point(vert.position.x(), vert.position.y(), vert.position.z()), *it, _meshAABBTree));
-			if (isinf(visDist))
+#pragma omp critical
 			{
-				std::cout << "Skeleton lies outside of mesh!" << std::endl;
-				system("PAUSE");
+				std::cout << "Skeleton vertex " << iVert << " lies outside of mesh!" << std::endl;
 			}
-			sphereSampling.AccessContainerData(sphereDistances, it) = visDist;
 
-			++n;
-			double delta = visDist - meanSphereDistance;
-			meanSphereDistance += delta / n;
-			M2 += delta * (visDist - meanSphereDistance);
-			if (visDist > maxSphereDistance)
-				maxSphereDistance = visDist;
-			if (visDist < minSphereDistance)
-				minSphereDistance = visDist;
+			maxDistances.at(iVert) = std::numeric_limits<double>::quiet_NaN();
+			minDistances.at(iVert) = std::numeric_limits<double>::quiet_NaN();
+			meanDistances.at(iVert) = std::numeric_limits<double>::quiet_NaN();
+			caveSizes.at(iVert) = std::numeric_limits<double>::quiet_NaN();
+			caveSizeUnsmoothed.at(iVert) = std::numeric_limits<double>::quiet_NaN();
+
+			return false;
+		}
+		sphereSampling.AccessContainerData(sphereDistances, it) = visDist;
+
+		++n;
+		double delta = visDist - meanSphereDistance;
+		meanSphereDistance += delta / n;
+		M2 += delta * (visDist - meanSphereDistance);
+		if (visDist > maxSphereDistance)
+			maxSphereDistance = visDist;
+		if (visDist < minSphereDistance)
+			minSphereDistance = visDist;
 
 #ifdef WRITE_SPHERE_VIS
-			auto p = *it;
-			sphereVis << "v " << p.x() << " " << p.y() << " " << p.z() << std::endl;
+		auto p = *it;
+		sphereVis << "v " << p.x() << " " << p.y() << " " << p.z() << std::endl;
 #endif
-		}
+	}
 
-		double variance = n < 2 ? 0 : M2 / (n - 1);
-		maxDistances.at(iVert) = maxSphereDistance;
-		minDistances.at(iVert) = minSphereDistance;
-		meanDistances.at(iVert) = meanSphereDistance;
+	double variance = n < 2 ? 0 : M2 / (n - 1);
+	maxDistances.at(iVert) = maxSphereDistance;
+	minDistances.at(iVert) = minSphereDistance;
+	meanDistances.at(iVert) = meanSphereDistance;
 
 #ifdef WRITE_SPHERE_STATS
-		auto sphereStatsFilename = outputDirectory + "/sphereStats" + std::to_string(iVert) + ".csv";
-		std::ofstream sphereStats(sphereStatsFilename.c_str());
-		sphereStats.imbue(std::locale("de-DE"));
+	auto sphereStatsFilename = outputDirectory + "/sphereStats" + std::to_string(iVert) + ".csv";
+	std::ofstream sphereStats(sphereStatsFilename.c_str());
+	sphereStats.imbue(std::locale("de-DE"));
 #endif
 
 
 #ifdef WRITE_SPHERE_STATS
-		sphereStats << vert.position.x() << ";" << vert.position.y() << ";" << vert.position.z() << std::endl;
+	sphereStats << vert.position.x() << ";" << vert.position.y() << ";" << vert.position.z() << std::endl;
 #endif		
 
 #ifdef WRITE_HEIGHTFIELD
-		auto heightFieldName = outputDirectory + "/heightField" + std::to_string(iVert) + ".obj";
-		std::ofstream heightField(heightFieldName.c_str());
-		heightField << "mtllib ./heightfield.mtl" << std::endl;
-		heightField << "usemtl Default_Smoothing" << std::endl;
+	auto heightFieldName = outputDirectory + "/heightField" + std::to_string(iVert) + ".obj";
+	std::ofstream heightField(heightFieldName.c_str());
+	heightField << "mtllib ./heightfield.mtl" << std::endl;
+	heightField << "usemtl Default_Smoothing" << std::endl;
 
-		auto heightFieldSphereName = outputDirectory + "/heightFieldSphere" + std::to_string(iVert) + ".obj";
-		std::ofstream heightFieldSphere(heightFieldSphereName.c_str());
-		heightFieldSphere << "mtllib ./heightfield.mtl" << std::endl;
-		heightFieldSphere << "usemtl Default_Smoothing" << std::endl;
+	auto heightFieldSphereName = outputDirectory + "/heightFieldSphere" + std::to_string(iVert) + ".obj";
+	std::ofstream heightFieldSphere(heightFieldSphereName.c_str());
+	heightFieldSphere << "mtllib ./heightfield.mtl" << std::endl;
+	heightFieldSphere << "usemtl Default_Smoothing" << std::endl;
 
-		int sample_resolution_x = sphereSampling.MaxNTheta();
-		for (int y = 0; y < SPHERE_SAMPLING_RESOLUTION; ++y)
+	int sample_resolution_x = sphereSampling.MaxNTheta();
+	for (int y = 0; y < SPHERE_SAMPLING_RESOLUTION; ++y)
+	{
+		double phi = y * M_PI / (SPHERE_SAMPLING_RESOLUTION - 1);
+		for (int x = 0; x < sample_resolution_x; ++x)
 		{
-			double phi = y * M_PI / (SPHERE_SAMPLING_RESOLUTION - 1);
-			for (int x = 0; x < sample_resolution_x; ++x)
+			double theta = x * 2 * M_PI / sample_resolution_x;
+			double height = sphereSampling.AccessInterpolatedContainerData(sphereDistances, phi, theta) / 10;
+			heightField << "v " << theta << " " << phi << " " << height << std::endl;
+			heightField << "vt " << theta / 2 / M_PI << " " << 1 - phi / M_PI << std::endl;
+			Vector p = sphereSampling.Point(phi, theta) * height;
+			heightFieldSphere << "v " << p.x() << " " << p.y() << " " << p.z() << std::endl;
+			heightFieldSphere << "vt " << theta / 2 / M_PI << " " << 1 - phi / M_PI << std::endl;
+			if (y > 0)
 			{
-				double theta = x * 2 * M_PI / sample_resolution_x;
-				double height = sphereSampling.AccessInterpolatedContainerData(sphereDistances, phi, theta) / 10;
-				heightField << "v " << theta << " " << phi << " " << height << std::endl;
-				heightField << "vt " << theta / 2 / M_PI << " " << 1 - phi / M_PI << std::endl;
-				Vector p = sphereSampling.Point(phi, theta) * height;
-				heightFieldSphere << "v " << p.x() << " " << p.y() << " " << p.z() << std::endl;
-				heightFieldSphere << "vt " << theta / 2 / M_PI << " " << 1 - phi / M_PI << std::endl;
-				if (y > 0)
+				int tl = 1 + (y - 1) * sample_resolution_x + (x);
+				int tr = 1 + (y - 1) * sample_resolution_x + (x + 1) % sample_resolution_x;
+				int bl = 1 + (y)* sample_resolution_x + (x);
+				int br = 1 + (y)* sample_resolution_x + (x + 1) % sample_resolution_x;
+				if (x < sample_resolution_x - 1)
 				{
-					int tl = 1 + (y - 1) * sample_resolution_x + (x);
-					int tr = 1 + (y - 1) * sample_resolution_x + (x + 1) % sample_resolution_x;
-					int bl = 1 + (y)* sample_resolution_x + (x);
-					int br = 1 + (y)* sample_resolution_x + (x + 1) % sample_resolution_x;
-					if (x < sample_resolution_x - 1)
-					{
-						heightField << "f " << tl << "/" << tl << " " << tr << "/" << tr << " " << bl << "/" << bl << std::endl;
-						heightField << "f " << bl << "/" << bl << " " << tr << "/" << tr << " " << br << "/" << br << std::endl;
-					}
-					heightFieldSphere << "f " << tl << "/" << tl << " " << tr << "/" << tr << " " << bl << "/" << bl << std::endl;
-					heightFieldSphere << "f " << bl << "/" << bl << " " << tr << "/" << tr << " " << br << "/" << br << std::endl;
+					heightField << "f " << tl << "/" << tl << " " << tr << "/" << tr << " " << bl << "/" << bl << std::endl;
+					heightField << "f " << bl << "/" << bl << " " << tr << "/" << tr << " " << br << "/" << br << std::endl;
 				}
+				heightFieldSphere << "f " << tl << "/" << tl << " " << tr << "/" << tr << " " << bl << "/" << bl << std::endl;
+				heightFieldSphere << "f " << bl << "/" << bl << " " << tr << "/" << tr << " " << br << "/" << br << std::endl;
 			}
 		}
-		heightField.close();
-		heightFieldSphere.close();
+	}
+	heightField.close();
+	heightFieldSphere.close();
 #endif				
 
-		//calculate gradient
-		CalculateGradient(sphereSampling, sphereDistances, distanceGradient);
+	TSphereVisualizer sphereVisualizer(outputDirectoryW);
 
-		std::vector<PositionValue> sphereDistanceMaxima, sphereDistanceMinima;
-		FindStrongLocalExtrema(sphereSampling, sphereDistances, MAXIMUM_SEARCH_RADIUS, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer);
+	//calculate gradient
+	CalculateGradient(sphereSampling, sphereDistances, distanceGradient);
 
-		sphereVisualizer.Save(L"distanceField" + std::to_wstring(iVert) + L".png");
+	std::vector<PositionValue> sphereDistanceMaxima, sphereDistanceMinima;
+	FindStrongLocalExtrema(sphereSampling, sphereDistances, MAXIMUM_SEARCH_RADIUS, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer);
 
-		//sphereVisualizer.DrawGradientField(sphereSampling, distanceGradient);		
+	sphereVisualizer.Save(L"distanceField" + std::to_wstring(iVert) + L".png");
 
-		caveSizeUnsmoothed.at(iVert) = caveSizeCalculator->CalculateDistance(sphereSampling, sphereDistances, distanceGradient, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer, iVert);
+	//sphereVisualizer.DrawGradientField(sphereSampling, distanceGradient);		
 
-		sphereVisualizer.Save(L"sphereVis" + std::to_wstring(iVert) + L".png");
+	int threadId = omp_in_parallel() ? omp_get_thread_num() : 0;
+
+	caveSizeUnsmoothed.at(iVert) = CaveSizeCalculator::CalculateDistance(sphereSampling, sphereDistances, distanceGradient, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer, iVert, caveSizeCalculatorCustomData.at(threadId));
+
+	sphereVisualizer.Save(L"sphereVis" + std::to_wstring(iVert) + L".png");
 
 #ifdef WRITE_SPHERE_STATS
-		sphereStats.close();
+	sphereStats.close();
 #endif
 
 #ifdef WRITE_SPHERE_VIS
-		sphereVis.close();
-#endif									
+	sphereVis.close();
+#endif
+
+	return true;
+}
+
+template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
+template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
+
+bool CaveData::CalculateDistances()
+{
+	std::vector<std::vector<std::vector<double>>> sphereDistances(omp_get_num_procs());
+	std::vector<std::vector<std::vector<Vector>>> distanceGradient(omp_get_num_procs());
+
+	for (int i = 0; i < omp_get_num_procs(); ++i)
+	{
+		sphereSampling.PrepareDataContainer(sphereDistances.at(i));
+		sphereSampling.PrepareDataContainer(distanceGradient.at(i));
 	}
 
-	std::cout << std::endl;
+	std::cout << "Calculating distances..." << std::endl;
+
+	bool valid = true;
+
+	caveSizeCalculatorCustomData.resize(omp_get_num_procs());
+#pragma omp parallel for
+	for (int iVert = 0; iVert < skeleton->vertices.size(); ++iVert)
+	{
+		bool vertexValid = CalculateDistancesSingleVertex(iVert, sphereDistances.at(omp_get_thread_num()), distanceGradient.at(omp_get_thread_num()));
+#pragma omp critical
+		{
+			valid = vertexValid && valid;
+		}
+	}
+
+	return valid;
 }
 
 void CaveData::LoadDistances(const std::string & file)
@@ -319,7 +361,8 @@ void CaveData::SmoothAndDeriveDistances()
 	std::vector<double> smoothWorkDouble(std::max(skeleton->vertices.size(), skeleton->edges.size()));
 
 	//Calculate cave scale by smoothing with a very large window
-	smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
+	//smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
+	findMax(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
 
 	//Derive per vertex
 	smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SIZE_KERNEL_FACTOR * caveScale.at(iVert); }, caveSizeUnsmoothed, caveSizes);
@@ -339,6 +382,13 @@ void CaveData::SmoothAndDeriveDistances()
 	}, smoothWorkDouble, caveSizeDerivativesPerEdge);
 
 	derivePerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, caveSizeDerivativesPerEdge, caveSizeCurvaturesPerEdge);
+
+	std::cout << "Finished smoothing." << std::endl;
+}
+
+void CaveData::SetOutputDirectory(const std::wstring & outputDirectory)
+{
+	outputDirectoryW = outputDirectory;
 }
 
 void CaveData::WriteBranchStatistics(const std::string & directory) const
@@ -439,7 +489,7 @@ void CaveData::ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount)
 	caveSizeDerivatives.resize(vertexCount);
 	caveSizeCurvatures.resize(vertexCount);
 	caveScale.resize(vertexCount);	
-	adjacency.resize(vertexCount);
+	adjacency.clear(); adjacency.resize(vertexCount);
 
 	caveSizeUnsmoothed.resize(caveSizes.size());	
 
@@ -495,7 +545,7 @@ void CaveData::CalculateBasicSkeletonData()
 	}
 
 	//find root
-	rootVertex = -1;
+	/*rootVertex = -1;
 	for (int v = 0; v < skeleton->vertices.size(); ++v)
 		if (adjacency[v].size() == 1)
 		{
@@ -503,7 +553,7 @@ void CaveData::CalculateBasicSkeletonData()
 			break;
 		}
 
-	buildTree(rootVertex, skeleton->vertices.size(), adjacency, parents, children);
+	buildTree(rootVertex, skeleton->vertices.size(), adjacency, parents, children);*/
 
 	//Clean correspondences (use the closer skeleton vertex of local neighbors)
 	std::vector<std::vector<int>> cleanedCorrespondences(skeleton->vertices.size());
@@ -564,4 +614,6 @@ void CaveData::CalculateBasicSkeletonData()
 		}
 		nodeRadii.at(iVert) = nodeRadius / adj.size();
 	}
+
+	std::cout << "Finished correspondences." << std::endl;
 }

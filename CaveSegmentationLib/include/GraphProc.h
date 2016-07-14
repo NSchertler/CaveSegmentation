@@ -4,6 +4,7 @@
 #include <CurveSkeleton.h>
 #include <map>
 #include <set>
+#include <unordered_set>
 
 //Returns the unnormalized value of the Gaussian normal distribution
 extern double gauss(double x, double variance);
@@ -20,6 +21,8 @@ struct NodeDistance
 	int node;
 	double distance;
 
+	NodeDistance(int node, double distance) : node(node), distance(distance) {}
+
 	bool operator<(const NodeDistance& rhs) const
 	{
 		if(distance != rhs.distance)
@@ -27,6 +30,61 @@ struct NodeDistance
 		return node < rhs.node;
 	}
 };
+
+template <typename T>
+T findMaxSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iVert, const std::vector<std::vector<int>>& adjacency, double searchDistance, const std::vector<T>& source)
+{
+	//perform DFS
+
+	std::stack<NodeDistance> dfsStack;
+	dfsStack.emplace(iVert, 0.0);
+
+	std::unordered_set<int> visited;
+	visited.insert(iVert);
+
+	T max = std::numeric_limits<T>::lowest();
+
+	while (!dfsStack.empty())
+	{
+		NodeDistance current = dfsStack.top();
+		dfsStack.pop();
+		if (source.at(current.node) > max)
+			max = source.at(current.node);
+
+		auto currentP = vertices.at(current.node).position;
+
+		for (int adj : adjacency.at(current.node))
+		{
+			double distance = current.distance + (vertices.at(adj).position - currentP).norm();
+			if (distance <= searchDistance && visited.find(adj) == visited.end())
+			{
+				visited.insert(adj);
+				dfsStack.emplace(adj, distance);
+			}
+		}
+	}
+
+	return max;
+}
+
+template <typename T>
+void findMax(const std::vector<CurveSkeleton::Vertex>& vertices, const std::vector<std::vector<int>>& adjacency, double searchDistance, std::vector<T>& source, std::vector<T>& target)
+{
+	for (int iVert = 0; iVert < vertices.size(); ++iVert)
+	{
+		target.at(iVert) = findMaxSingleVertex(vertices, iVert, adjacency, searchDistance, source);
+	}
+}
+
+template <typename T>
+void findMax(const std::vector<CurveSkeleton::Vertex>& vertices, const std::vector<std::vector<int>>& adjacency, std::function<double(int)> searchDistance, std::vector<T>& source, std::vector<T>& target)
+{
+	for (int iVert = 0; iVert < vertices.size(); ++iVert)
+	{
+		target.at(iVert) = findMaxSingleVertex(vertices, iVert, adjacency, searchDistance(iVert), source);
+	}
+}
+
 
 template <typename T>
 T smoothSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iVert, const std::vector<std::vector<int>>& adjacency, double smoothDeviation, const std::vector<T>& source)
@@ -50,10 +108,14 @@ T smoothSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iVe
 		if (node.distance > distanceThreshold)
 			break;
 
-		double weight = gauss(node.distance, smoothVariance);
-		sumWeight += weight;
-		sumValue += (T)(weight * source.at(node.node));
-		
+		auto v = source.at(node.node);
+		if (!std::isnan(v))
+		{
+			double weight = gauss(node.distance, smoothVariance);
+			sumWeight += weight;
+			sumValue += (T)(weight * v);
+		}
+
 		auto& adj = adjacency.at(node.node);
 		for (auto adjV : adj)
 		{

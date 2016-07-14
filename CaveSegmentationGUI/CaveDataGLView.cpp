@@ -161,8 +161,8 @@ void CaveDataGLView::meshChanged()
 {
 	align_to_bounding_box(vm.caveData.getMin(), vm.caveData.getMax());
 	if (eyeOffset != 0)
-	{
-		eyeOffset = (vm.caveData.getMax() - vm.caveData.getMin()).length() * 0.3f * sgn(eyeOffset);
+	{		
+		eyeOffset = glm::length(vm.caveData.getMax() - vm.caveData.getMin()) * 0.001f * sgn(eyeOffset);
 		recalculateView();
 		recalculateProjection();
 	}
@@ -199,13 +199,10 @@ void CaveDataGLView::initializeGL()
 
 	if (clearProgram == nullptr)
 	{
-		clearProgram = MakeProgram("clear.vert", "clear.frag");
-		markerProgram = MakeProgram("marker.vert", "marker.frag");
-		skyProgram = MakeProgram("sky.vert", "sky.frag");
-		cursorProgram = MakeProgram("cursor.vert", "cursor.frag");
-	}
-
-	clearVAO.create();
+		clearProgram = MakeProgram("glsl/clear.vert", "glsl/clear.frag");
+		markerProgram = MakeProgram("glsl/marker.vert", "glsl/marker.frag");
+		cursorProgram = MakeProgram("glsl/cursor.vert", "glsl/cursor.frag");
+	}	
 
 	//Generate picking render targets
 	glGenTextures(1, &pickingTexture);
@@ -237,23 +234,14 @@ void CaveDataGLView::paintGL()
 	glDrawBuffers(2, bufs);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDepthMask(GL_FALSE);
-	clearVAO.bind();
+	emptyVAO.bind();
 	clearProgram->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	clearProgram->release();
 	glDrawBuffers(1, bufs);
-
-	skyProgram->bind();
-	glEnable(GL_DEPTH_CLAMP);
-	auto MVP = glm::transpose(GetProjectionMatrix() * GetViewRotationMatrix());
-	auto mvp = QMatrix4x4(glm::value_ptr(MVP));
-	skyProgram->setUniformValue("mvp", mvp);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 6);
-	skyProgram->release();
-	glDisable(GL_DEPTH_CLAMP);
-
 	glDepthMask(GL_TRUE);
-	
+
+	renderSky();
 
 	if (vm.getLookThrough())
 	{
@@ -288,7 +276,7 @@ void CaveDataGLView::paintGL()
 		auto m = QMatrix4x4(glm::value_ptr(MVP));
 
 		markerProgram->bind();
-		clearVAO.bind();
+		emptyVAO.bind();
 		int viewport[4];
 		glGetIntegerv(GL_VIEWPORT, viewport);
 		markerProgram->setUniformValue("mvp", m);
@@ -300,18 +288,20 @@ void CaveDataGLView::paintGL()
 		glDrawArrays(GL_POINTS, 0, 1);
 
 		markerProgram->release();
-		clearVAO.release();
+		emptyVAO.release();
 	}
 
 	if (useSoftwareCursor && !std::isnan(vm.cursorPos.get().x))
 	{
-		clearVAO.bind();
+		glEnable(GL_DEPTH_CLAMP);
+		emptyVAO.bind();
 		cursorProgram->bind();
 		cursorTexture->bind();
 		cursorProgram->setUniformValue("posSize", vm.cursorPos.get().x + cursorOffset, vm.cursorPos.get().y, 2.0f / virtualAspectMultiplier * 32 / width(), 2.0f * 32 / height());
 		cursorProgram->setUniformValue("depth", cursorDepth);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		cursorProgram->release();
+		glDisable(GL_DEPTH_CLAMP);
 	}
 }
 

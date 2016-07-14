@@ -52,9 +52,6 @@
     <ClCompile Include="cavesegmentationgui.cpp">
       <Filter>Source Dateien</Filter>
     </ClCompile>
-    <ClCompile Include="GLView.cpp">
-      <Filter>Source Dateien</Filter>
-    </ClCompile>
     <ClCompile Include="CaveDataGLView.cpp">
       <Filter>Source Dateien</Filter>
     </ClCompile>
@@ -67,17 +64,8 @@
     <ClCompile Include="GeneratedFiles\Release\moc_CaveGLData.cpp">
       <Filter>Generierte Dateien\Release</Filter>
     </ClCompile>
-    <ClCompile Include="IHasBoundingBox.cpp">
-      <Filter>Source Dateien</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Dateien</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_GLView.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_GLView.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_cavesegmentationgui.cpp">
       <Filter>Generierte Dateien\Debug</Filter>
@@ -85,17 +73,11 @@
     <ClCompile Include="GeneratedFiles\Release\moc_cavesegmentationgui.cpp">
       <Filter>Generierte Dateien\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_GLView.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_CaveGLData.cpp">
       <Filter>Generierte Dateien\DebugNSight</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_cavesegmentationgui.cpp">
       <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
-    <ClCompile Include="GLUtils.cpp">
-      <Filter>Source Dateien</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_qcustomplot.cpp">
       <Filter>Generierte Dateien\DebugNSight</Filter>
@@ -133,15 +115,6 @@
     <ClCompile Include="DataPlot.cpp">
       <Filter>Source Dateien</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_ObservableVariable.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ObservableVariable.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ObservableVariable.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
-    </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_gui.cpp">
       <Filter>Generierte Dateien</Filter>
     </ClCompile>
@@ -152,9 +125,6 @@
     </CustomBuild>
     <CustomBuild Include="cavesegmentationgui.ui">
       <Filter>Form Dateien</Filter>
-    </CustomBuild>
-    <CustomBuild Include="GLView.h">
-      <Filter>Header Dateien</Filter>
     </CustomBuild>
     <CustomBuild Include="CaveGLData.hpp">
       <Filter>Header Dateien</Filter>
@@ -168,14 +138,8 @@
     <CustomBuild Include="DataPlot.h">
       <Filter>Header Dateien</Filter>
     </CustomBuild>
-    <CustomBuild Include="ObservableVariable.h">
-      <Filter>Header Dateien</Filter>
-    </CustomBuild>
     <CustomBuild Include="Resources\gui.qrc">
       <Filter>Resource Dateien</Filter>
-    </CustomBuild>
-    <CustomBuild Include="CameraProvider.h">
-      <Filter>Header Dateien</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -185,16 +149,10 @@
     <ClInclude Include="CaveDataGLView.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
-    <ClInclude Include="IHasBoundingBox.h">
-      <Filter>Header Dateien</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
-    <ClInclude Include="OpenGLContextProvider.h">
-      <Filter>Header Dateien</Filter>
-    </ClInclude>
-    <ClInclude Include="GLUtils.h">
+    <ClInclude Include="PrintRedirection.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -235,12 +193,6 @@
       <Filter>glsl</Filter>
     </None>
     <None Include="glsl\skeletonPointSelection.frag">
-      <Filter>glsl</Filter>
-    </None>
-    <None Include="glsl\sky.frag">
-      <Filter>glsl</Filter>
-    </None>
-    <None Include="glsl\sky.vert">
       <Filter>glsl</Filter>
     </None>
     <None Include="glsl\cave.frag">
