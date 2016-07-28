@@ -20,6 +20,7 @@ private slots:
 	void brushType_changed(bool);
 	void downloadCaves();
 	void nearClipChanged();
+	void loadExternalModel();
 	void saveSegmentation();
 	void loadSegmentation();
 	void uploadSegmentation();

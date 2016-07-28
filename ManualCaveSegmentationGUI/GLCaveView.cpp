@@ -3,14 +3,17 @@
 #include <QMouseEvent>
 #include <QPainter>
 
-GLCaveView::GLCaveView(QWidget* parent, std::shared_ptr<SharedData> data) : GLView(parent), measuring(false)
+GLCaveView::GLCaveView(QWidget* parent, std::shared_ptr<SharedData> data) : GLView(parent, true), measuring(false)
 {
 	painting = false;
 
 	chamberColor = QColor(175, 0, 0, 128);
 	passageColor = QColor(0, 175, 0, 128);
+	eraseColor = QColor(255, 255, 255, 128);
 
 	this->data = data;
+
+	setCameraControlModifier(Qt::ControlModifier);
 
 	connect(data.get(), &SharedData::meshChanged, this, &GLCaveView::data_MeshChanged);
 	connect(this, &GLView::CameraChanged, this, &GLCaveView::issueRepaint);
@@ -33,7 +36,12 @@ void GLCaveView::updateCursor()
 	
 
 	painter.setPen(Qt::NoPen);
-	painter.setBrush(brushType == Chamber ? chamberColor : passageColor);
+	switch (brushType)
+	{
+	case Chamber: painter.setBrush(chamberColor); break;
+	case Passage: painter.setBrush(passageColor); break;
+	case Erase: painter.setBrush(eraseColor); break;
+	}	
 	
 	painter.drawEllipse(0, 0, 2 * brushSize, 2 * brushSize);
 	auto m_Cursor = QCursor(m_LPixmap);
@@ -66,19 +74,21 @@ void GLCaveView::initializeGL()
 	glEnable (GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	glDisable(GL_CULL_FACE);
+
 	glClearColor(0.2f, 0.2f, 0.6f, 1.0f);
 
 	Mesh::init_shaders(this->context());	
 }
 
 void GLCaveView::mousePressEvent(QMouseEvent* e)
-{	
-	GLView::mousePressEvent(e);
-	if (data->getMesh() /*&& !tracking && !panningTilting && e->modifiers() == 0*/)
+{		
+	if (data->getMesh() && !tracking && !panningTilting && e->modifiers() == 0)
 	{
 		data->getMesh()->paint(e->x(), height() - e->y(), brushSize, (int)brushType);
 		painting = true;
 	}
+	GLView::mousePressEvent(e);
 }
 
 void GLCaveView::mouseReleaseEvent(QMouseEvent* e)

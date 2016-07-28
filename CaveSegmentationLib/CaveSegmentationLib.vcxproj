@@ -50,7 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT);$(OPENGM_ROOT)/include;$(MCFSKELETON_ROOT)/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)\build\include;$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT)/include;$(OPENGM_ROOT)/include;$(MCFSKELETON_ROOT)/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -65,7 +65,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT);$(OPENGM_ROOT)/include;$(MCFSKELETON_ROOT)/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)\build\include;$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT)/include;$(OPENGM_ROOT)/include;$(MCFSKELETON_ROOT)/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>

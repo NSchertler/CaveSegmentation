@@ -1,6 +1,12 @@
 <RCC>
-  <qresource prefix="img">
-    <file>iconChamber.png</file>
-    <file>iconPassage.png</file>
-  </qresource>
+    <qresource prefix="/img">
+        <file>iconChamber.png</file>
+        <file>iconPassage.png</file>
+        <file>Clean.png</file>
+    </qresource>
+    <qresource prefix="/glsl">
+        <file>mesh.frag</file>
+        <file>mesh.geom</file>
+        <file>mesh.vert</file>
+    </qresource>
 </RCC>

@@ -7,6 +7,7 @@
 
 enum SegmentationType
 {
+	Erase = 0,
 	Chamber = 1,
 	Passage = 2,
 };
@@ -29,7 +30,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent*);
 
 	void updateCursor();
-	QColor chamberColor, passageColor;
+	QColor chamberColor, passageColor, eraseColor;
 
 	int brushSize;
 	SegmentationType brushType;

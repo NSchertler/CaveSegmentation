@@ -3,10 +3,12 @@
 in vec3 color;
 uniform bool transparent;
 
+out vec4 c;
+
 void main(void)
 {
 	if(transparent)
-		gl_FragColor = vec4(color, 0.5);
+		c = vec4(color, 0.5);
 	else
-		gl_FragColor = vec4(color, 1.0);	
+		c = vec4(color, 1.0);	
 }

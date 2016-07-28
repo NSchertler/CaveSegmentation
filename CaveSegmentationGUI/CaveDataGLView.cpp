@@ -13,7 +13,7 @@ std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::skyProgram(nullptr);
 std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::markerProgram(nullptr);
 std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::cursorProgram(nullptr);
 
-CaveDataGLView::CaveDataGLView(ViewModel& vm, float eyeOffset, QWidget * parent, GLView* masterCam) : GLView(parent, eyeOffset, masterCam), vm(vm), fbo(-1), useSoftwareCursor(eyeOffset != 0)
+CaveDataGLView::CaveDataGLView(ViewModel& vm, float eyeOffset, QWidget * parent, GLView* masterCam) : GLView(parent, false, eyeOffset, masterCam), vm(vm), fbo(-1), useSoftwareCursor(eyeOffset != 0)
 {
 	connect(&vm.caveData, &CaveGLData::meshChanged, this, &CaveDataGLView::meshChanged);
 	connect(&vm.caveData, &CaveGLData::skeletonChanged, this, &CaveDataGLView::issueRepaint);

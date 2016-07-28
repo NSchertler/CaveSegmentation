@@ -10,8 +10,10 @@
 
 #include <iostream>
 
-GLView::GLView(QWidget* parent, float eyeOffset, GLView* masterCam) 
-	: QOpenGLWidget(parent), eyeOffset(eyeOffset), zeroParallaxInterpol(0.33f), cursorDepthInterpol(0.4f), depthBuffer(nullptr), depthBufferSize(0)
+GLView::GLView(QWidget* parent, bool automaticDepthBufferRetrieval, float eyeOffset, GLView* masterCam)
+	: QOpenGLWidget(parent), eyeOffset(eyeOffset), zeroParallaxInterpol(0.33f), cursorDepthInterpol(0.4f), 
+	_depthBuffer(nullptr), depthBufferSize(0), _enableAutomaticDepthBufferRetrieval(automaticDepthBufferRetrieval),
+	cameraControlModifier(Qt::NoModifier), frontViewCutoff(0), cameraHold(nullptr)
 {
 	Q_INIT_RESOURCE(guicore);
 
@@ -47,39 +49,89 @@ GLView::GLView(QWidget* parent, float eyeOffset, GLView* masterCam)
 	}
 
 	virtualAspectMultiplier = 1.0f;
+
+	stillViewTimer.setInterval(500);
+	stillViewTimer.setSingleShot(true);
+	connect(&stillViewTimer, &QTimer::timeout, this, &GLView::stillViewTimer_timeout);
 }
 
 GLView::~GLView()
 {
-	if (depthBuffer)
-		delete[] depthBuffer;
+	if (_depthBuffer)
+		delete[] _depthBuffer;
+}
+
+void GLView::setCameraControlModifier(Qt::KeyboardModifier m)
+{
+	cameraControlModifier = m;
 }
 
 void GLView::readDepthBuffer()
 {
+	makeCurrent();
 	//Read the depth buffer
 	int targetSize = width() * height();
 	if (targetSize > depthBufferSize)
 	{
-		if (depthBuffer)
-			delete[] depthBuffer;
+		if (_depthBuffer)
+			delete[] _depthBuffer;
 		depthBufferSize = targetSize;
-		depthBuffer = new float[targetSize];
+		_depthBuffer = new float[targetSize];
 	}
-	glReadPixels(0, 0, width(), height(), GL_DEPTH_COMPONENT, GL_FLOAT, depthBuffer);
+	glReadPixels(0, 0, width(), height(), GL_DEPTH_COMPONENT, GL_FLOAT, _depthBuffer);
+}
+
+const float * GLView::depthBuffer() const
+{
+	return _depthBuffer;
+}
+
+bool GLView::isAutomaticDepthBufferRetrievalEnabled() const
+{
+	return _enableAutomaticDepthBufferRetrieval;
+}
+
+void GLView::enableAutomaticDepthBufferRetrieval()
+{
+	_enableAutomaticDepthBufferRetrieval = true;
+	readDepthBuffer();
+}
+
+void GLView::disableAutomaticDepthBufferRetrieval()
+{
+	_enableAutomaticDepthBufferRetrieval = false;
+}
+
+float GLView::getZNear() const
+{
+	return znear;
+}
+
+float GLView::getZFar() const
+{
+	return zfar;
+}
+
+glm::vec3 GLView::getEye() const
+{
+	glm::vec3 dir(cos(tilt) * cos(pan), sin(tilt) * cos(pan), sin(pan));
+	return focus + focusLength * dir;
+}
+
+void GLView::setFrontViewCutoff(float c)
+{
+	frontViewCutoff = c;
+	recalculateProjection();
 }
 
 void GLView::findPositionUnderMouse(int x, int y, glm::vec3& v)
 {
-	glm::mat4 modelView, proj, MVP;
-	glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelView));
-	glGetFloatv(GL_PROJECTION_MATRIX, glm::value_ptr(proj));
-	MVP = proj * modelView;
+	glm::mat4 MVP = GetProjectionMatrix() * GetViewMatrix();
 
 	auto invMVP = glm::inverse(MVP);
 	float clipX = 2.0f * x / width() - 1.0f;
 	float clipY = 1.0f - 2.0f * y / height();
-	float depth = 2.0f * depthBuffer[x + width() * (height() - y)] - 1.0f;
+	float depth = 2.0f * _depthBuffer[x + width() * (height() - y)] - 1.0f;
 
 	glm::vec4 worldSpaceCoords = invMVP * glm::vec4(clipX, clipY, depth, 1);
 	worldSpaceCoords *= 1.0f / worldSpaceCoords.w;
@@ -111,6 +163,14 @@ void GLView::setZRange(float znear, float zfar, float zeroParallaxInterpol, floa
 	recalculateProjection();
 }
 
+void GLView::stillViewTimer_timeout()
+{
+	if(_enableAutomaticDepthBufferRetrieval)
+		readDepthBuffer();
+
+	emit CameraStill();
+}
+
 void GLView::setVirtualAspectMultiplier(float multiplier)
 {
 	virtualAspectMultiplier = multiplier;
@@ -139,6 +199,30 @@ const glm::mat4 & GLView::GetProjectionMatrix()
 void GLView::MakeOpenGLContextCurrent()
 {
 	makeCurrent();
+}
+
+void GLView::emitCameraChanged()
+{
+	if (cameraHold == nullptr)
+		emit CameraChanged();
+	else
+		cameraHold->cameraChanged = true;
+}
+
+void GLView::emitCamParamsChanged()
+{
+	if (cameraHold == nullptr)
+		emit camParamsChanged(pan, tilt, focus, focusLength);
+	else
+		cameraHold->camParamsChanged = true;
+}
+
+void GLView::emitZRangeChanged()
+{
+	if (cameraHold == nullptr)
+		emit zRangeChanged(znear, zfar, zeroParallaxInterpol, cursorDepthInterpol);
+	else
+		cameraHold->zRangeChanged = true;
 }
 
 void GLView::initializeGL()
@@ -177,11 +261,12 @@ void GLView::initializeGL()
 
 void GLView::recalculateView()
 {
-	glm::vec3 dir(cos(tilt) * cos(pan), sin(tilt) * cos(pan), sin(pan));
-	glm::vec3 eye = focus + focusLength * dir;
+	glm::vec3 eye = getEye();
 	view = glm::translate(glm::mat4(), glm::vec3(-eyeOffset, 0, 0)) * glm::lookAtRH(eye, focus, glm::vec3(0, 0, 1));
-	emit CameraChanged();
-	emit camParamsChanged(pan, tilt, focus, focusLength);
+	emitCameraChanged();
+	emitCamParamsChanged();
+
+	stillViewTimer.start();
 }
 
 void GLView::handleLoggedMessage(const QOpenGLDebugMessage & message)
@@ -191,6 +276,7 @@ void GLView::handleLoggedMessage(const QOpenGLDebugMessage & message)
 
 void GLView::wheelEvent(QWheelEvent* e)
 {
+	HoldCameraEvents hold(this);
 	if (e->modifiers() == Qt::ControlModifier)
 	{
 		zeroParallaxInterpol += 0.0001 * e->delta();
@@ -215,28 +301,32 @@ void GLView::wheelEvent(QWheelEvent* e)
 		auto diff = focusLength - oldLength;
 		znear += diff;
 		zfar += diff;
-		recalculateView();
-		emit CameraChanged();
+		recalculateView();		
+		emitCameraChanged();
 	}
-	recalculateProjection();	
-	emit zRangeChanged(znear, zfar, zeroParallaxInterpol, cursorDepthInterpol);
+	recalculateProjection();
+	emitZRangeChanged();
 }
 
 void GLView::mousePressEvent(QMouseEvent* e)
 {
-	if (e->buttons() == Qt::RightButton)
+	if (e->modifiers() == cameraControlModifier)
 	{
-		tracking = true;
+		if (e->buttons() == Qt::RightButton)
+		{
+			tracking = true;
+		}
+		else if (e->buttons() == Qt::LeftButton)
+		{
+			panningTilting = true;
+		}
+		dragStart = e->pos();
 	}
-	else if (e->buttons() == Qt::LeftButton)
-	{
-		panningTilting = true;
-	}
-	dragStart = e->pos();
 }
 
 void GLView::mouseMoveEvent(QMouseEvent* e)
 {
+	HoldCameraEvents hold(this);
 	if (tracking)
 	{
 		glm::vec3 dir(cos(tilt) * cos(pan), sin(tilt) * cos(pan), sin(pan));
@@ -306,8 +396,8 @@ glm::mat4 StereoFrustumScreen(float eyeOffset, float fovy,
 
 void GLView::recalculateProjection()
 {
-	float n = std::max(0.1f, znear);
-	float f = std::max(znear + 0.1f, zfar);
+	float n = std::max(0.1f, (1 - frontViewCutoff) * znear + frontViewCutoff * zfar);
+	float f = std::max(n, zfar);
 	//proj = glm::perspectiveFovRH<float>(fovy, width(), height(), n, f);
 	float zeroParallax = (1 - zeroParallaxInterpol) * n + zeroParallaxInterpol * f;
 	float aspect = width() * virtualAspectMultiplier / height();
@@ -317,7 +407,9 @@ void GLView::recalculateProjection()
 	cursorOffset = eyeOffset * (1.0f - zeroParallax / cursorZ) / (tan(fovy / 2) * zeroParallax * aspect);	
 	cursorDepth = (-cursorZ * proj[2][2] + proj[3][2]) / (-cursorZ * proj[2][3] + proj[3][3]);
 
-	emit CameraChanged();
+	stillViewTimer.start();
+
+	emitCameraChanged();
 }
 
 void GLView::align_to_bounding_box(glm::vec3 min, glm::vec3 max)
@@ -335,5 +427,29 @@ void GLView::align_to_bounding_box(glm::vec3 min, glm::vec3 max)
 	zfar = d + radius;
 	recalculateProjection();
 	recalculateView();
-	emit zRangeChanged(znear, zfar, zeroParallaxInterpol, cursorDepthInterpol);
+	emitZRangeChanged();
+}
+
+HoldCameraEvents::HoldCameraEvents(GLView * view)
+	: cameraChanged(false), camParamsChanged(false), zRangeChanged(false)
+{
+	if (view->cameraHold == nullptr)
+	{
+		this->view = view;
+		view->cameraHold = this;
+	}
+}
+
+HoldCameraEvents::~HoldCameraEvents()
+{
+	if (view)
+	{
+		if (cameraChanged)
+			emit view->CameraChanged();
+		if (camParamsChanged)
+			emit view->camParamsChanged(view->pan, view->tilt, view->focus, view->focusLength);
+		if(zRangeChanged)
+			emit view->zRangeChanged(view->znear, view->zfar, view->zeroParallaxInterpol, view->cursorDepthInterpol);
+		view->cameraHold = nullptr;
+	}
 }

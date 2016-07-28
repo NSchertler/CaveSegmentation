@@ -94,7 +94,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <widget class="QGroupBox" name="groupBox">
+          <widget class="QGroupBox" name="grpData">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
              <horstretch>0</horstretch>
@@ -212,6 +212,17 @@
               </property>
              </widget>
             </item>
+            <item row="3" column="1">
+             <widget class="QRadioButton" name="rbErase">
+              <property name="text">
+               <string>Erase</string>
+              </property>
+              <property name="icon">
+               <iconset resource="Resources.qrc">
+                <normaloff>:/img/Clean.png</normaloff>:/img/Clean.png</iconset>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>
@@ -300,14 +311,14 @@
          <item>
           <widget class="QLabel" name="label_4">
            <property name="text">
-            <string>Middle Mouse Button: Move View</string>
+            <string>Ctrl + Left Mouse Button: Rotate View</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>Right Mouse Button: Rotate View</string>
+            <string>Ctrl + Right Mouse Button: Move View</string>
            </property>
           </widget>
          </item>
@@ -315,20 +326,6 @@
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string>Mouse Wheel: Zoom View</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Shift + Left Mouse Button: Start Measuring</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Shift + Right Mouse Button: Finish Measuring</string>
            </property>
           </widget>
          </item>
