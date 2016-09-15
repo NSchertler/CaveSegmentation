@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{83D2DF8A-3183-457A-B9E9-2D7B532C80E8}</ProjectGuid>
+    <ProjectGuid>{4C883782-7689-4B6E-9BC5-F773D0711D81}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>CaveSegmentationCommandLine</RootNamespace>
+    <RootNamespace>Evaluation</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -56,6 +56,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(MCFSKELETON_ROOT)\include;$(EIGEN3_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -74,6 +75,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(MCFSKELETON_ROOT)\include;$(EIGEN3_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,12 +87,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Evaluation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CaveSegmentationLib\CaveSegmentationLib.vcxproj">
       <Project>{fa3bbbff-a6c8-4fd5-b05e-ee70fd50d402}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

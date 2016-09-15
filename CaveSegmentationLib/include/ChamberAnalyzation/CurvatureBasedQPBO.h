@@ -37,8 +37,6 @@ public:
 				propagateDistance(data, v, 0, distancesFromEnd);
 			}			*/
 
-		std::cout << "Building graphical model..." << std::endl;
-
 		opengm::DiscreteSpace<> labelSpace;
 		typedef opengm::GraphicalModel<double, opengm::Adder> Model;
 
@@ -48,6 +46,8 @@ public:
 			labelSpace.addVariable(2);
 
 		Model gm(labelSpace);
+
+		int nonsubmodular = 0;
 
 		//pairwise factors
 		const size_t functionShapePairwise[] = { 2, 2 };
@@ -89,9 +89,13 @@ public:
 			//std::cout << pairwiseFunction(0, 0) << "; " << pairwiseFunction(1, 0) << ", " << pairwiseFunction(0, 1) << std::endl;
 
 			gm.addFactor(gm.addFunction(pairwiseFunction), nodes, nodes + 2);
+			if (pairwiseFunction(0, 0) + pairwiseFunction(1, 1) > pairwiseFunction(0, 1) + pairwiseFunction(1, 0))
+				++nonsubmodular;
 		}
 
-		std::cout << "Solving minimization problem (" << gm.numberOfFactors() << " factors, " << gm.numberOfVariables() << " variables) ..." << std::endl;
+#ifndef NON_VERBOSE
+		std::cout << "Solving minimization problem (" << gm.numberOfFactors() << " factors, " << nonsubmodular << " non-submodular, " << gm.numberOfVariables() << " variables) ..." << std::endl;
+#endif
 
 		typedef opengm::external::QPBO<Model> Optimizer;
 
@@ -103,7 +107,9 @@ public:
 		Optimizer optimizer(gm, param);
 		optimizer.infer();
 
+#ifndef NON_VERBOSE
 		std::cout << "Generating output..." << std::endl;
+#endif
 
 		std::vector<size_t> argmin;
 		optimizer.arg(argmin);

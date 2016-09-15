@@ -74,6 +74,8 @@ protected:
 	virtual void resizeGL(int width, int height);
 	void align_to_bounding_box(glm::vec3 min, glm::vec3 max);
 
+	void zoom(float amount);
+
 	virtual void wheelEvent(QWheelEvent*);
 	virtual void mousePressEvent(QMouseEvent*);
 	virtual void mouseMoveEvent(QMouseEvent*);
@@ -98,6 +100,7 @@ protected:
 
 	bool panningTilting;
 	bool tracking;
+	bool zooming;
 	QPoint dragStart;
 
 	glm::mat4 view, proj;
@@ -120,6 +123,7 @@ protected:
 	bool _enableAutomaticDepthBufferRetrieval;
 
 	Qt::KeyboardModifier cameraControlModifier;
+	Qt::KeyboardModifier cameraZoomModifier;
 
 	float frontViewCutoff;
 

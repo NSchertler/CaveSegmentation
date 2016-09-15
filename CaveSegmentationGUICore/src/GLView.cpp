@@ -13,7 +13,7 @@
 GLView::GLView(QWidget* parent, bool automaticDepthBufferRetrieval, float eyeOffset, GLView* masterCam)
 	: QOpenGLWidget(parent), eyeOffset(eyeOffset), zeroParallaxInterpol(0.33f), cursorDepthInterpol(0.4f), 
 	_depthBuffer(nullptr), depthBufferSize(0), _enableAutomaticDepthBufferRetrieval(automaticDepthBufferRetrieval),
-	cameraControlModifier(Qt::NoModifier), frontViewCutoff(0), cameraHold(nullptr)
+	cameraControlModifier(Qt::NoModifier), cameraZoomModifier(Qt::AltModifier), frontViewCutoff(0), cameraHold(nullptr)
 {
 	Q_INIT_RESOURCE(guicore);
 
@@ -28,6 +28,7 @@ GLView::GLView(QWidget* parent, bool automaticDepthBufferRetrieval, float eyeOff
 
 	panningTilting = false;
 	tracking = false;
+	zooming = false;
 
 	QSurfaceFormat fmt;
 	fmt.setVersion(4, 3);
@@ -274,6 +275,20 @@ void GLView::handleLoggedMessage(const QOpenGLDebugMessage & message)
 	qDebug() << message;
 }
 
+void GLView::zoom(float amount)
+{
+	auto factor = pow(0.999, amount);
+	auto oldLength = focusLength;
+	focusLength *= factor;
+	auto diff = focusLength - oldLength;
+	znear += diff;
+	zfar += diff;
+	recalculateView();
+	emitCameraChanged();
+	recalculateProjection();
+	emitZRangeChanged();
+}
+
 void GLView::wheelEvent(QWheelEvent* e)
 {
 	HoldCameraEvents hold(this);
@@ -295,14 +310,7 @@ void GLView::wheelEvent(QWheelEvent* e)
 	}
 	else
 	{
-		auto factor = pow(0.999, e->delta());
-		auto oldLength = focusLength;
-		focusLength *= factor;
-		auto diff = focusLength - oldLength;
-		znear += diff;
-		zfar += diff;
-		recalculateView();		
-		emitCameraChanged();
+		zoom(e->delta());		
 	}
 	recalculateProjection();
 	emitZRangeChanged();
@@ -320,6 +328,12 @@ void GLView::mousePressEvent(QMouseEvent* e)
 		{
 			panningTilting = true;
 		}
+		dragStart = e->pos();
+	}
+	if (e->modifiers() == cameraZoomModifier)
+	{
+		if (e->buttons() == Qt::LeftButton)
+			zooming = true;
 		dragStart = e->pos();
 	}
 }
@@ -347,6 +361,10 @@ void GLView::mouseMoveEvent(QMouseEvent* e)
 		tilt -= (e->x() - dragStart.x()) / (float)width() * 10;
 		recalculateView();
 	}
+	else if (zooming)
+	{
+		zoom(-e->y() + dragStart.y());
+	}
 	dragStart = e->pos();
 }
 
@@ -354,6 +372,7 @@ void GLView::mouseReleaseEvent(QMouseEvent* e)
 {
 	tracking = false;
 	panningTilting = false;
+	zooming = false;
 }
 
 void GLView::renderSky()

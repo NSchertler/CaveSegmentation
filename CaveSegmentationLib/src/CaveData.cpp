@@ -6,6 +6,9 @@
 #include "ImageProc.h"
 
 #include <stack>
+#include <deque>
+
+#include <boost/filesystem/operations.hpp>
 
 void CalculateGradient(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
 {
@@ -112,18 +115,102 @@ void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, 
 CaveData::CaveData()
 	: skeleton(nullptr),
 	  sphereSampling(SPHERE_SAMPLING_RESOLUTION),
-	  CAVE_SCALE_KERNEL_FACTOR(10.0), CAVE_SIZE_KERNEL_FACTOR(0.2), CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR(0.2)
+	  CAVE_SCALE_KERNEL_FACTOR(10.0), CAVE_SIZE_KERNEL_FACTOR(0.2), CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR(0.2), CAVE_SCALE_ALGORITHM(CaveData::Max)
 {
 }
 
 void CaveData::LoadMesh(const std::string & offFile)
 {
-	ReadOff(offFile, _meshVertices, _meshTriangles, _meshTriIndices);
+	//Check if a cache for this file exists
+	std::string cachePath = offFile + ".cache";
+	bool loadFromCache = false;
+	auto lastModifiedTimeOfMesh = boost::filesystem::last_write_time(offFile);
+	if (boost::filesystem::exists(cachePath))
+	{
+		//check if the cache has the most recent version		
+		FILE* cache = fopen(cachePath.c_str(), "rb");
+		if (cache)
+		{
+			std::time_t cacheTime;
+			fread(&cacheTime, sizeof(std::time_t), 1, cache);
+			if (cacheTime == lastModifiedTimeOfMesh)
+			{
+				//Cache is up-to-date. Read it.
+
+				std::cout << "Loading from cache instead of OFF..." << std::endl;
+
+				_meshVertices.clear();
+				_meshTriangles.clear();
+				_meshTriIndices.clear();
+
+				int32_t n_vertices;
+				fread(&n_vertices, sizeof(int32_t), 1, cache);
+				if (n_vertices > 0)
+				{
+					_meshVertices.resize(n_vertices);
+					fread(&_meshVertices[0], sizeof(Eigen::Vector3f), n_vertices, cache);
+				}
+
+				int32_t n_triangles;
+				fread(&n_triangles, sizeof(int32_t), 1, cache);
+				if (n_triangles > 0)
+				{
+					_meshTriIndices.resize(n_triangles);
+					_meshTriangles.resize(n_triangles);
+					fread(&_meshTriIndices[0], sizeof(IndexedTriangle), n_triangles, cache);
+
+					for (int i = 0; i < n_triangles; ++i)
+					{
+						auto& tri = _meshTriIndices.at(i);
+						auto& v1 = _meshVertices.at(tri.i[0]);
+						auto& v2 = _meshVertices.at(tri.i[1]);
+						auto& v3 = _meshVertices.at(tri.i[2]);
+
+						_meshTriangles.at(i) = Triangle(Point(v1.x(), v1.y(), v1.z()), Point(v2.x(), v2.y(), v2.z()), Point(v3.x(), v3.y(), v3.z()));
+					}
+				}
+
+				fclose(cache);
+				loadFromCache = true;
+			}
+			else
+				std::cout << "Cannot read from cache." << std::endl;
+		}
+	}
+
+	if(!loadFromCache)
+		ReadOff(offFile, _meshVertices, _meshTriangles, _meshTriIndices);
 	ResizeMeshAttributes(_meshVertices.size());
 
 	_meshAABBTree.clear();
 	_meshAABBTree.insert(_meshTriangles.begin(), _meshTriangles.end());
 	_meshAABBTree.build();
+
+	if (!loadFromCache)
+	{
+		//Write the cache
+		FILE* cache = fopen(cachePath.c_str(), "wb");
+		if (cache)
+		{
+			fwrite(&lastModifiedTimeOfMesh, sizeof(std::time_t), 1, cache);
+
+			int32_t n_vertices = _meshVertices.size();
+			fwrite(&n_vertices, sizeof(int32_t), 1, cache);
+			if(n_vertices > 0)
+				fwrite(&_meshVertices[0], sizeof(Eigen::Vector3f), n_vertices, cache);
+
+			int32_t n_triangles = _meshTriIndices.size();
+			fwrite(&n_triangles, sizeof(int32_t), 1, cache);
+			if (n_triangles > 0)
+				fwrite(&_meshTriIndices[0], sizeof(IndexedTriangle), n_triangles, cache);
+
+			fclose(cache);
+		}
+		else
+		{
+			std::cout << "Cannot write cache." << std::endl;
+		}
+	}	
 }
 
 void CaveData::SetSkeleton(CurveSkeleton * skeleton)
@@ -139,7 +226,7 @@ void CaveData::SetSkeleton(CurveSkeleton * skeleton)
 }
 
 template <typename TSphereVisualizer>
-bool CaveData::CalculateDistancesSingleVertex(int iVert)
+bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent)
 {
 	std::vector<std::vector<double>> sphereDistances;
 	std::vector<std::vector<Vector>> distanceGradient;
@@ -148,19 +235,19 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert)
 
 	caveSizeCalculatorCustomData.resize(1);
 
-	return CalculateDistancesSingleVertex<TSphereVisualizer>(iVert, sphereDistances, distanceGradient);
+	return CalculateDistancesSingleVertex<TSphereVisualizer>(iVert, exponent, sphereDistances, distanceGradient);
 }
 
-template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert);
-template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert);
+template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert, float exponent);
+template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert, float exponent);
 
 template <typename TSphereVisualizer>
-bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
+bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
 {
 	auto& vert = skeleton->vertices.at(iVert);
 
 #ifdef WRITE_SPHERE_VIS
-	auto sphereVisFilename = outputDirectory + "/sphereVis" + std::to_string(iVert) + ".obj";
+	auto sphereVisFilename = outputDirectoryW + L"/sphereVis" + std::to_wstring(iVert) + L".obj";
 	std::ofstream sphereVis(sphereVisFilename.c_str());
 #endif
 
@@ -178,10 +265,12 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector
 		double visDist = sqrt(GetSqrDistanceToMesh(Point(vert.position.x(), vert.position.y(), vert.position.z()), *it, _meshAABBTree));
 		if (isinf(visDist))
 		{
+#ifndef NON_VERBOSE
 #pragma omp critical
 			{
 				std::cout << "Skeleton vertex " << iVert << " lies outside of mesh!" << std::endl;
 			}
+#endif
 
 			maxDistances.at(iVert) = std::numeric_limits<double>::quiet_NaN();
 			minDistances.at(iVert) = std::numeric_limits<double>::quiet_NaN();
@@ -191,7 +280,7 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector
 
 			return false;
 		}
-		sphereSampling.AccessContainerData(sphereDistances, it) = visDist;
+		sphereSampling.AccessContainerData(sphereDistances, it) = pow(visDist, exponent);
 
 		++n;
 		double delta = visDist - meanSphereDistance;
@@ -203,7 +292,7 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector
 			minSphereDistance = visDist;
 
 #ifdef WRITE_SPHERE_VIS
-		auto p = *it;
+		auto p = visDist * *it;
 		sphereVis << "v " << p.x() << " " << p.y() << " " << p.z() << std::endl;
 #endif
 	}
@@ -225,12 +314,12 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector
 #endif		
 
 #ifdef WRITE_HEIGHTFIELD
-	auto heightFieldName = outputDirectory + "/heightField" + std::to_string(iVert) + ".obj";
+	auto heightFieldName = outputDirectoryW + L"/heightField" + std::to_wstring(iVert) + L".obj";
 	std::ofstream heightField(heightFieldName.c_str());
 	heightField << "mtllib ./heightfield.mtl" << std::endl;
 	heightField << "usemtl Default_Smoothing" << std::endl;
 
-	auto heightFieldSphereName = outputDirectory + "/heightFieldSphere" + std::to_string(iVert) + ".obj";
+	auto heightFieldSphereName = outputDirectoryW + L"/heightFieldSphere" + std::to_wstring(iVert) + L".obj";
 	std::ofstream heightFieldSphere(heightFieldSphereName.c_str());
 	heightFieldSphere << "mtllib ./heightfield.mtl" << std::endl;
 	heightFieldSphere << "usemtl Default_Smoothing" << std::endl;
@@ -282,7 +371,7 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector
 
 	int threadId = omp_in_parallel() ? omp_get_thread_num() : 0;
 
-	caveSizeUnsmoothed.at(iVert) = CaveSizeCalculator::CalculateDistance(sphereSampling, sphereDistances, distanceGradient, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer, iVert, caveSizeCalculatorCustomData.at(threadId));
+	caveSizeUnsmoothed.at(iVert) = pow(CaveSizeCalculator::CalculateDistance(sphereSampling, sphereDistances, distanceGradient, sphereDistanceMaxima, sphereDistanceMinima, sphereVisualizer, iVert, caveSizeCalculatorCustomData.at(threadId)), 1.0 / exponent);
 
 	sphereVisualizer.Save(L"sphereVis" + std::to_wstring(iVert) + L".png");
 
@@ -297,10 +386,10 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, std::vector<std::vector
 	return true;
 }
 
-template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
-template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
+template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
+template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
 
-bool CaveData::CalculateDistances()
+bool CaveData::CalculateDistances(float exponent)
 {
 	std::vector<std::vector<std::vector<double>>> sphereDistances(omp_get_num_procs());
 	std::vector<std::vector<std::vector<Vector>>> distanceGradient(omp_get_num_procs());
@@ -311,22 +400,58 @@ bool CaveData::CalculateDistances()
 		sphereSampling.PrepareDataContainer(distanceGradient.at(i));
 	}
 
+#ifndef NON_VERBOSE
 	std::cout << "Calculating distances..." << std::endl;
+#endif
 
-	bool valid = true;
+	invalidVertices.clear();
 
 	caveSizeCalculatorCustomData.resize(omp_get_num_procs());
 #pragma omp parallel for
 	for (int iVert = 0; iVert < skeleton->vertices.size(); ++iVert)
-	{
-		bool vertexValid = CalculateDistancesSingleVertex(iVert, sphereDistances.at(omp_get_thread_num()), distanceGradient.at(omp_get_thread_num()));
+	{		
+		bool vertexValid = CalculateDistancesSingleVertex(iVert, exponent, sphereDistances.at(omp_get_thread_num()), distanceGradient.at(omp_get_thread_num()));
+		if(!vertexValid)
 #pragma omp critical
 		{
-			valid = vertexValid && valid;
+			invalidVertices.push_back(iVert);
 		}
 	}
 
-	return valid;
+#ifndef NON_VERBOSE
+	std::cout << "Finished." << std::endl;
+#endif
+
+	std::deque<int> invalidWork(invalidVertices.begin(), invalidVertices.end());
+	//TODO: instead of reconstruction, move skeleton vertices inside shape
+	//try to reconstruct invalid skeleton vertices
+	while (!invalidWork.empty())
+	{
+		auto it = invalidWork.begin();
+		while (it != invalidWork.end())
+		{
+			int validNeighborCount = 0;
+			double validSum = 0;
+			for (int n : adjacency.at(*it))
+			{
+				double neighborSize = caveSizeUnsmoothed.at(n);
+				if (!std::isnan(neighborSize))
+				{
+					++validNeighborCount;
+					validSum += neighborSize;
+				}
+			}
+			if (validNeighborCount == 0)
+				++it;
+			else
+			{
+				caveSizeUnsmoothed.at(*it) = validSum / validNeighborCount;
+				it = invalidWork.erase(it);
+			}
+		}
+	}
+
+	return invalidVertices.size() == 0;
 }
 
 void CaveData::LoadDistances(const std::string & file)
@@ -356,13 +481,25 @@ void CaveData::SmoothAndDeriveDistances()
 	if (skeleton == nullptr)
 		return;
 
+#ifndef NON_VERBOSE
 	std::cout << "Smoothing distances..." << std::endl;
+#endif
 
 	std::vector<double> smoothWorkDouble(std::max(skeleton->vertices.size(), skeleton->edges.size()));
 
 	//Calculate cave scale by smoothing with a very large window
-	//smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
-	findMax(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
+	switch (CAVE_SCALE_ALGORITHM)
+	{
+	case Max:
+		findMax(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
+		break;
+	case Smooth:
+		smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
+		break;
+	case Advect:
+		maxAdvect(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SCALE_KERNEL_FACTOR * caveSizeUnsmoothed.at(iVert); }, caveSizeUnsmoothed, caveScale);
+		break;
+	}	
 
 	//Derive per vertex
 	smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SIZE_KERNEL_FACTOR * caveScale.at(iVert); }, caveSizeUnsmoothed, caveSizes);
@@ -383,7 +520,9 @@ void CaveData::SmoothAndDeriveDistances()
 
 	derivePerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, caveSizeDerivativesPerEdge, caveSizeCurvaturesPerEdge);
 
+#ifndef NON_VERBOSE
 	std::cout << "Finished smoothing." << std::endl;
+#endif
 }
 
 void CaveData::SetOutputDirectory(const std::wstring & outputDirectory)
@@ -497,35 +636,37 @@ void CaveData::ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount)
 	caveSizeCurvaturesPerEdge.resize(edgeCount);
 }
 
+int noSegmentColor[3] = { 128, 128, 128 };
+int segmentColors[10][3] =
+{
+	{ 166, 206, 227 },
+	{ 31,120,180 },
+	{ 251,154,153 },
+	{ 227,26,28 },
+	{ 253,191,111 },
+	{ 255,127,0 },
+	{ 202,178,214 },
+	{ 106,61,154 },
+	{ 255,255,153 },
+	{ 177,89,40 }
+};
+
+const int* CaveData::GetSegmentColor(int segmentIndex)
+{
+	if (segmentIndex < 0)
+		return noSegmentColor;
+	else
+		return segmentColors[segmentIndex % 10];
+}
+
 void CaveData::WriteSegmentationColoredOff(const std::string & path, const std::vector<int32_t>& segmentation)
 {
-	int colors[10][3] =
-	{
-		{ 166, 206, 227 },
-		{ 31,120,180 },
-		{ 251,154,153 },
-		{ 227,26,28 },
-		{ 253,191,111 },
-		{ 255,127,0 },
-		{ 202,178,214 },
-		{ 106,61,154 },
-		{ 255,255,153 },
-		{ 177,89,40 }
-	};
-
 	auto colorFunc = [&](int i, int& r, int& g, int& b)
 	{
-		if (segmentation[i] < 0)
-		{
-			r = 0; g = 175; b = 0;
-		}
-		else
-		{
-			int* color = colors[segmentation[i] % 10];
-			r = color[0];
-			g = color[1];
-			b = color[2];
-		}
+		const int* color = GetSegmentColor(segmentation[i]);
+		r = color[0];
+		g = color[1];
+		b = color[2];
 	};
 
 	WriteOff(path.c_str(), meshVertices(), meshTriIndices(), [&](int i, int& r, int& g, int& b) {colorFunc(meshVertexCorrespondsTo[i], r, g, b); });

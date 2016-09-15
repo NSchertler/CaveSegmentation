@@ -1,0 +1,7 @@
+1.0   4.0    6     power
+5     20    15     scale
+0.0   1.0   20     size
+0.0   1.0   10     size derivative
+0.0   1.0   10     curvature tipping point
+0.00  1.0   10     direction tolerance
+lower upper steps	

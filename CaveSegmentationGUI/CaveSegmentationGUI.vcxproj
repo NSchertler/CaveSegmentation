@@ -1,13 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugNSight|Win32">
+      <Configuration>DebugNSight</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="DebugNSight|x64">
       <Configuration>DebugNSight</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -23,11 +35,23 @@
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
@@ -37,10 +61,19 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -50,16 +83,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(MCFSKELETON_ROOT)\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(SolutionDir)\MCFSkeleton\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -70,15 +112,34 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_LIBRARYDIR);$(CGAL_DIR)/build/lib;$(MCFSKELETON_ROOT)/bin/x64;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_ROOT)/lib64-msvc-14.0;$(CGAL_DIR)/build/lib;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbod.lib;MCFSkeletond.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbod.lib;qtmaind.lib;Qt5Cored.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;Qt5Guid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(SolutionDir)\MCFSkeleton\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_ROOT)/lib64-msvc-14.0;$(CGAL_DIR)/build/lib;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbod.lib;qtmaind.lib;Qt5Cored.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;Qt5Guid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NSIGHT_COMPATIBLE;UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\include;$(QPBO_ROOT);$(OPENGM_ROOT)\include;$(MCFSKELETON_ROOT)\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NSIGHT_COMPATIBLE;UNICODE;WIN32;QT_DLL;QT_CORE_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(SolutionDir)\MCFSkeleton\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -89,15 +150,34 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_LIBRARYDIR);$(CGAL_DIR)/build/lib;$(MCFSKELETON_ROOT)/bin/x64;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_ROOT)/lib64-msvc-14.0;$(CGAL_DIR)/build/lib;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbod.lib;MCFSkeletond.lib;qtmaind.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbod.lib;qtmaind.lib;Qt5Cored.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;Qt5Guid.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>NSIGHT_COMPATIBLE;QT_CONCURRENT_LIB;QT_CORE_LIB;QT_DLL;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;UNICODE;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(SolutionDir)\MCFSkeleton\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_ROOT)/lib64-msvc-14.0;$(CGAL_DIR)/build/lib;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbod.lib;qtmaind.lib;Qt5Cored.lib;Qt5OpenGLd.lib;opengl32.lib;glu32.lib;Qt5Widgetsd.lib;Qt5Concurrentd.lib;Qt5Guid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_GUI_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(MCFSKELETON_ROOT)\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(SolutionDir)\MCFSkeleton\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
@@ -107,9 +187,27 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_LIBRARYDIR);$(CGAL_DIR)/build/lib;$(MCFSKELETON_ROOT)/bin/x64;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_ROOT)/lib64-msvc-14.0;$(CGAL_DIR)/build/lib;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbo.lib;MCFSkeleton.lib;qtmain.lib;Qt5Core.lib;Qt5Gui.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Concurrent.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbo.lib;qtmain.lib;Qt5Core.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Concurrent.lib;Qt5Gui.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>UNICODE;WIN32;QT_DLL;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_CONCURRENT_LIB;QT_GUI_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(GLM_ROOT);$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(QPBO_ROOT)\include;$(OPENGM_ROOT)\include;$(SolutionDir)\MCFSkeleton\include;$(EIGEN3_ROOT);$(ProjectDir)GeneratedFiles;.;$(QTDIR)\include;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(CGAL_DIR)/auxiliary/gmp/lib;$(BOOST_ROOT)/lib64-msvc-14.0;$(CGAL_DIR)/build/lib;$(QPBO_ROOT)\lib\x64;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;qpbo.lib;qtmain.lib;Qt5Core.lib;Qt5OpenGL.lib;opengl32.lib;glu32.lib;Qt5Widgets.lib;Qt5Concurrent.lib;Qt5Gui.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -119,111 +217,174 @@
     <ClCompile Include="DataPlot.cpp" />
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_CaveGLData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_cavesegmentationgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_DataPlot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_qcustomplot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\DebugNSight\moc_ViewModel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_CaveGLData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_cavesegmentationgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_DataPlot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_qcustomplot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ViewModel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_gui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_CaveGLData.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_cavesegmentationgui.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_DataPlot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_qcustomplot.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ViewModel.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="QCustomPlot\qcustomplot.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ViewModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="cavesegmentationgui.h">
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing cavesegmentationgui.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing cavesegmentationgui.h...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Moc%27ing cavesegmentationgui.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Moc%27ing cavesegmentationgui.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\." "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing cavesegmentationgui.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing cavesegmentationgui.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../cavesegmentationgui.h"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="cavesegmentationgui.ui">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Uic%27ing %(Identity)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Uic%27ing %(Identity)...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Uic%27ing %(Identity)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Uic%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Uic%27ing %(Identity)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Uic%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
       <SubType>Designer</SubType>
     </CustomBuild>
   </ItemGroup>
@@ -231,61 +392,109 @@
     <ClInclude Include="CaveDataGLView.h" />
     <CustomBuild Include="DataPlot.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Moc%27ing DataPlot.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Moc%27ing DataPlot.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\." "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../DataPlot.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../DataPlot.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../DataPlot.h"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing DataPlot.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing DataPlot.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../DataPlot.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../DataPlot.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../DataPlot.h"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing DataPlot.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing DataPlot.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../DataPlot.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../DataPlot.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../DataPlot.h"</Command>
     </CustomBuild>
     <CustomBuild Include="ViewModel.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Moc%27ing ViewModel.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Moc%27ing ViewModel.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\." "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../ViewModel.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../ViewModel.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../ViewModel.h"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ViewModel.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing ViewModel.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../ViewModel.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../ViewModel.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../ViewModel.h"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ViewModel.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing ViewModel.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../ViewModel.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../ViewModel.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../ViewModel.h"</Command>
     </CustomBuild>
     <CustomBuild Include="QCustomPlot\qcustomplot.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Moc%27ing qcustomplot.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Moc%27ing qcustomplot.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\." "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing qcustomplot.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing qcustomplot.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing qcustomplot.h...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing qcustomplot.h...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../QCustomPlot/qcustomplot.h"</Command>
     </CustomBuild>
     <ClInclude Include="PrintRedirection.h" />
     <ClInclude Include="stdafx.h" />
     <CustomBuild Include="CaveGLData.hpp">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing CaveGLData.hpp...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing CaveGLData.hpp...</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Moc%27ing CaveGLData.hpp...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Moc%27ing CaveGLData.hpp...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\." "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DUNICODE -DWIN32 -DQT_DLL -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DNSIGHT_COMPATIBLE -DQT_CONCURRENT_LIB -DQT_CORE_LIB -DQT_DLL -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing CaveGLData.hpp...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing CaveGLData.hpp...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_GUI_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(MCFSKELETON_ROOT)\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o ".\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp"  -DUNICODE -DWIN32 -DQT_DLL -DQT_NO_DEBUG -DNDEBUG -DQT_CORE_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_CONCURRENT_LIB -DQT_GUI_LIB  "-I$(SolutionDir)\CaveSegmentationGUICore\include" "-I$(SolutionDir)\CaveSegmentationLib\include" "-I$(GLM_ROOT)\." "-I$(BOOST_ROOT)\." "-I$(CGAL_DIR)\auxiliary\gmp\include" "-I$(CGAL_DIR)\build\include" "-I$(CGAL_DIR)\include" "-I$(QPBO_ROOT)\include" "-I$(OPENGM_ROOT)\include" "-I$(SolutionDir)\MCFSkeleton\include" "-I$(EIGEN3_ROOT)\." "-I$(ProjectDir)GeneratedFiles" "-I." "-I$(QTDIR)\include" "-I$(ProjectDir)GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtOpenGL" "-I$(QTDIR)\include\QtWidgets" "-I.\GeneratedFiles\$(ConfigurationName)\." "-I$(QTDIR)\include\QtConcurrent" "-I$(QTDIR)\include\QtGui" "-fstdafx.h" "-f../../CaveGLData.hpp"</Command>
     </CustomBuild>
     <ClInclude Include="GeneratedFiles\ui_cavesegmentationgui.h" />
   </ItemGroup>
@@ -296,28 +505,46 @@
     <ProjectReference Include="..\CaveSegmentationLib\CaveSegmentationLib.vcxproj">
       <Project>{fa3bbbff-a6c8-4fd5-b05e-ee70fd50d402}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\MCFSkeleton\MCFSkeleton.vcxproj">
+      <Project>{acf54eb6-8fad-4fb5-8789-944abd833b06}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources\gui.qrc">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">%(FullPath);.\Resources\Icon\main.ico;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">%(FullPath);.\Resources\Icon\main.ico;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">Rcc%27ing %(Identity)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">Rcc%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath);.\Resources\Icon\main.ico;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(FullPath);.\Resources\Icon\main.ico;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Rcc%27ing %(Identity)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Rcc%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath);.\Resources\Icon\main.ico;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(FullPath);.\Resources\Icon\main.ico;%(AdditionalInputs)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Rcc%27ing %(Identity)...</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Rcc%27ing %(Identity)...</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Icon\main.ico">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugNSight|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -334,6 +561,7 @@
     <None Include="glsl\marker.frag" />
     <None Include="glsl\marker.vert" />
     <None Include="glsl\skeleton.frag" />
+    <None Include="glsl\skeleton.geom" />
     <None Include="glsl\skeleton.vert" />
     <None Include="glsl\skeletonPoint.frag" />
     <None Include="glsl\skeletonPoint.vert" />

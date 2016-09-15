@@ -31,6 +31,8 @@ public:
 	ObservableVariable<int32_t> hoveredElement;
 	ObservableVariable<int32_t> selectedVertex;
 
+	ObservableVariable<float> distanceExponent;
+
 	ObservableVariable<float> edgeCollapseThreshold;
 	ObservableVariable<float> skeletonSmooth;
 	ObservableVariable<float> skeletonVelocity;
@@ -45,6 +47,8 @@ private:
 	int32_t _hoveredElement;
 	int32_t _selectedVertex;
 	glm::vec3 marker;
+
+	float _distanceExponent;
 
 	float _edgeCollapseThreshold, _skeletonSmooth, _skeletonVelocity, _skeletonMedial;
 

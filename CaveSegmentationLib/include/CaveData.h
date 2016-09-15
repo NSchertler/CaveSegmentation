@@ -18,10 +18,10 @@ struct CaveData
 	void SetSkeleton(CurveSkeleton* skeleton);	
 
 	template <typename TSphereVisualizer = VoidSphereVisualizer>
-	bool CalculateDistancesSingleVertex(int iVert, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
+	bool CalculateDistancesSingleVertex(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
 	template <typename TSphereVisualizer = VoidSphereVisualizer>
-	bool CalculateDistancesSingleVertex(int iVert);
-	bool CalculateDistances();
+	bool CalculateDistancesSingleVertex(int iVert, float exponent = 1.0f);
+	bool CalculateDistances(float exponent = 1.0f);
 	void LoadDistances(const std::string& file);
 	void SaveDistances(const std::string& file) const;
 	void SmoothAndDeriveDistances();
@@ -59,11 +59,22 @@ struct CaveData
 
 	std::vector<double> caveSizeUnsmoothed;
 
-	const std::vector<Eigen::Vector3f>& meshVertices() { return _meshVertices; }
+	const std::vector<Eigen::Vector3f>& meshVertices() const { return _meshVertices; }
 	const TriangleList& meshTriangles(){ return _meshTriangles; }
 	const std::vector<IndexedTriangle>& meshTriIndices(){ return _meshTriIndices; }
 	const Tree& meshAABBTree(){ return _meshAABBTree; }
 
+	//Returns a 3-component RGB array
+	const int* GetSegmentColor(int segmentIndex);
+
+	std::vector<int> invalidVertices; //a list of vertices that did not have valid distances before reconstruction
+
+	enum Algorithm
+	{
+		Max,
+		Smooth,
+		Advect
+	} CAVE_SCALE_ALGORITHM;
 	double CAVE_SCALE_KERNEL_FACTOR; //kernel deviation for calculating cave scale (multiplied by local cave size)
 	double CAVE_SIZE_KERNEL_FACTOR; //kernel deviation for smoothing cave size (multiplied by cave scale)
 	double CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR; //kernel deviation for smoothing cave size derivative (multiplied by cave scale)	

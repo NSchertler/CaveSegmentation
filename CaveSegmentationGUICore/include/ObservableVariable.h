@@ -27,13 +27,13 @@ public:
 	void set(T v) { var = v; emit changed(); }
 	const T& get() const { return var; }
 
-	void setupSlider(QSlider* sld, T min, T max, int steps)
+	void setupSlider(QSlider* sld, T min, T max, T step)
 	{
 		this->sld = sld;
-		sliderValueStepLength = (max - min) / steps;
-		sld->setMinimum(min / sliderValueStepLength);
-		sld->setMaximum(max / sliderValueStepLength);
-		sld->setValue(get() / sliderValueStepLength);
+		this->sliderValueStepLength = step;
+		sld->setMinimum(min / step);
+		sld->setMaximum(max / step);
+		sld->setValue(get() / step);
 
 		connect(sld, &QSlider::valueChanged, this, &ObservableVariable<T>::sldChanged);
 	}

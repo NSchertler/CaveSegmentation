@@ -48,45 +48,8 @@ void CaveGLData::LoadSegmentation(const std::string& path)
 
 glm::vec4 CaveGLData::segmentColor(int32_t segment)
 {
-	const glm::vec4 colors[10] =
-	{
-		glm::vec4( 166.0f / 255.0f, 206.0f / 255.0f, 227.0f / 255.0f, 1 ),
-		glm::vec4(  31.0f / 255.0f, 120.0f / 255.0f, 180.0f / 255.0f, 1 ),
-		glm::vec4( 251.0f / 255.0f, 154.0f / 255.0f, 153.0f / 255.0f, 1 ),
-		glm::vec4( 227.0f / 255.0f,  26.0f / 255.0f,  28.0f / 255.0f, 1 ),
-		glm::vec4( 253.0f / 255.0f, 191.0f / 255.0f, 111.0f / 255.0f, 1 ),
-		glm::vec4( 255.0f / 255.0f, 127.0f / 255.0f,   0.0f / 255.0f, 1 ),
-		glm::vec4( 202.0f / 255.0f, 178.0f / 255.0f, 214.0f / 255.0f, 1 ),
-		glm::vec4( 106.0f / 255.0f,  61.0f / 255.0f, 154.0f / 255.0f, 1 ),
-		glm::vec4( 255.0f / 255.0f, 255.0f / 255.0f, 153.0f / 255.0f, 1 ),
-		glm::vec4( 177.0f / 255.0f,  89.0f / 255.0f,  40.0f / 255.0f, 1 )
-	};
-
-	if (segment < 0)
-	{
-		return glm::vec4(0, 0.686f, 0, 1);
-	}
-	else
-	{
-		return colors[segment % 10];		
-	}
-	/* curvature visualization
-	r = g = b = 100;
-	if (data.caveSizeCurvatures[i] > 0)
-	{
-	r += (int)(data.caveSizeCurvatures[i] * 155 / 0.2);
-	if (r > 255)
-	r = 255;
-	}*/
-	/* size visualization
-	r = g = b = (int)(data.caveSizes[i] * 255 / 30); */
-	/* entrance prob visualization
-	r = g = b = 0;
-	double prob = entranceProbability(data.caveSizeCurvatures[i]);
-	if (prob > 0.5)
-	r = 128 + 255 * (prob - 0.5);
-	else
-	b = 128 + 255 * prob;*/
+	const int* c = GetSegmentColor(segment);
+	return glm::vec4(c[0] / 255.0f, c[1] / 255.0f, c[2] / 255.0f, 1);
 }
 
 void CaveGLData::segmentationChangedHandler()
@@ -327,10 +290,11 @@ void CaveGLData::drawSkeleton(CameraProvider* cam)
 
 	data.skeletonVAO.bind();
 	skeletonProgram->bind();
-	
+
 	auto MVP = glm::transpose(cam->GetProjectionMatrix() * cam->GetViewMatrix());
 	auto m = QMatrix4x4(glm::value_ptr(MVP));
 	skeletonProgram->setUniformValue("mvp", m);
+
 	glDrawElements(GL_LINES, skeleton->edges.size() * 2, GL_UNSIGNED_INT, 0);
 
 	skeletonProgram->release();
@@ -426,7 +390,7 @@ void CaveGLData::initGL(OpenGLContextProvider* ctx, bool primary)
 void CaveGLData::init_shaders()
 {
 	meshProgram = MakeProgram("glsl/cave.vert", "glsl/cave.frag", "glsl/cave.geom");
-	skeletonProgram = MakeProgram("glsl/skeleton.vert", "glsl/skeleton.frag");
+	skeletonProgram = MakeProgram("glsl/skeleton.vert", "glsl/skeleton.frag", "glsl/skeleton.geom");
 	skeletonPointProgram = MakeProgram("glsl/skeletonPoint.vert", "glsl/skeletonPoint.frag");
 	skeletonPointSelectionProgram = MakeProgram("glsl/skeletonPoint.vert", "glsl/skeletonPointSelection.frag");
 	correspondenceProgram = MakeProgram("glsl/correspondence.vert", "glsl/correspondence.frag", "glsl/correspondence.geom");
