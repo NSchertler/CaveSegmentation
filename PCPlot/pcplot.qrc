@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/PCPlot"/>
+    <qresource prefix="/glsl">
+        <file>axes.frag</file>
+        <file>axes.vert</file>
+        <file>lines.frag</file>
+        <file>lines.vert</file>
+        <file>post.frag</file>
+        <file>post.vert</file>
+    </qresource>
+</RCC>
