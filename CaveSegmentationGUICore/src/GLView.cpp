@@ -318,6 +318,7 @@ void GLView::wheelEvent(QWheelEvent* e)
 
 void GLView::mousePressEvent(QMouseEvent* e)
 {
+	this->setFocus();
 	if (e->modifiers() == cameraControlModifier)
 	{
 		if (e->buttons() == Qt::RightButton)

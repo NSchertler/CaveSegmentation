@@ -83,7 +83,7 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 
 	if (!o.stereo)
 	{
-		setWindowState(windowState() | Qt::WindowMaximized);
+		//setWindowState(windowState() | Qt::WindowMaximized);
 		connect(glView, &GLView::inited, this, &CaveSegmentationGUI::preloadData);
 	}
 	else
@@ -117,6 +117,8 @@ void CaveSegmentationGUI::glViewInited()
 
 void CaveSegmentationGUI::preloadData()
 {
+	//this->setFixedWidth(1920 + width() - glView->width());
+	//this->setFixedHeight(1080 + height() - glView->height());
 	if (!options.dataDir.isEmpty())
 	{
 		dataDirectory = QDir(options.dataDir);

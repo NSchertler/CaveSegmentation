@@ -57,7 +57,7 @@ struct CaveInfo
 		CurvatureBasedQPBO::FindChambers(data, segmentation);
 	}
 
-	double segmentationPlausability() const
+	float segmentationPlausability() const
 	{
 		//seg result:
 		//0 -> chamber
@@ -76,7 +76,7 @@ struct CaveInfo
 			}
 		}
 
-		return 1 - unplausability / data.meshVertices().size();
+		return (float)(1 - unplausability / data.meshVertices().size());
 	}
 
 	CaveData data;
@@ -104,8 +104,6 @@ struct ParameterRange
 		bool operator!=(const Iterator& other) const { return i != other.i; }
 		T operator*() const { return static_cast<T>(range.lower + i * (range.upper - range.lower) / range.steps); }
 
-		double percentage() const { return i / (range.steps + 1); }
-
 		const ParameterRange& range;
 		int i;
 	};
@@ -119,21 +117,34 @@ struct ParameterRange
 
 struct ParameterSet
 {
-	double meanPlausibility = 0;
-	double minPlausibility = 0;
-
-	double power;
+	float power;
 	CaveData::Algorithm algo;
-	double scale, size, sizeDerivative;
-	double tipPoint, directionTolerance;
+	float scale, size, sizeDerivative;
+	float tipPoint, directionTolerance;
+
+	float meanPlausibility = 0;
+	float minPlausibility = 0;
 };
+
+std::ostream& operator<<(std::ostream& os, CaveData::Algorithm a)
+{
+	switch (a)
+	{
+	case CaveData::Max:
+		return os << "Max";
+	case CaveData::Smooth:
+		return os << "Smooth";
+	case CaveData::Advect:
+		return os << "Advect";
+	}
+}
 
 std::ostream& operator<<(std::ostream& os, const ParameterSet& p)
 {
 	os << "Mean Plausibility: " << (p.meanPlausibility * 100.0) << " %" << std::endl;
 	os << "Min Plausibility: " << (p.minPlausibility * 100.0) << " %" << std::endl;
 	os << "Distance Power: " << p.power << std::endl;
-	os << "Scale Algorithm: " << (p.algo == CaveData::Max ? "Max" : (p.algo == CaveData::Smooth ? "Smooth" : "Advect")) << std::endl;
+	os << "Scale Algorithm: " << p.algo << std::endl;
 	os << "Scale Kernel: " << p.scale << std::endl;
 	os << "Size Kernel: " << p.size << std::endl;
 	os << "Size Derivative Kernel: " << p.sizeDerivative << std::endl;
@@ -192,26 +203,42 @@ inline std::string timeString(double time, bool precise = false) {
 
 int main(int argc, char* argv[])
 {
+	std::cout.imbue(std::locale("en-US"));
+
 	std::vector<CaveInfo*> caves;
 	for (int i = 1; i < argc; ++i)
 	{
 		std::cout << "Loading \"" << argv[i] << "\".." << std::endl;
-		caves.push_back(new CaveInfo(std::string(argv[i])));
+		caves.push_back(new CaveInfo(std::string(argv[i])));		
 	}
 
-	std::vector<double> plausabilities(caves.size());
+	std::vector<float> plausabilities(caves.size());
 
-	ParameterRange<double> powerRange;
-	ParameterRange<CaveData::Algorithm> algorithmRange(CaveData::Algorithm::Max, CaveData::Algorithm::Advect, 1);
-	ParameterRange<double> scaleRange;
-	ParameterRange<double> sizeRange;
-	ParameterRange<double> sizeDerivativeRange;
-	ParameterRange<double> tipPointRange;
-	ParameterRange<double> directionToleranceRange;
+	ParameterRange<float> powerRange;
+	ParameterRange<float> scaleRange;
+	ParameterRange<float> sizeRange;
+	ParameterRange<float> sizeDerivativeRange;
+	ParameterRange<float> tipPointRange;
+	ParameterRange<float> directionToleranceRange;
 
-	ParameterRange<double>* configurableRanges[] = { &powerRange, &scaleRange, &sizeRange, &sizeDerivativeRange, &tipPointRange, &directionToleranceRange };
+	ParameterRange<float>* configurableRanges[] = { &powerRange, &scaleRange, &sizeRange, &sizeDerivativeRange, &tipPointRange, &directionToleranceRange };
 	std::ifstream config("config.txt");
+
 	std::string line;
+	std::getline(config, line);
+	std::istringstream ss(line);
+	std::vector<CaveData::Algorithm> algos;
+	while (!ss.eof())
+	{
+		int algo;
+		ss >> algo;
+		if (ss.fail())
+			break;
+		auto realAlgo = static_cast<CaveData::Algorithm>(algo);
+		algos.push_back(realAlgo);
+		std::cout << "Scheduling algorithm for evaluation: " << realAlgo << std::endl;
+	}
+	
 	for (int i = 0; i < 6; ++i)
 	{
 		std::getline(config, line);
@@ -221,12 +248,13 @@ int main(int argc, char* argv[])
 
 	size_t totalIterations = 
 		(powerRange.steps + 1)
-		* (algorithmRange.steps + 1)
+		* (algos.size())
 		* (scaleRange.steps + 1)
 		* (sizeRange.steps + 1)
 		* (sizeDerivativeRange.steps + 1)
 		* (tipPointRange.steps + 1)
 		* (directionToleranceRange.steps + 1);
+	std::cout << "Evaluating a total of " << totalIterations << " samples." << std::endl;
 	size_t currentIterations = 0;
 
 	ParameterSet bestAverageParameters;
@@ -241,17 +269,34 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
+	FILE* binFile = fopen("result.bin", "wb");
+	if (!binFile)
+	{
+		std::cerr << "Could not open binary file." << std::endl;
+		csvFile.close();
+		return 2;
+	}
+
+	std::ios oldState(nullptr);
+	oldState.copyfmt(std::cout);
+	std::cout << std::fixed;
+	std::cout.precision(1);
+
+	csvFile.imbue(std::locale("en-US"));
+	csvFile << "Distance Power;Scale Algorithm;Scale Kernel;Size Kernel;Size Derivative Kernel;Curvature Tipping Point;Direction Tolerance;Mean Plausability;Min Plausability;";
+	for (int i = 0; i < caves.size(); ++i)
+		csvFile << "Plausability Cave " << i << ";";
+	csvFile << std::endl;
 	
 	Timer<> timer;
-	for (double _power : powerRange)
+	for (float _power : powerRange)
 	{
 		params.power = _power;
 
-#pragma omp parallel for
 		for (int i = 0; i < caves.size(); ++i)
 			caves.at(i)->data.CalculateDistances(params.power);
 
-		for (auto _algo : algorithmRange)
+		for (auto _algo : algos)
 		{
 			params.algo = _algo;
 			for (auto _scale : scaleRange)
@@ -263,6 +308,9 @@ int main(int argc, char* argv[])
 					for (auto _sizeDerivative : sizeDerivativeRange)
 					{
 						params.sizeDerivative = _sizeDerivative;
+
+						double percentage = (double)currentIterations / totalIterations;
+						std::cout << "\rStatus: " << (100.0 * percentage) << " %, estimated time to finish: " << timeString(timer.value() / percentage - timer.value()) << "        ";
 
 #pragma omp parallel for
 						for (int i = 0; i < caves.size(); ++i)
@@ -277,9 +325,7 @@ int main(int argc, char* argv[])
 
 						for (auto _tipPoint : tipPointRange)
 						{
-							params.tipPoint = _tipPoint;
-							double percentage = (double)currentIterations / totalIterations;
-							std::cout << "\rStatus: " << (100.0 * percentage) << " %, estimated time to finish: " << timeString(timer.value() / percentage - timer.value()) << "        ";
+							params.tipPoint = _tipPoint;							
 
 							for (auto _directionTolerance : directionToleranceRange)
 							{
@@ -294,19 +340,20 @@ int main(int argc, char* argv[])
 								for (int i = 0; i < caves.size(); ++i)
 								{
 									caves.at(i)->segment();
-									double p = caves.at(i)->segmentationPlausability();
+									float p = caves.at(i)->segmentationPlausability();
 
 									plausabilities.at(i) = p;
 									int c = caves.at(i)->data.meshVertices().size();
 									countVertices += c;
-									params.meanPlausibility += (double)c / countVertices * (p - params.meanPlausibility);
+									params.meanPlausibility += (float)c / countVertices * (p - params.meanPlausibility);
 									params.minPlausibility = std::min(params.minPlausibility, p);
 								}
 
-								csvFile << params.tipPoint << ";" << params.directionTolerance << ";" << params.meanPlausibility << ";" << params.minPlausibility << "; ";
-								for (double p : plausabilities)
+								csvFile << params.power << ";" << (int)params.algo << ";" << params.scale << ";" << params.size << ";" << params.sizeDerivative << ";" << params.tipPoint << ";" << params.directionTolerance << ";" << params.meanPlausibility << ";" << params.minPlausibility << "; ";
+								for (float p : plausabilities)
 									csvFile << p << "; ";
 								csvFile << std::endl;
+								fwrite(&params, sizeof(ParameterSet), 1, binFile);
 
 								if (params.meanPlausibility > bestAverageParameters.meanPlausibility)
 									bestAverageParameters = params;
@@ -323,10 +370,15 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	std::cout << std::endl;
+	std::cout.copyfmt(oldState);
+
+	csvFile.close();
+	fclose(binFile);
+
+	std::cout << std::endl;	
 
 	std::cout << std::endl << "Best parameters for minimal plausibility:" << std::endl << bestMinParameters;
-	std::cout << std::endl << "Best parameters for average plausibility:" << std::endl << bestAverageParameters;	
+	std::cout << std::endl << "Best parameters for average plausibility:" << std::endl << bestAverageParameters;		
 
     return 0;
 }

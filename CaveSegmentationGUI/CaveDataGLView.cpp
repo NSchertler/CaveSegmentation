@@ -153,6 +153,19 @@ void CaveDataGLView::resizeGL(int width, int height)
 	recreatePickingResources = true;
 }
 
+void CaveDataGLView::keyPressEvent(QKeyEvent *e)
+{
+	if (e->key() == Qt::Key::Key_Space)
+	{
+		std::cout << "Saving screenshot.." << std::endl;
+		//QImage img = this->grabFramebuffer();
+		auto img = this->grab();
+		img.save("screen.png");
+	}
+	else
+		std::cout << "Wrong key" << std::endl;
+}
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -250,7 +263,7 @@ void CaveDataGLView::paintGL()
 	glDrawBuffers(1, bufs);
 	glDepthMask(GL_TRUE);
 
-	//renderSky();
+	renderSky();
 
 	if (vm.getLookThrough())
 	{
@@ -312,5 +325,10 @@ void CaveDataGLView::paintGL()
 		cursorProgram->release();
 		glDisable(GL_DEPTH_CLAMP);
 	}
+
+	glFlush();
+	GLubyte a[3];
+	//glReadPixels(30, 30, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, a);
+	std::cout << "Pixel: " << a[0] << ", " << a[1] << ", " << a[2] << std::endl;
 }
 

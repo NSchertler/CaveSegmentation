@@ -137,7 +137,15 @@ void LineFlow(std::list<PositionGradient>& linePoints, const RegularUniformSpher
 		for (auto it = linePoints.begin(); it != linePoints.end(); ++it)
 		{
 			Vector p = it->position + it->gradient * gradientMultiplier * direction;
+
+			Vector oldP = p;
+
 			p = p / sqrt(p.squared_length());
+
+			if (abs(p.x() * p.x() + p.y() * p.y() + p.z() * p.z() - 1) > 0.01)
+				std::cout << "Normalization of p failed. Input vector: " << oldP << ", output: " << p << std::endl;
+
+
 			it->position = p;
 		}
 
@@ -157,7 +165,14 @@ void LineFlow(std::list<PositionGradient>& linePoints, const RegularUniformSpher
 				if (distanceToNext > 1.5 * LINE_POINT_DISTANCE)
 				{
 					Vector meanPosition = it->position + next->position;
+
+					Vector oldMean = meanPosition; //debug
+
 					meanPosition = meanPosition / sqrt(meanPosition.squared_length());
+
+					if (abs(meanPosition.x() * meanPosition.x() + meanPosition.y() * meanPosition.y() + meanPosition.z() * meanPosition.z() - 1) > 0.01)
+						std::cout << "Normalization of mean failed. Input vector: " << oldMean << ", output: " << meanPosition << std::endl;
+
 					linePoints.insert(next, PositionGradient(meanPosition));
 				}
 
@@ -183,6 +198,9 @@ void LineFlow(std::list<PositionGradient>& linePoints, const RegularUniformSpher
 		for (auto it = linePoints.begin(); it != linePoints.end(); ++it)
 		{
 			Vector p = it->position;
+
+			if (abs(p.squared_length() - 1) > 0.01)
+				std::cout << "Point on line has non-unit length:" << p << std::endl;
 
 			double distance = sphereSampling.AccessInterpolatedContainerData(potential, p);
 

@@ -151,6 +151,9 @@ void maxAdvect(const std::vector<CurveSkeleton::Vertex>& vertices, const std::ve
 template <typename T>
 T smoothSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iVert, const std::vector<std::vector<int>>& adjacency, double smoothDeviation, const std::vector<T>& source)
 {
+	if (smoothDeviation <= 0)
+		return source[iVert];
+
 	double distanceThreshold = 3 * smoothDeviation; //Gaussian is practically 0 after 3 * standardDeviation
 
 	//perform Dijkstra

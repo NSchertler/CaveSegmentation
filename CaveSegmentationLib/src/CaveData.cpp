@@ -10,6 +10,18 @@
 
 #include <boost/filesystem/operations.hpp>
 
+//SDF
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
+#include <CGAL/IO/Polyhedron_iostream.h>
+#include <CGAL/mesh_segmentation.h>
+#include <CGAL/property_map.h>
+#include <iostream>
+#include <fstream>
+
+typedef CGAL::Exact_predicates_inexact_constructions_kernel SDFKernel;
+typedef CGAL::Polyhedron_3<SDFKernel> SDFPolyhedron;
+
 void CalculateGradient(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
 {
 	for (auto it = sphereSampling.begin(); it != sphereSampling.end(); ++it)
@@ -211,6 +223,50 @@ void CaveData::LoadMesh(const std::string & offFile)
 			std::cout << "Cannot write cache." << std::endl;
 		}
 	}	
+
+	//SDF test
+	//std::cout << "Calculating SDF segmentation .." << std::endl;
+
+	//// create and read Polyhedron
+	//SDFPolyhedron mesh;
+	//std::ifstream input(offFile);
+	//if ( !input || !(input >> mesh) || mesh.empty() )
+	//{
+	//	std::cerr << "Not a valid off file." << std::endl;  
+	//	return;
+	//}    
+	//// create a property-map for segment-ids   
+	//typedef std::map<SDFPolyhedron::Facet_const_handle, std::size_t> Facet_int_map;  
+	//Facet_int_map internal_segment_map;  
+	//boost::associative_property_map<Facet_int_map> segment_property_map(internal_segment_map);    
+	//// calculate SDF values and segment the mesh using default parameters.    
+	//std::size_t number_of_segments = CGAL::segmentation_via_sdf_values(mesh, segment_property_map, 2 * M_PI / 3, 23u, 5u, 0.5); 
+	//std::cout << "Number of segments: " << number_of_segments << std::endl;    
+	//// print segment-ids    
+	//std::ofstream coff(offFile + ".sdf.off");
+	//coff << "COFF" << std::endl;
+	//coff << 3 * mesh.size_of_facets() << " " << mesh.size_of_facets() << " 0" << std::endl;
+	//
+	//for(SDFPolyhedron::Facet_const_iterator facet_it = mesh.facets_begin();
+	//	facet_it != mesh.facets_end(); ++facet_it) 
+	//{   
+	//	auto v_it = facet_it->facet_begin();
+	//	do
+	//	{
+	//		int segment = segment_property_map[facet_it];
+	//		const int* color = GetSegmentColor(segment);	
+	//		auto p = v_it->vertex()->point();
+	//		coff << p.x() << " " << p.y() << " " << p.z() << " " << color[0] << " " << color[1] << " " << color[2] << std::endl;
+	//	} while (++v_it != facet_it->facet_begin());
+	//}
+	//for (int i = 0; i < mesh.size_of_facets(); ++i)
+	//{
+	//	coff << "3 " << 3 * i << " " << 3 * i + 1 << " " << 3 * i + 2 << std::endl;
+	//}
+
+	//coff.close();
+	//std::cout << std::endl;
+	//std::cout << "done." << std::endl;
 }
 
 void CaveData::SetSkeleton(CurveSkeleton * skeleton)
@@ -391,6 +447,14 @@ template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int
 
 bool CaveData::CalculateDistances(float exponent)
 {
+	/*std::cout.precision(5);
+	char data[] = { 0x17, 0, 0, 0, 0, 0, 0, 0, 0x90, 0, 0, 0, 0, 0, 0, 0, 0x1d, 0xf8, 0x34, 0x58, 0x0d, 0x99, 0xbf, 0xbf };	
+	Vector p = *reinterpret_cast<Vector*>(data);
+	std::cout << "Vector: " << p << std::endl;
+	std::cout << "Vector.squared_length(): " << p.squared_length() << std::endl;
+	std::cout << "squared length: " << (p.x() * p.x() + p.y() * p.y() + p.z() * p.z()) << std::endl;
+	system("pause");*/
+
 	std::vector<std::vector<std::vector<double>>> sphereDistances(omp_get_num_procs());
 	std::vector<std::vector<std::vector<Vector>>> distanceGradient(omp_get_num_procs());
 

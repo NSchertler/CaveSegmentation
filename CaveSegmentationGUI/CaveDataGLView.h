@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QOpenGLTexture>
+#include <QKeyEvent>
 
 class CaveDataGLView : public GLView, QOpenGLFunctions_3_3_Core 
 {
@@ -18,6 +19,7 @@ protected:
 	virtual void leaveEvent(QEvent *);
 	virtual void mousePressEvent(QMouseEvent*);
 	virtual void resizeGL(int width, int height);
+	virtual void keyPressEvent(QKeyEvent*);
 
 protected slots:
 	void meshChanged();	
