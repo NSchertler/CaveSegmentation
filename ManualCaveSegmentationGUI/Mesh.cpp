@@ -16,7 +16,7 @@ std::unique_ptr<QOpenGLShaderProgram> Mesh::program(nullptr);
 Mesh::Mesh(GLView* parent, std::string filename)
 	: parent(parent), screenSpaceTree(kd_create(2)), indexBuffer(QOpenGLBuffer::IndexBuffer), positionBuffer(QOpenGLBuffer::VertexBuffer), segmentationBuffer(QOpenGLBuffer::VertexBuffer), openGLReady(false)
 {
-	connect(parent, SIGNAL(viewUpdated()), this, SLOT(parent_viewUpdated()));
+	connect(parent, &GLView::CameraStill, this, &Mesh::Parent_CameraStill);
 
 	readFile(filename);
 }
@@ -26,29 +26,27 @@ Mesh::~Mesh()
 	kd_free(screenSpaceTree);	
 }
 
-void Mesh::parent_viewUpdated()
+void Mesh::Parent_CameraStill()
 {	
 	//Build screen space kd tree
 	kd_clear(screenSpaceTree);
 
-	glm::mat4 modelView, proj, MVP;
-	glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelView));
-	glGetFloatv(GL_PROJECTION_MATRIX, glm::value_ptr(proj));
-	MVP = proj * modelView;
+	glm::mat4 MVP = parent->GetProjectionMatrix() * parent->GetViewMatrix();
 
 	for (int i = 0; i < positions.size(); ++i)
 	{
-		auto posOnScreen = MVP * glm::vec4(positions[i], 1.0f);
-		posOnScreen *= 1.0f / posOnScreen.w;
+		auto posInViewSpace = parent->GetViewMatrix() * glm::vec4(positions[i], 1.0f);
+		auto posInClipSpace = parent->GetProjectionMatrix() * posInViewSpace;
+		posInClipSpace *= 1.0f / posInClipSpace.w;
 
-		posOnScreen.x = round(parent->width() * (0.5f * (posOnScreen.x + 1.0f)));
-		posOnScreen.y = round(parent->height() * (0.5f * (posOnScreen.y + 1.0f)));
-		posOnScreen.z = 0.5f * (posOnScreen.z + 1.0f);
+		posInClipSpace.x = round(parent->width() * (0.5f * (posInClipSpace.x + 1.0f)));
+		posInClipSpace.y = round(parent->height() * (0.5f * (posInClipSpace.y + 1.0f)));
+		posInClipSpace.z = 0.5f * (posInClipSpace.z + 1.0f);
 
-		if (posOnScreen.x >= 0 && posOnScreen.x < parent->width() && posOnScreen.y >= 0 && posOnScreen.y < parent->height())
+		if (posInClipSpace.x >= 0 && posInClipSpace.x < parent->width() && posInClipSpace.y >= 0 && posInClipSpace.y < parent->height())
 		{
-			kd_insertf(screenSpaceTree, glm::value_ptr(posOnScreen), &positions[i]);
-			screenSpaceDepths[i] = posOnScreen.z;
+			kd_insertf(screenSpaceTree, glm::value_ptr(posInClipSpace), &positions[i]);
+			screenSpaceDepths[i] = posInViewSpace.z;
 		}
 	}
 
@@ -104,30 +102,12 @@ void Mesh::paint(int mouseX, int mouseY, int radius, int value)
 {
 	bool changed = false;
 
-	/*for (int i = 0; i < positions.size(); ++i)
-	{
-		auto posOnScreen = MVP * glm::vec4(positions[i], 1.0f);
-		posOnScreen *= 1.0f / posOnScreen.w;
-
-		posOnScreen.x = round(parent->width() * (0.5f * (posOnScreen.x + 1.0f)));
-		posOnScreen.y = round(parent->height() * (0.5f * (posOnScreen.y + 1.0f)));
-		posOnScreen.z = 0.5f * (posOnScreen.z + 1.0f);
-
-		int dx = posOnScreen.x - mouseX;
-		int dy = posOnScreen.y - mouseY;
-		if (segmentation[i] != value && posOnScreen.x >= 0 && posOnScreen.x < parent->width() && posOnScreen.y >= 0 && posOnScreen.y < parent->height() && dx * dx + dy * dy <= radiusSqr)
-		{	
-			//qDebug() << "Calculated z-value: " << posOnScreen.z << ", depthBuffer: " << depthBuffer[(int)(posOnScreen.x + posOnScreen.y * parent->width())];
-			if (abs(posOnScreen.z - depthBuffer[(int)(posOnScreen.x + posOnScreen.y * parent->width())]) < 0.01f)
-			{
-				segmentation[i] = value;
-				changed = true;
-			}
-		}
-	}*/
-
-	float mousePos[2] = { mouseX, mouseY };
+	float mousePos[2] = { (float)mouseX, (float)mouseY };
 	auto candidates = kd_nearest_rangef(screenSpaceTree, mousePos, radius);
+
+	float zTolerance = 0.005 * (parent->getZFar() - parent->getZNear()); //The allowed tolerance between actual depth buffer and theoretical value.
+
+	auto proj = parent->GetProjectionMatrix();
 
 	float vertexScreenPos[2];
 	while (!kd_res_end(candidates))
@@ -135,12 +115,20 @@ void Mesh::paint(int mouseX, int mouseY, int radius, int value)
 		auto positionPointer = (glm::vec3*)kd_res_itemf(candidates, vertexScreenPos);
 		int index = positionPointer - &positions[0];
 
-		if (segmentation[index] != value)
+		//check vertex orientation
+		if (glm::dot(parent->getEye() - *positionPointer, vertexNormals.at(index)) > 0)
 		{
-			if (abs(screenSpaceDepths[index] - parent->depthBuffer[(int)(vertexScreenPos[0] + vertexScreenPos[1] * parent->width())]) < 0.01f)
+
+			if (segmentation[index] != value)
 			{
-				segmentation[index] = value;
-				changed = true;
+				float depthMin = ((screenSpaceDepths[index] + zTolerance) * proj[2][2] + proj[3][2]) / ((screenSpaceDepths[index] + zTolerance) * proj[2][3] + proj[3][3]);
+				float depthMax = ((screenSpaceDepths[index] - zTolerance) * proj[2][2] + proj[3][2]) / ((screenSpaceDepths[index] - zTolerance) * proj[2][3] + proj[3][3]);
+				float actualDepth = 2 * parent->depthBuffer()[(int)(vertexScreenPos[0] + vertexScreenPos[1] * parent->width())] - 1;
+				if (depthMin <= actualDepth && actualDepth <= depthMax)
+				{
+					segmentation[index] = value;
+					changed = true;
+				}
 			}
 		}
 
@@ -161,7 +149,7 @@ void Mesh::paint(int mouseX, int mouseY, int radius, int value)
 
 void Mesh::init_shaders(QOpenGLContext* context)
 {
-	program = MakeProgram("mesh.vert", "mesh.frag", "mesh.geom");		
+	program = MakeProgram(":/glsl/mesh.vert", ":/glsl/mesh.frag", ":/glsl/mesh.geom");		
 }
 
 void Mesh::createBuffers()
@@ -189,7 +177,7 @@ void Mesh::createBuffers()
 
 	vao.release();
 
-	parent_viewUpdated();
+	Parent_CameraStill();
 
 	openGLReady = true;
 }
@@ -329,7 +317,9 @@ void Mesh::readFile(std::string filename)
 	for (auto& v : positions)
 		add_point(v);
 
-	/*{
+
+#ifdef ADMIN
+	{
 		std::ofstream binaryOutput("cave.bin", std::ios::binary);
 		
 		int nVertices = positions.size();
@@ -340,12 +330,27 @@ void Mesh::readFile(std::string filename)
 		binaryOutput.write(reinterpret_cast<char*>(&indices[0]), nIndices * sizeof(unsigned int));
 
 		binaryOutput.close();
-	}*/
+	}
+#endif
 
 	n_indices = indices.size();
 	segmentation.clear();
 	segmentation.resize(positions.size(), 0);
 	screenSpaceDepths.resize(positions.size());
+
+	vertexNormals.clear();
+	vertexNormals.resize(positions.size(), glm::vec3(0, 0, 0));
+
+	// Calculate vertex normals
+	for (int i = 0; i < n_indices; i += 3)
+	{
+		glm::vec3 n = glm::cross(positions[indices[i + 1]] - positions[indices[i]], positions[indices[i + 2]] - positions[indices[i]]);
+		vertexNormals.at(indices[i]) += n;
+		vertexNormals.at(indices[i + 1]) += n;
+		vertexNormals.at(indices[i + 2]) += n;
+	}
+	for (int i = 0; i < positions.size(); ++i)
+		vertexNormals.at(i) = glm::normalize(vertexNormals.at(i));
 }
 
 void Mesh::draw(CameraProvider* cam, bool transparent)
@@ -366,9 +371,9 @@ void Mesh::draw(CameraProvider* cam, bool transparent)
 		vao.release();
 		program->release();
 
-		auto min = this->getMin();
+		/*auto min = this->getMin();
 		auto max = this->getMax();
-		/*glBegin(GL_LINES);
+		glBegin(GL_LINES);
 
 		glColor3f(1.0f, 0.5f, 0.3f);
 		glVertex3f(min.x, min.y, min.z);

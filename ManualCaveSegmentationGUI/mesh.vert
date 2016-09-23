@@ -1,7 +1,7 @@
 #version 420 compatibility
 
 in vec3 in_position;
-in unsigned int segmentation;
+in uint segmentation;
 
 out vec4 position;
 out vec3 segColor;

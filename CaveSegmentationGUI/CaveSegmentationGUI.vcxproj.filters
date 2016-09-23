@@ -213,5 +213,8 @@
     <None Include="glsl\correspondence.frag">
       <Filter>glsl</Filter>
     </None>
+    <None Include="glsl\skeleton.geom">
+      <Filter>glsl</Filter>
+    </None>
   </ItemGroup>
 </Project>

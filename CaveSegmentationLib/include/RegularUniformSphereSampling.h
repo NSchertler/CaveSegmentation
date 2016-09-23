@@ -164,6 +164,9 @@ public:
 		int lowerPhi = (int)floor(iPhi);
 		int upperPhi = (int)ceil(iPhi);
 		
+		if (lowerPhi < 0 || std::isnan(iPhi) || upperPhi >= nPhi)
+			std::cout << "Phi " << phi << " resulted in iPhi = " << iPhi << ", lowerPhi = " << lowerPhi << ", upperPhi = " << upperPhi << ", with phiSlice = " << phiSlice << ", nPhi = " << nPhi;
+
 		double lowerThetaSlice = 2 * M_PI / nTheta[lowerPhi];
 		double iLowerTheta = (theta / lowerThetaSlice);
 		int lowerLeftTheta = (int)floor(iLowerTheta);
@@ -214,10 +217,15 @@ public:
 	}
 
 	template<typename TContainer, typename T = TContainer::value_type::value_type>
-	const T AccessInterpolatedContainerData(const TContainer& container, Vector p) const
+	const T AccessInterpolatedContainerData(const TContainer& container, const Vector& p) const
 	{
+		if (abs(p.squared_length() - 1) > 0.01)
+			std::cout << "Point for container access has non-unit length:" << p << std::endl;
+
 		double phi, theta;
 		ParametersFromPoint(p, phi, theta);
+		if (phi < 0 ||std::isnan(phi))
+			std::cout << "Vector " << p << " resulted in phi = " << phi;
 		return AccessInterpolatedContainerData<TContainer, T>(container, phi, theta);
 	}
 	

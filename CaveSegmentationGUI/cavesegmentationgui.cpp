@@ -25,32 +25,36 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 	ui.chkLookThrough->setChecked(vm.getLookThrough());
 	connect(ui.chkLookThrough, &QCheckBox::stateChanged, this, &CaveSegmentationGUI::lookThroughChanged);
 
+	vm.distanceExponent.set(1.0f);
+	vm.distanceExponent.setupLabel(ui.lblDistanceExponent);
+	vm.distanceExponent.setupSlider(ui.sldDistanceExponent, 0.5f, 3.0f, 0.1f);
+
 	vm.caveScaleKernelFactor.setupLabel(ui.lblCaveScaleKernel);
-	vm.caveScaleKernelFactor.setupSlider(ui.sldCaveScaleKernel, 1.0, 20.0, 190);
+	vm.caveScaleKernelFactor.setupSlider(ui.sldCaveScaleKernel, 1.0, 20.0, 0.01);
 
 	vm.caveSizeKernelFactor.setupLabel(ui.lblSizeKernel);
-	vm.caveSizeKernelFactor.setupSlider(ui.sldSizeKernel, 0.01, 2.0, 199);
+	vm.caveSizeKernelFactor.setupSlider(ui.sldSizeKernel, 0.01, 2.0, 0.01);
 
 	vm.caveSizeDerivativeKernelFactor.setupLabel(ui.lblDerivativeKernel);
-	vm.caveSizeDerivativeKernelFactor.setupSlider(ui.sldDerivativeKernel, 0.01, 2.0, 199);
+	vm.caveSizeDerivativeKernelFactor.setupSlider(ui.sldDerivativeKernel, 0.01, 2.0, 0.01);
 
 	vm.tippingCurvature.setupLabel(ui.lblTippingCurvature);
-	vm.tippingCurvature.setupSlider(ui.sldTippingCurvature, 0.01, 1.0, 99);
+	vm.tippingCurvature.setupSlider(ui.sldTippingCurvature, 0.01, 1.0, 0.01);
 
 	vm.directionTolerance.setupLabel(ui.lblDirectionTolerance);
-	vm.directionTolerance.setupSlider(ui.sldDirectionTolerance, 0.01, 2.0, 199);
+	vm.directionTolerance.setupSlider(ui.sldDirectionTolerance, 0.01, 2.0, 0.01);
 
 	vm.edgeCollapseThreshold.setupLabel(ui.lblEdgeCollapseThreshold);
-	vm.edgeCollapseThreshold.setupSlider(ui.sldEdgeCollapseThreshold, 0.01, 1, 99);
+	vm.edgeCollapseThreshold.setupSlider(ui.sldEdgeCollapseThreshold, 0.01, 1, 0.01);
 
 	vm.skeletonSmooth.setupLabel(ui.lblSkeletonSmooth);
-	vm.skeletonSmooth.setupSlider(ui.sldSkeletonSmooth, 0.0, 40.0, 4000);
+	vm.skeletonSmooth.setupSlider(ui.sldSkeletonSmooth, 0.0, 40.0, 0.01);
 
 	vm.skeletonVelocity.setupLabel(ui.lblSkeletonVelocity);
-	vm.skeletonVelocity.setupSlider(ui.sldSkeletonVelocity, 0.0, 40.0, 4000);
+	vm.skeletonVelocity.setupSlider(ui.sldSkeletonVelocity, 0.0, 40.0, 0.01);
 
 	vm.skeletonMedial.setupLabel(ui.lblSkeletonMedial);
-	vm.skeletonMedial.setupSlider(ui.sldSkeletonMedial, 0.0, 40.0, 4000);
+	vm.skeletonMedial.setupSlider(ui.sldSkeletonMedial, 0.0, 40.0, 0.01);
 
 	connect(&vm.caveData, &CaveGLData::meshChanged, this, &CaveSegmentationGUI::meshChanged); meshChanged();
 	connect(&vm.caveData, &CaveGLData::skeletonChanged, this, &CaveSegmentationGUI::skeletonChanged); skeletonChanged();
@@ -79,7 +83,7 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 
 	if (!o.stereo)
 	{
-		setWindowState(windowState() | Qt::WindowMaximized);
+		//setWindowState(windowState() | Qt::WindowMaximized);
 		connect(glView, &GLView::inited, this, &CaveSegmentationGUI::preloadData);
 	}
 	else
@@ -113,6 +117,8 @@ void CaveSegmentationGUI::glViewInited()
 
 void CaveSegmentationGUI::preloadData()
 {
+	this->setFixedWidth(1920 + width() - glView->width());
+	this->setFixedHeight(1080 + height() - glView->height());
 	if (!options.dataDir.isEmpty())
 	{
 		dataDirectory = QDir(options.dataDir);
@@ -254,53 +260,17 @@ void CaveSegmentationGUI::loadDistances(bool)
 
 void CaveSegmentationGUI::calculateDistances(bool)
 {
-	if (!vm.caveData.CalculateDistances())
-	{
-		std::deque<int> invalidVertices;
-		
+	if (!vm.caveData.CalculateDistances(vm.distanceExponent.get()))
+	{		
 #pragma omp parallel for
 		for (int i = 0; i < vm.caveData.skeleton->vertices.size(); ++i)
-		{
-			if (std::isnan(vm.caveData.caveSizeUnsmoothed.at(i)))
-			{
-				vm.caveData.colorLayer.at(i) = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
-#pragma omp critical
-				invalidVertices.push_back(i);
-			}
-			else
-				vm.caveData.colorLayer.at(i) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		}
+			vm.caveData.colorLayer.at(i) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-		int invalidVerticesCount = invalidVertices.size();
+		for(int i : vm.caveData.invalidVertices)			
+			vm.caveData.colorLayer.at(i) = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
+				
 		vm.caveData.UpdateColorLayer();
-
-		//try to reconstruct invalid skeleton vertices
-		while (!invalidVertices.empty())
-		{
-			auto it = invalidVertices.begin();
-			while(it != invalidVertices.end())
-			{
-				int validNeighborCount = 0;
-				double validSum = 0;
-				for (int n : vm.caveData.adjacency.at(*it))
-				{
-					double neighborSize = vm.caveData.caveSizeUnsmoothed.at(n);
-					if (!std::isnan(neighborSize))
-					{
-						++validNeighborCount;
-						validSum += neighborSize;
-					}
-				}
-				if (validNeighborCount == 0)
-					++it;
-				else
-				{
-					vm.caveData.caveSizeUnsmoothed.at(*it) = validSum / validNeighborCount;
-					it = invalidVertices.erase(it);
-				}
-			}
-		}
-		QMessageBox::critical(this, "Calculate Distances", QStringLiteral("There are %1 vertices with invalid distances. Make sure that the skeleton is valid and is completely contained within the cave.").arg(invalidVerticesCount));
+		QMessageBox::critical(this, "Calculate Distances", QStringLiteral("There are %1 vertices with invalid distances. Make sure that the skeleton is valid and is completely contained within the cave.").arg(vm.caveData.invalidVertices.size()));
 	}
 	vm.caveData.SmoothAndDeriveDistances();
 }
@@ -310,7 +280,7 @@ void CaveSegmentationGUI::calculateSpecificVertexDistances(bool)
 	if (vm.selectedVertex.get() < 0)
 		return;
 	
-	vm.caveData.CalculateDistancesSingleVertex<SphereVisualizer>(vm.selectedVertex.get());
+	vm.caveData.CalculateDistancesSingleVertex<SphereVisualizer>(vm.selectedVertex.get(), vm.distanceExponent.get());
 	QMessageBox::information(this, "Distance Calculation", "Calculated Cave Size at vertex " + QString::number(vm.selectedVertex.get()) + ": " + QString::number(vm.caveData.caveSizeUnsmoothed.at(vm.selectedVertex.get())));
 }
 

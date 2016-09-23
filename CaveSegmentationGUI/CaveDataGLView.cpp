@@ -13,7 +13,7 @@ std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::skyProgram(nullptr);
 std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::markerProgram(nullptr);
 std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::cursorProgram(nullptr);
 
-CaveDataGLView::CaveDataGLView(ViewModel& vm, float eyeOffset, QWidget * parent, GLView* masterCam) : GLView(parent, eyeOffset, masterCam), vm(vm), fbo(-1), useSoftwareCursor(eyeOffset != 0)
+CaveDataGLView::CaveDataGLView(ViewModel& vm, float eyeOffset, QWidget * parent, GLView* masterCam) : GLView(parent, false, eyeOffset, masterCam), vm(vm), fbo(-1), useSoftwareCursor(eyeOffset != 0)
 {
 	connect(&vm.caveData, &CaveGLData::meshChanged, this, &CaveDataGLView::meshChanged);
 	connect(&vm.caveData, &CaveGLData::skeletonChanged, this, &CaveDataGLView::issueRepaint);
@@ -153,6 +153,16 @@ void CaveDataGLView::resizeGL(int width, int height)
 	recreatePickingResources = true;
 }
 
+void CaveDataGLView::keyPressEvent(QKeyEvent *e)
+{
+	if (e->key() == Qt::Key::Key_Space)
+	{
+		glReadBuffer(GL_COLOR_ATTACHMENT0);
+		QImage img = this->grabFramebuffer();		
+		img.save("screen.png");
+	}
+}
+
 template <typename T> int sgn(T val) {
 	return (T(0) < val) - (val < T(0));
 }
@@ -211,6 +221,15 @@ void CaveDataGLView::initializeGL()
 
 	cursorTexture = new QOpenGLTexture(QImage(":/icon/cursor.png").mirrored());
 
+	float minmax[2];
+	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, minmax);
+	std::cout << "min: " << minmax[0] << ", max: " << minmax[1] << std::endl;
+	glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, minmax);
+	std::cout << "min: " << minmax[0] << ", max: " << minmax[1] << std::endl;
+
+	glLineWidth(5.0f);
+	glEnable(GL_LINE_SMOOTH);
+
 	GLView::initializeGL();
 }
 
@@ -250,7 +269,7 @@ void CaveDataGLView::paintGL()
 		vm.caveData.drawCave(this);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		glCullFace(GL_BACK);
-		vm.caveData.drawCave(this);
+		//vm.caveData.drawCave(this);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 	else
@@ -302,6 +321,6 @@ void CaveDataGLView::paintGL()
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		cursorProgram->release();
 		glDisable(GL_DEPTH_CLAMP);
-	}
+	}	
 }
 

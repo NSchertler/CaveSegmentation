@@ -45,6 +45,8 @@ private:
 	std::vector<float> screenSpaceDepths;
 	std::vector<unsigned int> segmentation;
 
+	std::vector<glm::vec3> vertexNormals;
+
 	static std::unique_ptr<QOpenGLShaderProgram> program;
 
 	unsigned int n_indices;	
@@ -58,5 +60,5 @@ private:
 	void readFile(std::string filename);
 
 private slots:
-	void parent_viewUpdated();
+	void Parent_CameraStill();
 };

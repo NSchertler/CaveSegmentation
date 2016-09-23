@@ -3,7 +3,9 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-#define WRITE_BRANCH_STATISTICS
+#define NON_VERBOSE
+
+//#define WRITE_BRANCH_STATISTICS
 //#define DRAW_DEBUG_IMAGES
 //#define WRITE_SPHERE_STATS
 //#define WRITE_SPHERE_VIS

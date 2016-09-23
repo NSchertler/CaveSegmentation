@@ -8,6 +8,7 @@ in vec4 clipPos;
 void main()
 {
 	float t = (clipPos.y + 1) / 2;
-	color = vec4(1, 0, 0, 1);//(1 - t) * vec4(0.1, 0.1f, 0.3f, 1.00) + t * vec4(0.5, 0.6, 0.8, 1.0);
+	//color = vec4(1, 0, 0, 1);//(1 - t) * vec4(0.1, 0.1f, 0.3f, 1.00) + t * vec4(0.5, 0.6, 0.8, 1.0);
+	color = vec4(1, 0, 0, 1);
 	id = 0;
 }

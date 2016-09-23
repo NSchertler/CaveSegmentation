@@ -31,10 +31,18 @@ struct NodeDistance
 	}
 };
 
-template <typename T>
-T findMaxSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iVert, const std::vector<std::vector<int>>& adjacency, double searchDistance, const std::vector<T>& source)
+class IDFSHook
 {
-	//perform DFS
+	virtual void processNode(const NodeDistance& node) = 0;
+};
+
+// Performs a depth-first search on the graph, starting from iVert.
+// The methods of the hook object are called during the execution of the search.
+// THook must obey to class IDFSHook
+template <typename THook>
+void graphDFS(THook& hook, const std::vector<CurveSkeleton::Vertex>& vertices, int iVert, const std::vector<std::vector<int>>& adjacency, double searchDistance)
+{
+	//perform depth-first search
 
 	std::stack<NodeDistance> dfsStack;
 	dfsStack.emplace(iVert, 0.0);
@@ -42,14 +50,12 @@ T findMaxSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iV
 	std::unordered_set<int> visited;
 	visited.insert(iVert);
 
-	T max = std::numeric_limits<T>::lowest();
-
 	while (!dfsStack.empty())
 	{
 		NodeDistance current = dfsStack.top();
 		dfsStack.pop();
-		if (source.at(current.node) > max)
-			max = source.at(current.node);
+		
+		hook.processNode(current);		
 
 		auto currentP = vertices.at(current.node).position;
 
@@ -63,16 +69,37 @@ T findMaxSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iV
 			}
 		}
 	}
-
-	return max;
 }
+
+template <typename T>
+class MaxSearchDFSHook : IDFSHook
+{
+public:
+	MaxSearchDFSHook(const std::vector<T>& source)
+		: maximum(std::numeric_limits<T>::min()), source(source)
+	{ }
+
+	void processNode(const NodeDistance& node)
+	{
+		if (source.at(node.node) > maximum)
+			maximum = source.at(node.node);
+	}
+
+	T getMaximum() const { return maximum; }
+
+private:
+	T maximum;
+	const std::vector<T>& source;
+};
 
 template <typename T>
 void findMax(const std::vector<CurveSkeleton::Vertex>& vertices, const std::vector<std::vector<int>>& adjacency, double searchDistance, std::vector<T>& source, std::vector<T>& target)
 {
 	for (int iVert = 0; iVert < vertices.size(); ++iVert)
 	{
-		target.at(iVert) = findMaxSingleVertex(vertices, iVert, adjacency, searchDistance, source);
+		MaxSearchDFSHook<T> hook(source);
+		graphDFS(hook, vertices, iVert, adjacency, searchDistance);
+		target.at(iVert) = hook.getMaximum();
 	}
 }
 
@@ -81,14 +108,52 @@ void findMax(const std::vector<CurveSkeleton::Vertex>& vertices, const std::vect
 {
 	for (int iVert = 0; iVert < vertices.size(); ++iVert)
 	{
-		target.at(iVert) = findMaxSingleVertex(vertices, iVert, adjacency, searchDistance(iVert), source);
+		MaxSearchDFSHook<T> hook(source);
+		graphDFS(hook, vertices, iVert, adjacency, searchDistance(iVert));
+		target.at(iVert) = hook.getMaximum();
 	}
 }
 
+template <typename T>
+class MaxAdvectDFSHook : IDFSHook
+{
+public:
+	MaxAdvectDFSHook(T advectValue, std::vector<T>& target)
+		: advectValue(advectValue), target(target)
+	{ }
+
+	void processNode(const NodeDistance& node)
+	{
+		if (target.at(node.node) < advectValue)
+			target.at(node.node) = advectValue;
+	}
+
+private:
+	T advectValue;
+	std::vector<T>& target;
+};
+
+template <typename T> 
+void maxAdvect(const std::vector<CurveSkeleton::Vertex>& vertices, const std::vector<std::vector<int>>& adjacency, std::function<double(int)> searchDistance, std::vector<T>& source, std::vector<T>& target)
+{
+	for (int iVert = 0; iVert < vertices.size(); ++iVert)
+	{
+		target.at(iVert) = source.at(iVert);
+	}
+
+	for (int iVert = 0; iVert < vertices.size(); ++iVert)
+	{
+		MaxAdvectDFSHook<T> hook(source.at(iVert), target);
+		graphDFS(hook, vertices, iVert, adjacency, searchDistance(iVert));
+	}
+}
 
 template <typename T>
 T smoothSingleVertex(const std::vector<CurveSkeleton::Vertex>& vertices, int iVert, const std::vector<std::vector<int>>& adjacency, double smoothDeviation, const std::vector<T>& source)
 {
+	if (smoothDeviation <= 0)
+		return source[iVert];
+
 	double distanceThreshold = 3 * smoothDeviation; //Gaussian is practically 0 after 3 * standardDeviation
 
 	//perform Dijkstra

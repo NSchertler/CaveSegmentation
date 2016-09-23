@@ -20,6 +20,8 @@ ManualCaveSegmentation::ManualCaveSegmentation(QWidget *parent)
 	connect(ui.btnLoadModel, SIGNAL(clicked()), this, SLOT(load_model()));
 	connect(ui.sldBrushSize, SIGNAL(valueChanged(int)), this, SLOT(brushSize_changed(int)));
 	connect(ui.rbChamber, SIGNAL(toggled(bool)), this, SLOT(brushType_changed(bool)));
+	connect(ui.rbPassage, SIGNAL(toggled(bool)), this, SLOT(brushType_changed(bool)));
+	connect(ui.rbErase, SIGNAL(toggled(bool)), this, SLOT(brushType_changed(bool)));
 	connect(ui.btnDownloadCaves, SIGNAL(clicked()), this, SLOT(downloadCaves()));
 	connect(ui.sldNearClip, &QSlider::valueChanged, this, &ManualCaveSegmentation::nearClipChanged);
 	connect(ui.btnSaveSegmentation, &QPushButton::clicked, this, &ManualCaveSegmentation::saveSegmentation);
@@ -29,7 +31,15 @@ ManualCaveSegmentation::ManualCaveSegmentation(QWidget *parent)
 	glView->setBrushType(ui.rbChamber->isChecked() ? Chamber : Passage);
 	glView->setBrushSize(ui.sldBrushSize->value());
 
+#ifdef ADMIN
+	QPushButton* loadExternal = new QPushButton("Load External Cave", ui.grpData);
+	ui.verticalLayout_4->addWidget(loadExternal);
+	connect(loadExternal, &QPushButton::clicked, this, &ManualCaveSegmentation::loadExternalModel);
+#endif
+
 	data->view = glView;
+
+	setWindowState(Qt::WindowMaximized);
 }
 
 ManualCaveSegmentation::~ManualCaveSegmentation()
@@ -43,7 +53,12 @@ void ManualCaveSegmentation::brushSize_changed(int v)
 
 void ManualCaveSegmentation::brushType_changed(bool)
 {
-	glView->setBrushType(ui.rbChamber->isChecked() ? Chamber : Passage);
+	if (ui.rbChamber->isChecked())
+		glView->setBrushType(Chamber);
+	else if(ui.rbPassage->isChecked())
+		glView->setBrushType(Passage);
+	else if(ui.rbErase->isChecked())
+		glView->setBrushType(Erase);
 }
 
 void ManualCaveSegmentation::downloadCaves()
@@ -55,7 +70,7 @@ void ManualCaveSegmentation::downloadCaves()
 
 void ManualCaveSegmentation::nearClipChanged()
 {
-	//glView->setNearClip(ui.sldNearClip->value() / (float)ui.sldNearClip->maximum());
+	glView->setFrontViewCutoff(ui.sldNearClip->value() / (float)ui.sldNearClip->maximum());
 }
 
 void ManualCaveSegmentation::load_model()
@@ -63,6 +78,15 @@ void ManualCaveSegmentation::load_model()
 	auto dialog = new AvailableCaveListDialog(data, this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->show();
+}
+
+void ManualCaveSegmentation::loadExternalModel()
+{
+	auto filename = QFileDialog::getOpenFileName(this, "External Cave", QString(), "3D Models (*.off *.obj *.bin)");
+	if (filename != nullptr)
+	{
+		data->setMesh(std::make_shared<Mesh>(data->view, filename.toStdString()));
+	}
 }
 
 void ManualCaveSegmentation::saveSegmentation()

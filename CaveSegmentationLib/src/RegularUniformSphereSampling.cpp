@@ -61,7 +61,12 @@ Vector RegularUniformSphereSampling::Point(double phi, double theta) const
 
 void RegularUniformSphereSampling::ParametersFromPoint(const Vector & point, double & phi, double & theta) const
 {
-	phi = acos(point.z());
+	double z = point.z();
+	if (z < -1)
+		z = -1;
+	if (z > 1)
+		z = 1;
+	phi = acos(z);
 	theta = atan2(point.x(), point.y());
 	if (theta < 0)
 		theta += 2 * M_PI;
