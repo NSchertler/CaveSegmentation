@@ -161,7 +161,7 @@ public:
 					for (int i2 = i1 + 1; i2 < sphereDistanceMinima.size(); ++i2)
 					{
 						auto& m2 = sphereDistanceMinima.at(i2);
-						double score = lambda / M_PI * (1 - acos(m1.position * m2.position)) + (m1.value + m2.value) / (2 * maxF);
+						double score = lambda * (1 - acos(m1.position * m2.position) / M_PI) + (m1.value + m2.value) / (2 * maxF);
 						if (score < bestScore)
 						{
 							bestScore = score;

@@ -1,6 +1,9 @@
 #pragma once
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
+
 #include <cmath>
 
 #define NON_VERBOSE
@@ -11,8 +14,6 @@
 //#define WRITE_SPHERE_VIS
 //#define WRITE_HEIGHTFIELD
 //#define EXPORT_BRANCHES
-//#define CALC_SKELETON
-//#define CALC_DISTANCES
 
 #ifdef DRAW_DEBUG_IMAGES
 const int imWidth = 1280;

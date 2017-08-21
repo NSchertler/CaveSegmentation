@@ -269,7 +269,7 @@ void CaveDataGLView::paintGL()
 		vm.caveData.drawCave(this);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		glCullFace(GL_BACK);
-		//vm.caveData.drawCave(this);
+		vm.caveData.drawCave(this);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 	else

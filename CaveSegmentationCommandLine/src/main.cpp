@@ -25,19 +25,26 @@
 
 #include <fstream>
 
-
-/*#include <CGAL/Polyhedron_3.h>
-#include <CGAL/IO/Polyhedron_iostream.h>
-#include <CGAL/triangulate_polyhedron.h>
-#include <CGAL/HalfedgeDS_vector.h>
-#include <CGAL/Polyhedron_incremental_builder_3.h>
-#include <CGAL/Union_find.h>*/
-
-
-int main()
+int main(int argc, char* argv[])
 {	
-	//const std::string dataDirectory = "data/SmallCaveDownsampled";
-	const std::string dataDirectory = "data/SimudPuteh";
+	if (argc < 2)
+	{
+		std::cout << "Usage: CaveSegmentationCommandLine [dataDirectory]" << std::endl;
+		std::cout << "The data directory must contain a \"model.off\"." << std::endl;
+#ifdef CALC_SKELETON
+		std::cout << "The skeleton will be saved in the data directory under \"model.skel\"." << std::endl;
+#else
+		std::cout << "The data directory must contain a \"model.skel\"." << std::endl;
+#endif
+#ifdef CALC_DISTANCES
+		std::cout << "Distance data will be saved in the data directory under \"distances.bin\"." << std::endl;
+#else
+		std::cout << "The data directory must contain a \"distances.bin\"." << std::endl;
+#endif
+		std::cout << "All output will be saved in \"[dataDirectory]\\output\"." << std::endl;
+	}
+
+	const std::string dataDirectory = argv[1];
 
 	const std::string outputDirectory = dataDirectory + "/output";
 
@@ -74,47 +81,7 @@ int main()
 	CurveSkeleton* skeleton = LoadCurveSkeleton(skeletonFile.c_str());	
 	data.SetSkeleton(skeleton);
 #endif
-	// Reposition skeleton vertices in center of correspondences
-	/*for (auto& vertex : skeleton->vertices)
-	{
-		Eigen::Matrix3f covariance = Eigen::Matrix3f::Zero();
-		Eigen::Vector3f centroid = Eigen::Vector3f::Zero();
-		for (int corr : vertex.correspondingOriginalVertices)
-		{
-			centroid += vertices.at(corr);
-		}
-		centroid *= 1.0f / vertex.correspondingOriginalVertices.size();
-
-		for (int corr : vertex.correspondingOriginalVertices)
-		{
-			Eigen::Vector3f corrDir = vertices.at(corr) - centroid;
-			covariance += corrDir * corrDir.transpose();
-		}
-		Eigen::JacobiSVD<Eigen::Matrix3f> svd(covariance, Eigen::ComputeFullV);
-		Eigen::Matrix3f toLocal = svd.matrixV();
-		for (int i = 0; i < 3; ++i)
-			toLocal.row(0).normalize();
-
-		Eigen::Vector3f localMin(std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
-		Eigen::Vector3f localMax(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity());
-		for (int corr : vertex.correspondingOriginalVertices)
-		{
-			Eigen::Vector3f local = toLocal * (vertices.at(corr) - centroid);
-			for (int i = 0; i < 3; ++i)
-			{
-				if (local(i) < localMin(i))
-					localMin(i) = local(i);
-				if (local(i) > localMax(i))
-					localMax(i) = local(i);
-			}
-		}
-		Eigen::Vector3f localCenter = (localMin + localMax) * 0.5f;
-		Eigen::Vector3f globalCenter = toLocal.transpose() * localCenter + centroid;
-		vertex.position = globalCenter;
-	}
-	skeleton->SaveToObj(calculatedSkeletonFile.c_str());
-	skeleton->SaveToObjWithCorrespondences(calculatedSkeletonCorrFile.c_str(), offFile);
-	return 0;*/	
+	
 	
 #ifdef CALC_DISTANCES
 	data.CalculateDistances();
@@ -205,35 +172,4 @@ int main()
 	StopImageProc();
 
 	return 0;
-
-	/*std::cout << "Extracting halls..." << std::endl;
-
-	
-	typedef CGAL::Polyhedron_3<K> Polyhedron; //CGAL::Exact_predicates_inexact_constructions_kernel
-	Polyhedron poly;		
-	poly.delegate(BuildCavePolyhedron<Polyhedron::HalfedgeDS>(argmin, meshVertexCorrespondsTo, vertices, triIndices));
-	std::cout << "Valid poly: " << poly.is_valid() << std::endl;
-
-	std::cout << "Filling holes..." << std::endl;
-
-	poly.normalize_border();
-	while (poly.size_of_border_edges() > 0) {
-		// get the first hole we can find, and close it
-		poly.fill_hole(poly.border_halfedges_begin()->opposite());
-
-		// renormalize mesh so that halfedge iterators are again valid
-		poly.normalize_border();
-	}
-
-	CGAL::triangulate_polyhedron<Polyhedron>(poly);
-	std::cout << "Border edges: " << poly.size_of_border_edges() << std::endl;
-
-	std::cout << "Writing OFF..." << std::endl;
-	std::ofstream off("CavesWithFilledHoles.off");
-	off << poly;
-	off.close();
-
-	std::cout << "Finished." << std::endl;
-
-	return 0;*/
 }

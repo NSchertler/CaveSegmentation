@@ -83,7 +83,7 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 
 	if (!o.stereo)
 	{
-		//setWindowState(windowState() | Qt::WindowMaximized);
+		setWindowState(windowState() | Qt::WindowMaximized);
 		connect(glView, &GLView::inited, this, &CaveSegmentationGUI::preloadData);
 	}
 	else

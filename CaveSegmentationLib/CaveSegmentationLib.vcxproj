@@ -49,7 +49,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)\build\include;$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT)/include;$(OPENGM_ROOT)/include;$(SolutionDir)/MCFSkeleton/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -64,7 +64,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)\build\include;$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT)/include;$(OPENGM_ROOT)/include;$(SolutionDir)/MCFSkeleton/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
@@ -104,6 +104,11 @@
     <ClCompile Include="src\MeshProc.cpp" />
     <ClCompile Include="src\RegularUniformSphereSampling.cpp" />
     <ClCompile Include="src\SphereVisualizer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MCFSkeleton\MCFSkeleton.vcxproj">
+      <Project>{acf54eb6-8fad-4fb5-8789-944abd833b06}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
