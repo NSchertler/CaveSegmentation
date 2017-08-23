@@ -172,6 +172,13 @@ public:
 		int lowerLeftTheta = (int)floor(iLowerTheta);
 		int lowerRightTheta = (int)ceil(iLowerTheta);
 
+		if (lowerLeftTheta >= nTheta[lowerPhi])
+		{
+			iLowerTheta -= nTheta[lowerPhi];
+			lowerLeftTheta -= nTheta[lowerPhi];
+			lowerRightTheta -= nTheta[lowerPhi];
+		}
+
 		//No interpolation required
 		if(lowerPhi == upperPhi && lowerLeftTheta == lowerRightTheta)
 			return container[lowerPhi][lowerLeftTheta];
@@ -187,6 +194,13 @@ public:
 		double iUpperTheta = (theta / upperThetaSlice);
 		int upperLeftTheta = (int)floor(iUpperTheta);
 		int upperRightTheta = (int)ceil(iUpperTheta);		
+
+		if (upperLeftTheta >= nTheta[upperPhi])
+		{
+			iUpperTheta -= nTheta[upperPhi];
+			upperLeftTheta -= nTheta[upperPhi];
+			upperRightTheta -= nTheta[upperPhi];
+		}
 
 		T interpolLower, interpolUpper;
 

@@ -86,8 +86,6 @@ public:
 				nodes[0] = edge.second;
 			}
 
-			//std::cout << pairwiseFunction(0, 0) << "; " << pairwiseFunction(1, 0) << ", " << pairwiseFunction(0, 1) << std::endl;
-
 			gm.addFactor(gm.addFunction(pairwiseFunction), nodes, nodes + 2);
 			if (pairwiseFunction(0, 0) + pairwiseFunction(1, 1) > pairwiseFunction(0, 1) + pairwiseFunction(1, 0))
 				++nonsubmodular;

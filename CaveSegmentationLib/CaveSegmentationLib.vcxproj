@@ -85,6 +85,7 @@
     <ClInclude Include="include\ChamberAnalyzation\Utils.h" />
     <ClInclude Include="include\FileInputOutput.h" />
     <ClInclude Include="include\GraphProc.h" />
+    <ClInclude Include="include\IHasBoundingBox.h" />
     <ClInclude Include="include\ImageProc.h" />
     <ClInclude Include="include\LineProc.h" />
     <ClInclude Include="include\MeshProc.h" />
@@ -100,6 +101,7 @@
     <ClCompile Include="src\ChamberAnalyzation\Utils.cpp" />
     <ClCompile Include="src\FileInputOutput.cpp" />
     <ClCompile Include="src\GraphProc.cpp" />
+    <ClCompile Include="src\IHasBoundingBox.cpp" />
     <ClCompile Include="src\ImageProc.cpp" />
     <ClCompile Include="src\MeshProc.cpp" />
     <ClCompile Include="src\RegularUniformSphereSampling.cpp" />

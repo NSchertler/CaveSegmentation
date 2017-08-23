@@ -125,11 +125,7 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 
 		c.second.meshVAO.release();
 	}
-
-	reset_bounding_box();
-	for (auto& v : _meshVertices)
-		add_point(v.x(), v.y(), v.z());
-
+	
 	emit meshChanged();
 }
 

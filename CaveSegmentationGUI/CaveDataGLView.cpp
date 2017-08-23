@@ -169,10 +169,12 @@ template <typename T> int sgn(T val) {
 
 void CaveDataGLView::meshChanged()
 {
-	align_to_bounding_box(vm.caveData.getMin(), vm.caveData.getMax());
+	auto& min = vm.caveData.getMin();
+	auto& max = vm.caveData.getMax();
+	align_to_bounding_box(glm::vec3(min.x(), min.y(), min.z()), glm::vec3(max.x(), max.y(), max.z()));
 	if (eyeOffset != 0)
 	{		
-		eyeOffset = glm::length(vm.caveData.getMax() - vm.caveData.getMin()) * 0.001f * sgn(eyeOffset);
+		eyeOffset = (vm.caveData.getMax() - vm.caveData.getMin()).norm() * 0.001f * sgn(eyeOffset);
 		recalculateView();
 		recalculateProjection();
 	}

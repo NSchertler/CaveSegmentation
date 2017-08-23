@@ -12,7 +12,8 @@
 #include "CameraProvider.h"
 #include "OpenGLContextProvider.h"
 
-class CaveGLData : public QObject, public CaveData, QOpenGLFunctions_3_3_Core, public IHasBoundingBox {
+class CaveGLData : public QObject, public CaveData, QOpenGLFunctions_3_3_Core
+{
 	Q_OBJECT
 
 public:

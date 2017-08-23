@@ -3,48 +3,91 @@
 #include "ImageProc.h"
 #include "CGALCommon.h"
 
-#include "RegularUniformSphereSampling.h"
-#include "FileInputOutput.h"
-#include "MeshProc.h"
-#include "LineProc.h"
-#include "ChamberAnalyzation/CurvatureBasedAStar.h"
+#include "CaveData.h"
 #include "ChamberAnalyzation/CurvatureBasedQPBO.h"
 #include "ChamberAnalyzation/Utils.h"
-#include "SizeCalculation.h"
-#include "GraphProc.h"
-#include "CaveData.h"
+#include "FileInputOutput.h"
+
+#include <boost/filesystem.hpp>
 
 #include <iostream>
 #include <CurveSkeleton.h>
-#include <Eigen/Dense>
-#include <map>
-#include <stack>
-#include <unordered_set>
-#include <queue>
-#include <boost/filesystem.hpp>
 
-#include <fstream>
+void PrintHelp()
+{
+	std::cout << "Usage: CaveSegmentationCommandLine [options] [dataDirectory]" << std::endl;
+	std::cout << "Options: " << std::endl;
+	std::cout << "\t-d [dataDirectory]    The data directory must contain a \"model.off\"." << std::endl;
+	std::cout << "\t                      The skeleton location is \"[dataDirectory]/model.skel\"." << std::endl;
+	std::cout << "\t                      The distance data location is \"[dataDirectory]/distances.bin\"." << std::endl;
+	std::cout << "\t--calcSkel            Specify this to calculate the skeleton and save it to file. Otherwise, it will be loaded from a file." << std::endl;
+	std::cout << "\t--calcDist            Specify this to calculate distance data and save them to file. Otherwise, they will be loaded from a file." << std::endl;
+	std::cout << "\t--edgeLength [float]  Specify the edge collapse threshold for skeleton calculation in percent of the model's bounding box diagonal." << std::endl;
+	std::cout << "\t--wsmooth [float]    Specify the smoothing weight for skeleton calculation." << std::endl;
+	std::cout << "\t--wvelocity [float]  Specify the velocity weight for skeleton calculation." << std::endl;
+	std::cout << "\t--wmedial [float]    Specify the medial weight for skeleton calculation." << std::endl;
+	std::cout << "All output will be saved in \"[dataDirectory]/output\"." << std::endl;
+}
 
 int main(int argc, char* argv[])
 {	
+	bool calculateSkeleton = false;
+	bool calculateDistances = false;
+	std::string dataDirectory;
+
+	float edgeCollapseThresholdPercent = 1.0f;
+	float w_smooth = 1.0f;
+	float w_velocity = 20.0f;
+	float w_medial = 1.0f;
+
 	if (argc < 2)
 	{
-		std::cout << "Usage: CaveSegmentationCommandLine [dataDirectory]" << std::endl;
-		std::cout << "The data directory must contain a \"model.off\"." << std::endl;
-#ifdef CALC_SKELETON
-		std::cout << "The skeleton will be saved in the data directory under \"model.skel\"." << std::endl;
-#else
-		std::cout << "The data directory must contain a \"model.skel\"." << std::endl;
-#endif
-#ifdef CALC_DISTANCES
-		std::cout << "Distance data will be saved in the data directory under \"distances.bin\"." << std::endl;
-#else
-		std::cout << "The data directory must contain a \"distances.bin\"." << std::endl;
-#endif
-		std::cout << "All output will be saved in \"[dataDirectory]\\output\"." << std::endl;
+		PrintHelp();
+
+		return -1;
+	}
+	else
+	{
+		for (int i = 1; i < argc; ++i)
+		{
+			if (strcmp(argv[i], "-d") == 0)
+			{
+				dataDirectory = std::string(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--calcSkel") == 0)
+				calculateSkeleton = true;
+			else if (strcmp(argv[i], "--calcDist") == 0)
+				calculateDistances = true;
+			else if (strcmp(argv[i], "--edgeLength") == 0)
+			{
+				edgeCollapseThresholdPercent = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--wsmooth") == 0)
+			{
+				w_smooth = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--wvelocity") == 0)
+			{
+				w_velocity = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--wmedial") == 0)
+			{
+				w_medial = std::stof(argv[i + 1]);
+				++i;
+			}
+		}
 	}
 
-	const std::string dataDirectory = argv[1];
+	if (dataDirectory.empty())
+	{
+		std::cout << "You did not specify a data directory." << std::endl;
+		PrintHelp();
+		return -2;
+	}
 
 	const std::string outputDirectory = dataDirectory + "/output";
 
@@ -62,34 +105,54 @@ int main(int argc, char* argv[])
 	const std::string calculatedSkeletonCorrFile = outputDirectory + "/skeletonCorr.obj";
 	const std::string segmentationFile = outputDirectory + "/segmentation.seg";
 
+	std::cout << "Model file: " << offFile << std::endl;
+
 	CaveData data;
 	data.LoadMesh(offFile);	
 	data.SetOutputDirectory(outputDirectoryW);
 
 	StartImageProc();	
 
-#ifdef CALC_SKELETON
-	std::cout << "Calculating skeleton..." << std::endl;
-	//CurveSkeleton* skeleton = ComputeCurveSkeleton(offFile, 1.0, 0.8, 1.5);
-	CurveSkeleton* skeleton = ComputeCurveSkeleton(offFile, 1.0, 1.0, 20, 1.0);
-	skeleton->Save(skeletonFile.c_str());
-	skeleton->SaveToObj(calculatedSkeletonFile.c_str());
-	skeleton->SaveToObjWithCorrespondences(calculatedSkeletonCorrFile.c_str(), offFile);
+	CurveSkeleton* skeleton;
+	if (calculateSkeleton)
+	{
+		std::cout << "Calculating skeleton..." << std::endl;
+		AbortHandle abort;
+		float edgeCollapseThreshold = edgeCollapseThresholdPercent * (data.getMax() - data.getMin()).norm() / 100.0f;
+		std::cout << "Edge collapse threshold: " << edgeCollapseThreshold << std::endl;
+		std::cout << "w_smooth: " << w_smooth << std::endl;
+		std::cout << "w_velocity: " << w_velocity << std::endl;
+		std::cout << "w_medial: " << w_medial << std::endl;
+		skeleton = ComputeCurveSkeleton(offFile, &abort, edgeCollapseThreshold, w_smooth, w_velocity, w_medial);
+		std::cout << "Saving skeleton to " << skeletonFile << std::endl;
+		skeleton->Save(skeletonFile.c_str());
+		std::cout << "Saving skeleton OBJ to " << calculatedSkeletonFile << std::endl;
+		skeleton->SaveToObj(calculatedSkeletonFile.c_str());
+		std::cout << "Saving skeleton OBJ with correspondences to " << calculatedSkeletonCorrFile << std::endl;
+		skeleton->SaveToObjWithCorrespondences(calculatedSkeletonCorrFile.c_str(), offFile);
+	}
+	else
+	{
+		std::cout << "Loading skeleton from " << skeletonFile << std::endl;
+		skeleton = LoadCurveSkeleton(skeletonFile.c_str());		
+	}
 	data.SetSkeleton(skeleton);
-#else
-	std::cout << "Loading skeleton..." << std::endl;
-	CurveSkeleton* skeleton = LoadCurveSkeleton(skeletonFile.c_str());	
-	data.SetSkeleton(skeleton);
-#endif
 	
 	
-#ifdef CALC_DISTANCES
-	data.CalculateDistances();
+	if (calculateDistances)
+	{
+		std::cout << "Calculating distances..." << std::endl;
+		data.CalculateDistances();
 
-	data.SaveDistances(distancesFile);
-#else
-	data.LoadDistances(distancesFile);	
-#endif
+		std::cout << "Saving distances to " << distancesFile << std::endl;
+		data.SaveDistances(distancesFile);
+	}
+	else
+	{
+		std::cout << "Loading distances from " << distancesFile << std::endl;
+		data.LoadDistances(distancesFile);
+	}
+	std::cout << "Smoothing and deriving distances..." << std::endl;
 	data.SmoothAndDeriveDistances();
 	
 
@@ -105,6 +168,7 @@ int main(int argc, char* argv[])
 
 	AssignUniqueChamberIndices(data, segmentation);
 	
+	std::cout << "Writing segmentation to " << segmentationFile << std::endl;
 	WriteSegmentation(segmentationFile, segmentation);
 
 	int colors[10][3] = 
@@ -160,11 +224,15 @@ int main(int argc, char* argv[])
 	std::string skeletonHeightCodedFile = outputDirectory + "/SkeletonWithHeightCodedSize.obj";
 	std::string segmentedMeshFile = outputDirectory + "/segmentedMesh.off";
 
+	std::cout << "Saving skeleton with colored correspondences to " << corrsFile << std::endl;
 	skeleton->SaveToObjWithCorrespondences(corrsFile.c_str(), offFile, colorVertexFunc);
 
+	std::cout << "Saving colored skeleton to " << skeletonObjFile << std::endl;
 	skeleton->SaveToObj(skeletonObjFile.c_str(), colorVertexFunc);
+	std::cout << "Saving skeleton with cave size encoded as z-coordinates to " << skeletonHeightCodedFile << std::endl;
 	skeleton->SaveToObj(skeletonHeightCodedFile.c_str(), colorVertexFunc, [&](const CurveSkeleton::Vertex& v, int i, float& newX, float& newY, float& newZ) { newX = v.position.x(), newY = v.position.y(), newZ = (float)data.caveSizes.at(i); });
 
+	std::cout << "Saving segmented model to " << segmentedMeshFile << std::endl;
 	WriteOff(segmentedMeshFile.c_str(), data.meshVertices(), data.meshTriIndices(), [&](int i, int& r, int& g, int& b) {colorFunc(data.meshVertexCorrespondsTo[i], r, g, b); } );
 
 	DestroySkeleton(skeleton);

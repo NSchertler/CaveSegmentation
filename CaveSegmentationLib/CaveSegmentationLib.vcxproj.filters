@@ -75,6 +75,9 @@
     <ClInclude Include="include\ChamberAnalyzation\Utils.h">
       <Filter>Headerdateien\ChamberAnalyzation</Filter>
     </ClInclude>
+    <ClInclude Include="include\IHasBoundingBox.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\RegularUniformSphereSampling.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="include\ChamberAnalyzation\energies.cpp">
       <Filter>Quelldateien\ChamberAnalyzation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\IHasBoundingBox.cpp">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

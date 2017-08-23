@@ -41,9 +41,6 @@
     <ClInclude Include="include\cavesegmentationguicore_global.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
-    <ClInclude Include="include\IHasBoundingBox.h">
-      <Filter>Header Dateien</Filter>
-    </ClInclude>
     <ClInclude Include="include\CameraProvider.h">
       <Filter>Header Dateien</Filter>
     </ClInclude>
@@ -58,9 +55,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\IHasBoundingBox.cpp">
-      <Filter>Source Dateien</Filter>
-    </ClCompile>
     <ClCompile Include="src\GLView.cpp">
       <Filter>Source Dateien</Filter>
     </ClCompile>

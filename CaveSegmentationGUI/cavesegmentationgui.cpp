@@ -45,7 +45,7 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 	vm.directionTolerance.setupSlider(ui.sldDirectionTolerance, 0.01, 2.0, 0.01);
 
 	vm.edgeCollapseThreshold.setupLabel(ui.lblEdgeCollapseThreshold);
-	vm.edgeCollapseThreshold.setupSlider(ui.sldEdgeCollapseThreshold, 0.01, 1, 0.01);
+	vm.edgeCollapseThreshold.setupSlider(ui.sldEdgeCollapseThreshold, 0.1, 10, 0.1);
 
 	vm.skeletonSmooth.setupLabel(ui.lblSkeletonSmooth);
 	vm.skeletonSmooth.setupSlider(ui.sldSkeletonSmooth, 0.0, 40.0, 0.01);
@@ -218,7 +218,7 @@ void CaveSegmentationGUI::loadSkeleton(bool)
 void CaveSegmentationGUI::calculateSkeleton(bool)
 {
 	QApplication::setOverrideCursor(Qt::WaitCursor);
-	float edgeCollapseThreshold = glm::length(vm.caveData.getMax() - vm.caveData.getMin()) * vm.edgeCollapseThreshold.get() / 100.0f;
+	float edgeCollapseThreshold = (vm.caveData.getMax() - vm.caveData.getMin()).norm() * vm.edgeCollapseThreshold.get() / 100.0f;
 	skeletonComputation = QtConcurrent::run(std::bind(ComputeCurveSkeleton, modelFilename, &skeletonAbort, edgeCollapseThreshold, vm.skeletonSmooth.get(), vm.skeletonVelocity.get(), vm.skeletonMedial.get()));
 	skeletonWatcher.setFuture(skeletonComputation);
 	ui.btnCalculateSkeleton->setEnabled(false);

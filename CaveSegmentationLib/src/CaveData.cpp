@@ -224,6 +224,10 @@ void CaveData::LoadMesh(const std::string & offFile)
 		}
 	}	
 
+	reset_bounding_box();
+	for (auto& v : _meshVertices)
+		add_point(v.x(), v.y(), v.z());
+
 	//SDF test
 	//std::cout << "Calculating SDF segmentation .." << std::endl;
 
@@ -446,24 +450,7 @@ template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVe
 template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
 
 bool CaveData::CalculateDistances(float exponent)
-{
-	/*std::cout.precision(5);
-	char data[] = { 0x17, 0, 0, 0, 0, 0, 0, 0, 0x90, 0, 0, 0, 0, 0, 0, 0, 0x1d, 0xf8, 0x34, 0x58, 0x0d, 0x99, 0xbf, 0xbf };	
-	Vector p = *reinterpret_cast<Vector*>(data);
-	std::cout << "Vector: " << p << std::endl;
-	std::cout << "Vector.squared_length(): " << p.squared_length() << std::endl;
-	std::cout << "squared length: " << (p.x() * p.x() + p.y() * p.y() + p.z() * p.z()) << std::endl;
-	system("pause");*/
-
-	std::vector<std::vector<std::vector<double>>> sphereDistances(omp_get_num_procs());
-	std::vector<std::vector<std::vector<Vector>>> distanceGradient(omp_get_num_procs());
-
-	for (int i = 0; i < omp_get_num_procs(); ++i)
-	{
-		sphereSampling.PrepareDataContainer(sphereDistances.at(i));
-		sphereSampling.PrepareDataContainer(distanceGradient.at(i));
-	}
-
+{	
 #ifndef NON_VERBOSE
 	std::cout << "Calculating distances..." << std::endl;
 #endif
@@ -471,14 +458,21 @@ bool CaveData::CalculateDistances(float exponent)
 	invalidVertices.clear();
 
 	caveSizeCalculatorCustomData.resize(omp_get_num_procs());
-#pragma omp parallel for
-	for (int iVert = 0; iVert < skeleton->vertices.size(); ++iVert)
-	{		
-		bool vertexValid = CalculateDistancesSingleVertex(iVert, exponent, sphereDistances.at(omp_get_thread_num()), distanceGradient.at(omp_get_thread_num()));
-		if(!vertexValid)
-#pragma omp critical
+#pragma omp parallel
+	{
+		std::vector<std::vector<double>> sphereDistances;
+		std::vector<std::vector<Vector>> distanceGradient;
+		sphereSampling.PrepareDataContainer(sphereDistances);
+		sphereSampling.PrepareDataContainer(distanceGradient);
+#pragma omp for
+		for (int iVert = 0; iVert < skeleton->vertices.size(); ++iVert)
 		{
-			invalidVertices.push_back(iVert);
+			bool vertexValid = CalculateDistancesSingleVertex(iVert, exponent, sphereDistances, distanceGradient);
+			if (!vertexValid)
+#pragma omp critical
+			{
+				invalidVertices.push_back(iVert);
+			}
 		}
 	}
 

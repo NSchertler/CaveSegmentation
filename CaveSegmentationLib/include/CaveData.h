@@ -5,12 +5,13 @@
 
 #include "CGALCommon.h"
 #include "MeshProc.h"
+#include "IHasBoundingBox.h"
 
 #include "SizeCalculation.h"
 #include "RegularUniformSphereSampling.h"
 #include "SphereVisualizer.h"
 
-struct CaveData
+struct CaveData : public IHasBoundingBox
 {
 	CaveData();
 
