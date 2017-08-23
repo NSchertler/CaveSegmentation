@@ -1,164 +1,164 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Dateien">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;cxx;c;def</Extensions>
-    </Filter>
-    <Filter Include="Header Dateien">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h</Extensions>
-    </Filter>
-    <Filter Include="Form Dateien">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-    </Filter>
-    <Filter Include="Resource Dateien">
-      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
-      <Extensions>qrc;*</Extensions>
-      <ParseFiles>false</ParseFiles>
-    </Filter>
-    <Filter Include="Generierte Dateien">
-      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
-      <Extensions>moc;h;cpp</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
-    </Filter>
-    <Filter Include="Generierte Dateien\Debug">
-      <UniqueIdentifier>{c917b30c-f582-4144-b3e2-d166818a2d47}</UniqueIdentifier>
-      <Extensions>cpp;moc</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
-    </Filter>
-    <Filter Include="Generierte Dateien\Release">
-      <UniqueIdentifier>{16798188-96ad-42d4-b5c9-2c95792add20}</UniqueIdentifier>
-      <Extensions>cpp;moc</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
-    </Filter>
-    <Filter Include="Generierte Dateien\DebugNSight">
-      <UniqueIdentifier>{d4471951-7fb1-4f66-b766-f31d6c99b506}</UniqueIdentifier>
-      <Extensions>cpp;moc</Extensions>
-      <SourceControlFiles>False</SourceControlFiles>
-    </Filter>
     <Filter Include="QCustomPlot">
       <UniqueIdentifier>{b82720f2-b7be-4d6f-a941-dd60a76edd50}</UniqueIdentifier>
     </Filter>
     <Filter Include="glsl">
       <UniqueIdentifier>{e16246b3-7fb5-4fd4-94d4-40766a08f442}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;cxx;c;def</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
+      <Extensions>qrc;*</Extensions>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
+      <Extensions>moc;h;cpp</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{c917b30c-f582-4144-b3e2-d166818a2d47}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{16798188-96ad-42d4-b5c9-2c95792add20}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\DebugNSight">
+      <UniqueIdentifier>{d4471951-7fb1-4f66-b766-f31d6c99b506}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="cavesegmentationgui.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CaveDataGLView.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CaveGLData.cpp">
-      <Filter>Source Dateien</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_CaveGLData.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_CaveGLData.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Dateien</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_cavesegmentationgui.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_cavesegmentationgui.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_CaveGLData.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_cavesegmentationgui.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_qcustomplot.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_qcustomplot.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_qcustomplot.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="QCustomPlot\qcustomplot.cpp">
       <Filter>QCustomPlot</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_ViewModel.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_ViewModel.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_ViewModel.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\DebugNSight\moc_DataPlot.cpp">
-      <Filter>Generierte Dateien\DebugNSight</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_DataPlot.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_DataPlot.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
-    </ClCompile>
     <ClCompile Include="ViewModel.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DataPlot.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_gui.cpp">
-      <Filter>Generierte Dateien</Filter>
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_cavesegmentationgui.cpp">
+      <Filter>Generated Files\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_cavesegmentationgui.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_cavesegmentationgui.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_DataPlot.cpp">
+      <Filter>Generated Files\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_DataPlot.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_DataPlot.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_ViewModel.cpp">
+      <Filter>Generated Files\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_ViewModel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_ViewModel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_CaveGLData.cpp">
+      <Filter>Generated Files\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_CaveGLData.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_CaveGLData.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\DebugNSight\moc_qcustomplot.cpp">
+      <Filter>Generated Files\DebugNSight</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_qcustomplot.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_qcustomplot.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="cavesegmentationgui.h">
-      <Filter>Header Dateien</Filter>
-    </CustomBuild>
     <CustomBuild Include="cavesegmentationgui.ui">
-      <Filter>Form Dateien</Filter>
+      <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="CaveGLData.hpp">
-      <Filter>Header Dateien</Filter>
+    <CustomBuild Include="Resources\gui.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="cavesegmentationgui.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="DataPlot.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ViewModel.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CaveGLData.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="QCustomPlot\qcustomplot.h">
       <Filter>QCustomPlot</Filter>
     </CustomBuild>
-    <CustomBuild Include="ViewModel.h">
-      <Filter>Header Dateien</Filter>
-    </CustomBuild>
-    <CustomBuild Include="DataPlot.h">
-      <Filter>Header Dateien</Filter>
-    </CustomBuild>
-    <CustomBuild Include="Resources\gui.qrc">
-      <Filter>Resource Dateien</Filter>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_cavesegmentationgui.h">
-      <Filter>Generierte Dateien</Filter>
-    </ClInclude>
-    <ClInclude Include="CaveDataGLView.h">
-      <Filter>Header Dateien</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="PrintRedirection.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CaveDataGLView.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Icon\main.ico">
-      <Filter>Resource Dateien</Filter>
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

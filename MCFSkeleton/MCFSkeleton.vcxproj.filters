@@ -1,22 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Quelldateien">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Headerdateien">
+    <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Ressourcendateien">
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Headerdateien\surface_mesh">
+    <Filter Include="Header Files\surface_mesh">
       <UniqueIdentifier>{9322002d-207b-4d49-84c4-ecca5af8f7da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Quelldateien\surface_mesh">
+    <Filter Include="Source Files\surface_mesh">
       <UniqueIdentifier>{862bb272-252a-4439-85ed-13e382a84aaf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Include">
@@ -25,55 +25,55 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\EdgePropertyPriorityQueue.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\EigenContractionHelper.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\QhullVoronoiHelper.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\Skelcollapse.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\StdIterators.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\SurfaceMeshForEachHelpers.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\SurfaceMeshHelper.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\SurfaceMeshModel.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\TopologyJanitor.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\TopologyJanitor_ClosestPole.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\WingedEdgeMesh.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\WingedEdgeMeshForEach.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\WingedEdgeMeshModel.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\CotangentLaplacianHelper.h">
-      <Filter>Headerdateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="header\surface_mesh\Surface_mesh.h">
-      <Filter>Headerdateien\surface_mesh</Filter>
+      <Filter>Header Files\surface_mesh</Filter>
     </ClInclude>
     <ClInclude Include="header\surface_mesh\IO.h">
-      <Filter>Headerdateien\surface_mesh</Filter>
+      <Filter>Header Files\surface_mesh</Filter>
     </ClInclude>
     <ClInclude Include="header\surface_mesh\properties.h">
-      <Filter>Headerdateien\surface_mesh</Filter>
+      <Filter>Header Files\surface_mesh</Filter>
     </ClInclude>
     <ClInclude Include="include\CurveSkeleton.h">
       <Filter>Include</Filter>
@@ -84,31 +84,31 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\SurfaceMeshModel.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\WingedEdgeMeshModel.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Skelcollapse.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\surface_mesh\IO_obj.cpp">
-      <Filter>Quelldateien\surface_mesh</Filter>
+      <Filter>Source Files\surface_mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\surface_mesh\IO_off.cpp">
-      <Filter>Quelldateien\surface_mesh</Filter>
+      <Filter>Source Files\surface_mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\surface_mesh\IO_stl.cpp">
-      <Filter>Quelldateien\surface_mesh</Filter>
+      <Filter>Source Files\surface_mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\surface_mesh\Surface_mesh.cpp">
-      <Filter>Quelldateien\surface_mesh</Filter>
+      <Filter>Source Files\surface_mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\surface_mesh\IO.cpp">
-      <Filter>Quelldateien\surface_mesh</Filter>
+      <Filter>Source Files\surface_mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\CurveSkeleton.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

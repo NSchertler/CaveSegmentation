@@ -377,8 +377,8 @@ int main(int argc, char* argv[])
 
 	std::cout << std::endl;	
 
-	std::cout << std::endl << "Best parameters for minimal plausibility:" << std::endl << bestMinParameters;
-	std::cout << std::endl << "Best parameters for average plausibility:" << std::endl << bestAverageParameters;		
+	std::cout << std::endl << "Best parameters for maximum minimal plausibility:" << std::endl << bestMinParameters;
+	std::cout << std::endl << "Best parameters for maximum average plausibility:" << std::endl << bestAverageParameters;		
 
     return 0;
 }

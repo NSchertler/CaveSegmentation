@@ -5,8 +5,6 @@
 
 int main(int argc, char *argv[])
 {
-
-
 	QApplication a(argc, argv);
 	PCPlot w;
 	w.show();

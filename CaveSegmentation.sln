@@ -27,6 +27,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PCPlot", "PCPlot\PCPlot.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CaveSegmentationGUICore", "CaveSegmentationGUICore\CaveSegmentationGUICore.vcxproj", "{54356F79-68E9-45FE-92FA-C3DB4D9F1E39}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QPBO_vs14", "dependencies\QPBO-opengm\QPBO_vs14.vcxproj", "{ACCCB653-C128-47F1-9D2C-93DA46DEF6B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -87,6 +89,12 @@ Global
 		{54356F79-68E9-45FE-92FA-C3DB4D9F1E39}.DebugNSight|x64.Build.0 = Debug|x64
 		{54356F79-68E9-45FE-92FA-C3DB4D9F1E39}.Release|x64.ActiveCfg = Release|x64
 		{54356F79-68E9-45FE-92FA-C3DB4D9F1E39}.Release|x64.Build.0 = Release|x64
+		{ACCCB653-C128-47F1-9D2C-93DA46DEF6B6}.Debug|x64.ActiveCfg = Debug|x64
+		{ACCCB653-C128-47F1-9D2C-93DA46DEF6B6}.Debug|x64.Build.0 = Debug|x64
+		{ACCCB653-C128-47F1-9D2C-93DA46DEF6B6}.DebugNSight|x64.ActiveCfg = Debug|x64
+		{ACCCB653-C128-47F1-9D2C-93DA46DEF6B6}.DebugNSight|x64.Build.0 = Debug|x64
+		{ACCCB653-C128-47F1-9D2C-93DA46DEF6B6}.Release|x64.ActiveCfg = Release|x64
+		{ACCCB653-C128-47F1-9D2C-93DA46DEF6B6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

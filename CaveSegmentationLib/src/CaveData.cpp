@@ -206,12 +206,12 @@ void CaveData::LoadMesh(const std::string & offFile)
 		{
 			fwrite(&lastModifiedTimeOfMesh, sizeof(std::time_t), 1, cache);
 
-			int32_t n_vertices = _meshVertices.size();
+			int32_t n_vertices = (int32_t)_meshVertices.size();
 			fwrite(&n_vertices, sizeof(int32_t), 1, cache);
 			if(n_vertices > 0)
 				fwrite(&_meshVertices[0], sizeof(Eigen::Vector3f), n_vertices, cache);
 
-			int32_t n_triangles = _meshTriIndices.size();
+			int32_t n_triangles = (int32_t)_meshTriIndices.size();
 			fwrite(&n_triangles, sizeof(int32_t), 1, cache);
 			if (n_triangles > 0)
 				fwrite(&_meshTriIndices[0], sizeof(IndexedTriangle), n_triangles, cache);

@@ -263,7 +263,7 @@ void GLView::initializeGL()
 void GLView::recalculateView()
 {
 	glm::vec3 eye = getEye();
-	view = glm::translate(glm::mat4(), glm::vec3(-eyeOffset, 0, 0)) * glm::lookAtRH(eye, focus, glm::vec3(0, 0, 1));
+	view = glm::translate(glm::mat4(1.0f), glm::vec3(-eyeOffset, 0, 0)) * glm::lookAtRH(eye, focus, glm::vec3(0, 0, 1));
 	emitCameraChanged();
 	emitCamParamsChanged();
 
@@ -432,7 +432,7 @@ void GLView::recalculateProjection()
 	emitCameraChanged();
 }
 
-void GLView::align_to_bounding_box(glm::vec3 min, glm::vec3 max)
+void GLView::align_to_bounding_box(const glm::vec3& min, const glm::vec3& max)
 {
 	if (!isPrimary)
 		return;

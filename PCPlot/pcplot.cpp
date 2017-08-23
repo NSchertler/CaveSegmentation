@@ -19,35 +19,32 @@ PCPlot::PCPlot(QWidget *parent)
 {
 	ui.setupUi(this);
 
+	auto fname = QFileDialog::getOpenFileName(this, "Open Evaluation Result", QString(), "*.bin"); //"C:/Users/Nico/Desktop/Evaluation/Evaluation/coarse/result.bin";//
+	if (fname.isEmpty())
+		return;	
+
 	auto plot = new GLView(this);
 	setCentralWidget(plot);
-
-	QString fname;
-	do {
-		fname = QFileDialog::getOpenFileName(this); //"C:/Users/Nico/Desktop/Evaluation/Evaluation/coarse/result.bin";//
-		if (!fname.isEmpty())
+		
+	ParameterSet* buffer = new ParameterSet[1024];
+	FILE* f = fopen(fname.toStdString().c_str(), "rb");
+	while (!feof(f))
+	{
+		int count = fread(buffer, sizeof(ParameterSet), 1024, f);
+		for (int i = 0; i < count; ++i)
 		{
-			ParameterSet* buffer = new ParameterSet[1024];
-			FILE* f = fopen(fname.toStdString().c_str(), "rb");
-			while (!feof(f))
-			{
-				int count = fread(buffer, sizeof(ParameterSet), 1024, f);
-				for (int i = 0; i < count; ++i)
-				{
-					if (buffer[i].algo != 0)
-						continue;
-					data.push_back(buffer[i].minPlausibility);
-					data.push_back(buffer[i].power);
-					data.push_back(buffer[i].algo);
-					data.push_back(buffer[i].scale);
-					data.push_back(buffer[i].size);
-					data.push_back(buffer[i].sizeDerivative);
-					data.push_back(buffer[i].tipPoint);
-					data.push_back(buffer[i].directionTolerance);
-				}
-			}
+			if (buffer[i].algo != 0)
+				continue;
+			data.push_back(buffer[i].minPlausibility);
+			data.push_back(buffer[i].power);
+			data.push_back(buffer[i].algo);
+			data.push_back(buffer[i].scale);
+			data.push_back(buffer[i].size);
+			data.push_back(buffer[i].sizeDerivative);
+			data.push_back(buffer[i].tipPoint);
+			data.push_back(buffer[i].directionTolerance);
 		}
-	} while (!fname.isEmpty());
+	}
 
 	plot->setData(data.data(), data.size() / 8, 8);
 

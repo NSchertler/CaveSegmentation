@@ -50,7 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)\build\include;$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT)/include;$(OPENGM_ROOT)/include;$(SolutionDir)/MCFSkeleton/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(EIGEN3_ROOT);$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(SolutionDir)\MCFSkeleton\include;$(SolutionDir)\dependencies\glm;$(SolutionDir)\dependencies\QPBO-opengm;$(SolutionDir)\dependencies\opengm\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -65,7 +65,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(BOOST_ROOT);$(CGAL_DIR)\build\include;$(CGAL_DIR)/auxiliary/gmp/include;$(CGAL_DIR)/include;$(QPBO_ROOT)/include;$(OPENGM_ROOT)/include;$(SolutionDir)/MCFSkeleton/include;$(EIGEN3_ROOT)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(CGAL_DIR)\auxiliary\gmp\include;$(CGAL_DIR)\build\include;$(CGAL_DIR)\include;$(EIGEN3_ROOT);$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\CaveSegmentationLib\include;$(SolutionDir)\MCFSkeleton\include;$(SolutionDir)\dependencies\glm;$(SolutionDir)\dependencies\QPBO-opengm;$(SolutionDir)\dependencies\opengm\include;</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -108,6 +108,9 @@
     <ClCompile Include="src\SphereVisualizer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\dependencies\QPBO-opengm\QPBO_vs14.vcxproj">
+      <Project>{acccb653-c128-47f1-9d2c-93da46def6b6}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\MCFSkeleton\MCFSkeleton.vcxproj">
       <Project>{acf54eb6-8fad-4fb5-8789-944abd833b06}</Project>
     </ProjectReference>

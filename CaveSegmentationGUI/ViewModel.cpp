@@ -17,7 +17,7 @@ ViewModel::ViewModel(QObject * parent) : QObject(parent), lookThrough(true),
 
 	_cursorPos.x = std::numeric_limits<float>::quiet_NaN();
 
-	_edgeCollapseThreshold = 1.0;
+	_edgeCollapseThreshold = 0.2;
 	_skeletonSmooth = 1.0;
 	_skeletonVelocity = 20.0;
 	_skeletonMedial = 1.0;

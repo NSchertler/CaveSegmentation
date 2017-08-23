@@ -72,7 +72,7 @@ protected:
 	virtual void paintGL() = 0;
 	virtual void initializeGL();
 	virtual void resizeGL(int width, int height);
-	void align_to_bounding_box(glm::vec3 min, glm::vec3 max);
+	void align_to_bounding_box(const glm::vec3& min, const glm::vec3& max);
 
 	void zoom(float amount);
 

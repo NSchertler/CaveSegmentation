@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <QObject>
 
-#include "CaveGLData.hpp"
+#include "CaveGLData.h"
 #include "ObservableVariable.h"
 
 class ViewModel : public QObject {

@@ -45,7 +45,7 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 	vm.directionTolerance.setupSlider(ui.sldDirectionTolerance, 0.01, 2.0, 0.01);
 
 	vm.edgeCollapseThreshold.setupLabel(ui.lblEdgeCollapseThreshold);
-	vm.edgeCollapseThreshold.setupSlider(ui.sldEdgeCollapseThreshold, 0.1, 10, 0.1);
+	vm.edgeCollapseThreshold.setupSlider(ui.sldEdgeCollapseThreshold, 0.01, 2, 0.01);
 
 	vm.skeletonSmooth.setupLabel(ui.lblSkeletonSmooth);
 	vm.skeletonSmooth.setupSlider(ui.sldSkeletonSmooth, 0.0, 40.0, 0.01);

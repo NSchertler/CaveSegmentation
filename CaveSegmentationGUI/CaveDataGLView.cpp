@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "CaveDataGLView.h"
-#include "CaveGLData.hpp"
+#include "CaveGLData.h"
 #include "GLUtils.h"
 
 #include <QMouseEvent>
@@ -128,17 +128,7 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 					emit vm.selectedPathChanged();
 					vm.caveData.UpdateColorLayer();
 					e->accept();
-					vm.selectedVertex.set(vm.hoveredElement.get() - 1);
-
-					//Debug output
-					for (int i = 0; i < vm.selectedPath.size() - 1; ++i)
-					{
-						int v1 = vm.selectedPath.at(i);
-						int v2 = vm.selectedPath.at(i + 1);
-						auto edgeId = vm.caveData.vertexPairToEdge.at(std::pair<int, int>(v1, v2));
-						auto edge = vm.caveData.skeleton->edges.at(edgeId);
-						std::cout << "Edge " << edgeId << ": " << edge.first << " -> " << edge.second << " (" << vm.caveData.caveSizeDerivativesPerEdge.at(edgeId) << ")" << std::endl;
-					}
+					vm.selectedVertex.set(vm.hoveredElement.get() - 1);					
 				}
 			}			
 		}

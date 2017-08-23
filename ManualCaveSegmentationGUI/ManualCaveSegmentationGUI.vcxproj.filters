@@ -1,198 +1,198 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Dateien">
+    <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;cxx;c;def</Extensions>
     </Filter>
-    <Filter Include="Header Dateien">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h</Extensions>
-    </Filter>
-    <Filter Include="Form Dateien">
-      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
-      <Extensions>ui</Extensions>
-    </Filter>
-    <Filter Include="Resource Dateien">
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{D9D6E242-F8AF-46E4-B9FD-80ECBC20BA3E}</UniqueIdentifier>
       <Extensions>qrc;*</Extensions>
       <ParseFiles>false</ParseFiles>
     </Filter>
-    <Filter Include="Generierte Dateien">
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h</Extensions>
+    </Filter>
+    <Filter Include="Generated Files">
       <UniqueIdentifier>{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}</UniqueIdentifier>
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Generierte Dateien\Debug">
+    <Filter Include="Generated Files\Debug">
       <UniqueIdentifier>{725a6f10-3430-437c-87e7-4685803b882f}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
-    <Filter Include="Generierte Dateien\Release">
+    <Filter Include="Generated Files\Release">
       <UniqueIdentifier>{03ed074f-9b79-4a36-9cf4-dd2c3e3046fd}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Form Files">
+      <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
+      <Extensions>ui</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="IHasBoundingBox.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_Mesh.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_Mesh.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_Resources.cpp">
-      <Filter>Generierte Dateien</Filter>
+      <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="kdtree.c">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CaveListDialog.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_CaveListDialog.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_CaveListDialog.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="common.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_AvailableCaveListDialog.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_AvailableCaveListDialog.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="AvailableCaveListDialog.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_SharedData.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_SharedData.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_UploadSegmentationDialog.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_UploadSegmentationDialog.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="UploadSegmentationDialog.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RestClient.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Debug\moc_ManualCaveSegmentation.cpp">
-      <Filter>Generierte Dateien\Debug</Filter>
+      <Filter>Generated Files\Debug</Filter>
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_ManualCaveSegmentation.cpp">
-      <Filter>Generierte Dateien\Release</Filter>
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="GLCaveView.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ManualCaveSegmentation.cpp">
-      <Filter>Source Dateien</Filter>
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="mesh.frag">
-      <Filter>Resource Dateien</Filter>
+      <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="mesh.geom">
-      <Filter>Resource Dateien</Filter>
+      <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="mesh.vert">
-      <Filter>Resource Dateien</Filter>
+      <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="Mesh.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="Resources.qrc">
-      <Filter>Resource Dateien</Filter>
+      <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="CaveList.ui">
-      <Filter>Form Dateien</Filter>
+      <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="CaveListDialog.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="AvailableCaveList.ui">
-      <Filter>Form Dateien</Filter>
+      <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="AvailableCaveListDialog.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="Common.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="SharedData.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="UploadSegmentation.ui">
-      <Filter>Form Dateien</Filter>
+      <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="UploadSegmentationDialog.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ManualCaveSegmentation.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="ManualCaveSegmentation.ui">
-      <Filter>Form Dateien</Filter>
+      <Filter>Form Files</Filter>
     </CustomBuild>
     <CustomBuild Include="_GLView.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IHasBoundingBox.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kdtree.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RestClient.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_CaveList.h">
-      <Filter>Generierte Dateien</Filter>
+      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="CaveData.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_AvailableCaveList.h">
-      <Filter>Generierte Dateien</Filter>
+      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_UploadSegmentation.h">
-      <Filter>Generierte Dateien</Filter>
+      <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="GLCaveView.h">
-      <Filter>Header Dateien</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_ManualCaveSegmentation.h">
-      <Filter>Generierte Dateien</Filter>
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="iconChamber.png">
-      <Filter>Resource Dateien</Filter>
+      <Filter>Resource Files</Filter>
     </Image>
     <Image Include="iconPassage.png">
-      <Filter>Resource Dateien</Filter>
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

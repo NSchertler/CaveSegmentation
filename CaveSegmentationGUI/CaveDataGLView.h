@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "GLView.h"
 #include <qglfunctions.h>
-#include "CaveGLData.hpp"
+#include "CaveGLData.h"
 #include "ViewModel.h"
 #include <QTimer>
 #include <QOpenGLFunctions_3_3_Core>

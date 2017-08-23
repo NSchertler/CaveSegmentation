@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 
-#include "CaveGLData.hpp"
+#include "CaveGLData.h"
 #include <GLUtils.h>
 #include <qmessagebox.h>
 #include <QDir>
