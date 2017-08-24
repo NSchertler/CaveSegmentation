@@ -57,6 +57,7 @@ void CaveDataGLView::mouseMoveEvent(QMouseEvent *e)
 	if (fbo >= 0)
 	{
 #ifndef NSIGHT_COMPATIBLE
+		//Find what is in the index buffer at the current mouse location
 		makeCurrent();
 		auto oldHovered = vm.hoveredElement.get();
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -66,7 +67,7 @@ void CaveDataGLView::mouseMoveEvent(QMouseEvent *e)
 		if (newHovered != oldHovered)
 			vm.hoveredElement.set(newHovered);
 #else
-		hoveredElement = 1;
+		vm.hoveredElement.set(1);
 #endif
 	}
 
@@ -88,6 +89,7 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 		{
 			if (e->modifiers() == 0)
 			{
+				//Select a vertex
 				vm.selectedVertex.set(vm.hoveredElement.get() - 1);
 				vm.caveData.ResetColorLayer();
 				vm.caveData.UpdateColorLayer();
@@ -97,6 +99,7 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 			}
 			else if(e->modifiers() == Qt::ShiftModifier)
 			{
+				//Append the segment selected vertex -> hovered vertex to the current path
 				if (vm.selectedVertex.get() >= 0 && vm.selectedVertex.get() != vm.hoveredElement.get() - 1)
 				{
 					std::deque<int> additionalPath;
@@ -115,11 +118,14 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 						verticesInPath.insert(vertex);
 					}
 
+					//Update the color layer for the current path
 					for (int i = 0; i < vm.selectedPath.size(); ++i)
 					{
-						float c = 0.4f + 0.5f * i / (vm.selectedPath.size() - 1);
-						vm.caveData.colorLayer.at(vm.selectedPath.at(i)) = glm::vec4(1, c, c, 1.0);
+						//Use a linearly increasing brightness to show the path direction
+						float c = 0.7f + 0.3f * i / (vm.selectedPath.size() - 1);
+						vm.caveData.colorLayer.at(vm.selectedPath.at(i)) = glm::vec4(c, c, c, 1.0);
 					}
+					//Darken all vertices that are not on the path
 					for (int i = 0; i < vm.caveData.colorLayer.size(); ++i)
 					{
 						if(verticesInPath.find(i) == verticesInPath.end())
@@ -201,9 +207,9 @@ void CaveDataGLView::initializeGL()
 
 	if (clearProgram == nullptr)
 	{
-		clearProgram = MakeProgram("glsl/clear.vert", "glsl/clear.frag");
-		markerProgram = MakeProgram("glsl/marker.vert", "glsl/marker.frag");
-		cursorProgram = MakeProgram("glsl/cursor.vert", "glsl/cursor.frag");
+		clearProgram = MakeProgram(":/glsl/clear.vert", ":/glsl/clear.frag");
+		markerProgram = MakeProgram(":/glsl/marker.vert", ":/glsl/marker.frag");
+		cursorProgram = MakeProgram(":/glsl/cursor.vert", ":/glsl/cursor.frag");
 	}	
 
 	//Generate picking render targets
@@ -212,12 +218,6 @@ void CaveDataGLView::initializeGL()
 	recreatePickingResources = true;
 
 	cursorTexture = new QOpenGLTexture(QImage(":/icon/cursor.png").mirrored());
-
-	float minmax[2];
-	glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, minmax);
-	std::cout << "min: " << minmax[0] << ", max: " << minmax[1] << std::endl;
-	glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, minmax);
-	std::cout << "min: " << minmax[0] << ", max: " << minmax[1] << std::endl;
 
 	glLineWidth(5.0f);
 	glEnable(GL_LINE_SMOOTH);
@@ -256,9 +256,12 @@ void CaveDataGLView::paintGL()
 
 	if (vm.getLookThrough())
 	{
+		//Draw back faces of cave solid
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glCullFace(GL_FRONT);
 		vm.caveData.drawCave(this);
+
+		//Draw front faces of cave as dots
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		glCullFace(GL_BACK);
 		vm.caveData.drawCave(this);

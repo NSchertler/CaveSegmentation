@@ -4,9 +4,6 @@
     <Filter Include="QCustomPlot">
       <UniqueIdentifier>{b82720f2-b7be-4d6f-a941-dd60a76edd50}</UniqueIdentifier>
     </Filter>
-    <Filter Include="glsl">
-      <UniqueIdentifier>{e16246b3-7fb5-4fd4-94d4-40766a08f442}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;cxx;c;def</Extensions>
@@ -43,6 +40,9 @@
     <Filter Include="Form Files">
       <UniqueIdentifier>{99349809-55BA-4b9d-BF79-8FDBB0286EB3}</UniqueIdentifier>
       <Extensions>ui</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\glsl">
+      <UniqueIdentifier>{4bee5500-6502-4bab-89d8-e96418a4cad9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -162,59 +162,59 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="glsl\correspondence.geom">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\clear.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\correspondence.vert">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\clear.vert">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\cursor.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\correspondence.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\cursor.vert">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\correspondence.geom">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\marker.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\correspondence.vert">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\marker.vert">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\cursor.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\skeleton.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\cursor.vert">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\skeleton.vert">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\marker.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\skeletonPoint.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\marker.vert">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\skeletonPoint.vert">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\skeleton.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\skeletonPointSelection.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\skeleton.geom">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\cave.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\skeleton.vert">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\cave.geom">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\skeletonPoint.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\cave.vert">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\skeletonPoint.vert">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\clear.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\skeletonPointSelection.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\clear.vert">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\cave.frag">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\correspondence.frag">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\cave.geom">
+      <Filter>Resource Files\glsl</Filter>
     </None>
-    <None Include="glsl\skeleton.geom">
-      <Filter>glsl</Filter>
+    <None Include="Resources\glsl\cave.vert">
+      <Filter>Resource Files\glsl</Filter>
     </None>
   </ItemGroup>
 </Project>

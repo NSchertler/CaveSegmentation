@@ -8,6 +8,7 @@
 #include <QOpenGLTexture>
 #include <QKeyEvent>
 
+//Main renderer
 class CaveDataGLView : public GLView, QOpenGLFunctions_3_3_Core 
 {
 public:
@@ -39,6 +40,7 @@ private:
 	static std::unique_ptr<QOpenGLShaderProgram> markerProgram;
 	static std::unique_ptr<QOpenGLShaderProgram> cursorProgram;
 
+	//index texture for skeleton nodes
 	GLuint pickingTexture;
 	GLint fbo;
 

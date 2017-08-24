@@ -12,10 +12,6 @@ extern double gauss(double x, double variance);
 //Returns the unnormalized definite integral of the Gaussian normal distribution between the given limits
 extern double gaussIntegrate(double standardDeviation, double lower, double upper);
 
-extern void buildTreeDfs(const int currentVertex, const int prevVertex, const std::vector<std::vector<int>>& adjacency, std::vector<bool>& visited, std::vector<int>& parents, std::vector<std::vector<int>>& children);
-
-extern void buildTree(const int root, const int vertexCount, const std::vector<std::vector<int>>& adjacency, std::vector<int>& parents, std::vector<std::vector<int>>& children);
-
 struct NodeDistance
 {
 	int node;

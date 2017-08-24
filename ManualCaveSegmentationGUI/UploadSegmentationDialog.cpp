@@ -31,21 +31,29 @@ void UploadSegmentationDialog::dialogButtonClicked(QAbstractButton* button)
 	QDialogButtonBox::StandardButton stdButton = ui.buttonBox->standardButton(button);
 	if (stdButton == QDialogButtonBox::StandardButton::Ok)
 	{
-		startProgress();		
-
-		const unsigned int* segmentation;
-		size_t segmentationSize = data->getMesh()->getSegmentationData(segmentation);
-		QByteArray qSegmentation(reinterpret_cast<const char*>(segmentation), sizeof(unsigned int) * segmentationSize);
-		QString segmentationB64 = qSegmentation.toBase64();
-
 		auto serverUrl = GlobalData.serverUrl().toStdWString();
-		RestClient c(serverUrl);
-		GetTaskResult(c.UploadSegmentation(data->currentCaveId, segmentationB64.toStdWString(), ui.txtName->text().toStdWString(), ui.cmbExpertise->currentData().toInt(), ui.cmbCertainty->currentData().toInt())).then(
-			[=](TaskResult<void> result)
+		try
+		{
+			RestClient c(serverUrl);
+			startProgress();
+
+			const unsigned int* segmentation;
+			size_t segmentationSize = data->getMesh()->getSegmentationData(segmentation);
+			QByteArray qSegmentation(reinterpret_cast<const char*>(segmentation), sizeof(unsigned int) * segmentationSize);
+			QString segmentationB64 = qSegmentation.toBase64();
+
+
+			GetTaskResult(c.UploadSegmentation(data->currentCaveId, segmentationB64.toStdWString(), ui.txtName->text().toStdWString(), ui.cmbExpertise->currentData().toInt(), ui.cmbCertainty->currentData().toInt())).then(
+				[=](TaskResult<void> result)
 			{
 				emit actionFinished(result.success);
 			}
-		);
+			);
+		}
+		catch (std::exception& e)
+		{
+			QMessageBox::critical(this, "Upload Segmentation", QString("There was an error uploading the segmentation: ") + e.what());
+		}
 	}
 }
 

@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 	bool calculateDistances = false;
 	std::string dataDirectory;
 
-	float edgeCollapseThresholdPercent = 1.0f;
+	float edgeCollapseThresholdPercent = 0.2f;
 	float w_smooth = 1.0f;
 	float w_velocity = 20.0f;
 	float w_medial = 1.0f;
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 	{
 		std::cout << "You did not specify a data directory." << std::endl;
 		PrintHelp();
-		return -2;
+		return 1;
 	}
 
 	const std::string outputDirectory = dataDirectory + "/output";
@@ -108,7 +108,15 @@ int main(int argc, char* argv[])
 	std::cout << "Model file: " << offFile << std::endl;
 
 	CaveData data;
-	data.LoadMesh(offFile);	
+	try
+	{
+		data.LoadMesh(offFile);
+	}
+	catch (...)
+	{
+		std::cerr << "Cannot load mesh from " << offFile << std::endl;
+		return 2;
+	}
 	data.SetOutputDirectory(outputDirectoryW);
 
 	StartImageProc();	

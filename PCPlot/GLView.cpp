@@ -292,7 +292,7 @@ void GLView::initializeGL()
 
 void GLView::recalculateView()
 {
-	view = glm::mat4();
+	view = glm::mat4(1.0f);
 }
 
 void GLView::handleLoggedMessage(const QOpenGLDebugMessage & message)

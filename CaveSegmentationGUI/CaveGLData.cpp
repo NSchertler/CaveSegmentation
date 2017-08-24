@@ -385,11 +385,11 @@ void CaveGLData::initGL(OpenGLContextProvider* ctx, bool primary)
 
 void CaveGLData::init_shaders()
 {
-	meshProgram = MakeProgram("glsl/cave.vert", "glsl/cave.frag", "glsl/cave.geom");
-	skeletonProgram = MakeProgram("glsl/skeleton.vert", "glsl/skeleton.frag", "glsl/skeleton.geom");
-	skeletonPointProgram = MakeProgram("glsl/skeletonPoint.vert", "glsl/skeletonPoint.frag");
-	skeletonPointSelectionProgram = MakeProgram("glsl/skeletonPoint.vert", "glsl/skeletonPointSelection.frag");
-	correspondenceProgram = MakeProgram("glsl/correspondence.vert", "glsl/correspondence.frag", "glsl/correspondence.geom");
+	meshProgram = MakeProgram(":/glsl/cave.vert", ":/glsl/cave.frag", ":/glsl/cave.geom");
+	skeletonProgram = MakeProgram(":/glsl/skeleton.vert", ":/glsl/skeleton.frag", ":/glsl/skeleton.geom");
+	skeletonPointProgram = MakeProgram(":/glsl/skeletonPoint.vert", ":/glsl/skeletonPoint.frag");
+	skeletonPointSelectionProgram = MakeProgram(":/glsl/skeletonPoint.vert", ":/glsl/skeletonPointSelection.frag");
+	correspondenceProgram = MakeProgram(":/glsl/correspondence.vert", ":/glsl/correspondence.frag", ":/glsl/correspondence.geom");
 }
 
 void CaveGLData::FindPath(int startVertex, int targetVertex, std::deque<int>& resultPath)
@@ -456,4 +456,18 @@ void CaveGLData::FindPath(int startVertex, int targetVertex, std::deque<int>& re
 		resultPath.push_front(v);
 		v = predecessors.at(v);
 	}
+}
+
+void CaveGLData::WriteBIN(const std::string& filename) const
+{
+	std::ofstream binaryOutput(filename, std::ios::binary);
+
+	int nVertices = meshVertices().size();
+	int nIndices = 3 * meshTriIndices().size();
+	binaryOutput.write(reinterpret_cast<const char*>(&nVertices), sizeof(int));
+	binaryOutput.write(reinterpret_cast<const char*>(&nIndices), sizeof(int));
+	binaryOutput.write(reinterpret_cast<const char*>(meshVertices().data()), nVertices * sizeof(Eigen::Vector3f));
+	binaryOutput.write(reinterpret_cast<const char*>(meshTriIndices().data()), meshTriIndices().size() * sizeof(IndexedTriangle));
+
+	binaryOutput.close();
 }

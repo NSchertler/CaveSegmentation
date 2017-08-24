@@ -10,6 +10,7 @@
 #include <iostream>
 #include <queue>
 
+//Tries to find the minimizer of an energy (the sum of entrance probability energies) through A* in the graph of possible solutions.
 class CurvatureBasedAStar
 {
 	struct NeighborViaEdge
@@ -375,7 +376,10 @@ class CurvatureBasedAStar
 	{
 		if(debug)
 			return;
+#ifdef WITH_GRAPHVIZ
 		{
+			const std::string neatoPath = "\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato\"";
+
 			std::ofstream dot("layout.dot");
 			int oldPrec = dot.precision();
 			dot << "digraph G {	graph[splines = \"false\" inputscale=10];";
@@ -402,8 +406,9 @@ class CurvatureBasedAStar
 			}
 			dot << "}";
 		}
-		std::string call = "\"\"C:\\Program Files (x86)\\Graphviz2.38\\bin\\neato\" -Tpng layout.dot -o \"" + name + "\"\"";
+		std::string call = "\"" + neatoPath + " -Tpng layout.dot -o \"" + name + "\"\"";
 		system(call.c_str());
+#endif
 	}
 
 public:

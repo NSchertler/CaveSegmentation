@@ -2,23 +2,25 @@
 #include "RestClient.h"
 #include "Common.h"
 #include <QPushButton>
+#include <QMessageBox>
 
 CaveListDialog::CaveListDialog(QWidget *parent)
 	: QDialog(parent), elementsInQueue(0)
 {
 	ui.setupUi(this);
-
-	ui.lstCaves->addItem("Loading caves from server...");
-
-	auto btnDownload = new QPushButton("Download");
-	ui.buttonBox->addButton(btnDownload, QDialogButtonBox::ActionRole);
-
+	
+	//Use signals for thread safety
 	connect(this, SIGNAL(newList()), this, SLOT(clearList()));
 	connect(this, SIGNAL(newListItem(QString)), this, SLOT(insertListItem(QString)));
 	connect(this, SIGNAL(newCave(CaveMetadata*)), this, SLOT(insertCave(CaveMetadata*)));
 	connect(this, SIGNAL(actionFinished()), this, SLOT(stopProgress()));
 	connect(this, &CaveListDialog::actionStarted, this, &CaveListDialog::startProgress);
-	connect(this, &CaveListDialog::caveArrived, this, &CaveListDialog::markCave);
+	connect(this, &CaveListDialog::caveArrived, this, &CaveListDialog::markCave);	
+
+	
+
+	auto btnDownload = new QPushButton("Download");
+	ui.buttonBox->addButton(btnDownload, QDialogButtonBox::ActionRole);
 	connect(btnDownload, &QPushButton::clicked, this, &CaveListDialog::downloadSelectedCaves);
 
 	downloadCaveList();
@@ -32,21 +34,30 @@ CaveListDialog::~CaveListDialog()
 void CaveListDialog::downloadCaveList()
 {
 	auto serverUrl = GlobalData.serverUrl().toStdWString();
-	RestClient c(serverUrl);
-	GetTaskResult(c.GetCaves()).then([=](TaskResult<std::shared_ptr<std::vector<CaveMetadata>>> v)
+	try
 	{
-		emit newList();
-		if (v.success)
+		RestClient c(serverUrl);
+		startProgress();
+		ui.lstCaves->addItem("Loading caves from server...");
+		GetTaskResult(c.GetCaves()).then([=](TaskResult<std::shared_ptr<std::vector<CaveMetadata>>> v)
 		{
-			caves = v.result;
-			for (auto& cave : *caves)
-				emit newCave(&cave);
-		}
-		else
-			emit newListItem("Error retrieving caves from server.");
+			emit newList();
+			if (v.success)
+			{
+				caves = v.result;
+				for (auto& cave : *caves)
+					emit newCave(&cave);
+			}
+			else
+				emit newListItem("Error retrieving caves from server.");
 
-		emit actionFinished();
-	});
+			emit actionFinished();
+		});
+	}
+	catch (std::exception& e)
+	{
+		QMessageBox::critical(this, "Download Cave List", QString("There was an error downloading the cave list: ") + e.what());
+	}
 }
 
 void CaveListDialog::downloadSelectedCaves()

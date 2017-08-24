@@ -53,7 +53,7 @@
        <x>0</x>
        <y>0</y>
        <width>433</width>
-       <height>914</height>
+       <height>943</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="rootLayout">
@@ -67,6 +67,13 @@
           <widget class="QPushButton" name="btnLoadOff">
            <property name="text">
             <string>Load OFF</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnWriteBin">
+           <property name="text">
+            <string>Write BIN</string>
            </property>
           </widget>
          </item>

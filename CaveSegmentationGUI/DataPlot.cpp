@@ -68,15 +68,7 @@ DataPlot::DataPlot(ViewModel& vm, QWidget * parent) : QCustomPlot(parent), vm(vm
 	graph(graphCount() - 1)->setScatterStyle(QCPScatterStyle::ssTriangleInverted);
 	graph(graphCount() - 1)->setPen(QPen(QColor(77, 175, 74)));
 
-	legend->setVisible(true);
-	/*QCPLayoutGrid *subLayout = new QCPLayoutGrid;
-	QCPLayoutElement *dummyElement = new QCPLayoutElement;
-	plotLayout()->addElement(0, 1, subLayout); // add sub-layout in the cell to the right of the main axis rect
-	subLayout->addElement(0, 0, legend); // add legend
-	subLayout->setMargins(QMargins(5, 5, 5, 5));
-	subLayout->addElement(1, 0, dummyElement); // add dummy element below legend
-	subLayout->setRowStretchFactor(0, 0.01); // make legend cell (in row 0) take up as little vertical space as possible
-	plotLayout()->setColumnStretchFactor(1, 0.01);*/
+	legend->setVisible(true);	
 	
 	setInteractions(QCP::iRangeZoom | QCP::iRangeDrag);
 	axisRect()->setRangeDrag(Qt::Horizontal);
@@ -119,7 +111,6 @@ void DataPlot::updatePlot(bool keepXAxis)
 		tValuesPerEdge[i - 1] = t + edgeLength / 2;
 		t += edgeLength;
 		tValuesPerVertex[i] = t;
-		std::cout << "t: " << t << std::endl;
 	}
 
 	QVector<double> caveSizes(vm.selectedPath.size());

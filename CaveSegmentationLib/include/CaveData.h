@@ -11,6 +11,7 @@
 #include "RegularUniformSphereSampling.h"
 #include "SphereVisualizer.h"
 
+//Agglomeration of all cave-related data.
 struct CaveData : public IHasBoundingBox
 {
 	CaveData();
@@ -29,8 +30,6 @@ struct CaveData : public IHasBoundingBox
 
 	void SetOutputDirectory(const std::wstring& outputDirectory);
 
-	void WriteBranchStatistics(const std::string& directory) const;
-
 	void ResizeMeshAttributes(size_t vertexCount);
 	void ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount);
 
@@ -41,28 +40,38 @@ struct CaveData : public IHasBoundingBox
 	std::vector<CaveSizeCalculator::TCustomData> caveSizeCalculatorCustomData;
 
 	CurveSkeleton* skeleton;
+	//Mean radius of the visible sphere around a skeleton vertex; not used anymore.
 	std::vector<double> meanDistances;
+	//Maximum radius of the visible sphere around a skeleton vertex; not used anymore.
 	std::vector<double> maxDistances;
+	//Minimum radius of the visible sphere around a skeleton vertex; not used anymore.
 	std::vector<double> minDistances;
-	std::vector<double> caveSizes;
-	std::vector<double> nodeRadii;
-	std::vector<unsigned int> meshVertexCorrespondsTo;
-	std::vector<int> parents;
-	std::vector<std::vector<int>> children;
-	std::vector<double> caveSizeDerivatives;
-	std::vector<double> caveSizeCurvatures;
-	std::vector<double> caveScale; //average cave size in the area surrounded by the vertex
-	std::vector<double> caveSizeDerivativesPerEdge;
-	std::vector<double> caveSizeCurvaturesPerEdge;
-	std::vector<std::vector<int>> adjacency;
-	std::map<std::pair<int, int>, int> vertexPairToEdge;
-	int rootVertex;	
 
+	//Cave size for a given skeleton vertex
+	std::vector<double> caveSizes;
+
+	//Radius of a skeleton vertex based on the distance to its neighbor vertices.
+	std::vector<double> nodeRadii;
+
+	//Correspondence of the mesh vertices to skeleton vertices
+	std::vector<unsigned int> meshVertexCorrespondsTo;
+
+	//Unsmoothed cave size per skeleton vertex as calculated by the size calculator
 	std::vector<double> caveSizeUnsmoothed;
 
+	//Calculated skeleton properties	
+	std::vector<double> caveScale;
+	std::vector<double> caveSizeDerivativesPerEdge;
+	std::vector<double> caveSizeCurvaturesPerEdge;
+
+	//Adjacency list of the skeleton
+	std::vector<std::vector<int>> adjacency;
+	//Maps a pair of vertices to an edge index for the ...PerEdge vectors
+	std::map<std::pair<int, int>, int> vertexPairToEdge;
+	
 	const std::vector<Eigen::Vector3f>& meshVertices() const { return _meshVertices; }
-	const TriangleList& meshTriangles(){ return _meshTriangles; }
-	const std::vector<IndexedTriangle>& meshTriIndices(){ return _meshTriIndices; }
+	const TriangleList& meshTriangles() const { return _meshTriangles; }
+	const std::vector<IndexedTriangle>& meshTriIndices() const { return _meshTriIndices; }
 	const Tree& meshAABBTree(){ return _meshAABBTree; }
 
 	//Returns a 3-component RGB array

@@ -318,21 +318,6 @@ void Mesh::readFile(std::string filename)
 		add_point(v);
 
 
-#ifdef ADMIN
-	{
-		std::ofstream binaryOutput("cave.bin", std::ios::binary);
-		
-		int nVertices = positions.size();
-		int nIndices = indices.size();
-		binaryOutput.write(reinterpret_cast<char*>(&nVertices), sizeof(int));
-		binaryOutput.write(reinterpret_cast<char*>(&nIndices), sizeof(int));
-		binaryOutput.write(reinterpret_cast<char*>(&positions[0]), nVertices * sizeof(glm::vec3));
-		binaryOutput.write(reinterpret_cast<char*>(&indices[0]), nIndices * sizeof(unsigned int));
-
-		binaryOutput.close();
-	}
-#endif
-
 	n_indices = indices.size();
 	segmentation.clear();
 	segmentation.resize(positions.size(), 0);
@@ -370,23 +355,5 @@ void Mesh::draw(CameraProvider* cam, bool transparent)
 
 		vao.release();
 		program->release();
-
-		/*auto min = this->getMin();
-		auto max = this->getMax();
-		glBegin(GL_LINES);
-
-		glColor3f(1.0f, 0.5f, 0.3f);
-		glVertex3f(min.x, min.y, min.z);
-		glVertex3f(max.x, min.y, min.z);
-
-		glColor3f(1.0f, 0.5f, 0.3f);
-		glVertex3f(min.x, min.y, min.z);
-		glVertex3f(min.x, max.y, min.z);
-
-		glColor3f(1.0f, 0.5f, 0.3f);
-		glVertex3f(min.x, min.y, min.z);
-		glVertex3f(min.x, min.y, max.z);
-
-		glEnd();*/
 	}
 }

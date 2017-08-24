@@ -6,6 +6,7 @@
 #include <QSlider>
 #include <QLabel>
 
+//Wraps a given variable and emits signals when the variable is changed.
 class CAVESEGMENTATIONGUICORE_EXPORT ObservableVariableBase : public QObject
 {
 	Q_OBJECT

@@ -28,6 +28,9 @@ namespace Service.Controllers
         }
 
         // GET: api/Caves
+        /// <summary>
+        /// Returns a list of all registered caves.
+        /// </summary>
         public IEnumerable<CaveMetadata> Get()
         {
             var caves = new List<CaveMetadata>();
@@ -55,6 +58,11 @@ namespace Service.Controllers
         }
 
         // GET: api/Caves/5
+        /// <summary>
+        /// Returns data for a given cave.
+        /// </summary>
+        /// <param name="id">The cave's id</param>
+        /// <returns>Base64-encoded binary data</returns>
         public string Get(int id)
         {
             string root = HttpContext.Current.Server.MapPath("~/App_Data");
@@ -65,12 +73,20 @@ namespace Service.Controllers
             return Convert.ToBase64String(bytes);
         }
 
-
+        /// <summary>
+        /// Adds a new cave.
+        /// The provided form data must consist of the following elements:
+        /// "name" is the cave's name.
+        /// "pass" is the upload password.
+        /// The single file attachment contains the cave's data.
+        /// </summary>
         public async Task<HttpResponseMessage> PostFormData()
         {
+            const string UploadPassword = "";
+
             if (!Request.Content.IsMimeMultipartContent())
             {
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+                return Request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, "The request is not a multipart request.");
             }
 
             string root = HttpContext.Current.Server.MapPath("~/App_Data");
@@ -86,7 +102,11 @@ namespace Service.Controllers
 
                 string name = provider.FormData["name"];
                 string pass = provider.FormData["pass"];
-                if (pass != name.Substring(name.Length - 3).ToUpper())
+
+                if (String.IsNullOrEmpty(name))
+                    return Request.CreateErrorResponse(HttpStatusCode.BadRequest, "The name of the cave must not be empty.");
+
+                if (pass != UploadPassword)
                     return Request.CreateErrorResponse(HttpStatusCode.Unauthorized, "The provided password is wrong.");
 
                 var file = provider.FileData[0];
@@ -112,6 +132,11 @@ namespace Service.Controllers
             }
         }
 
+        /// <summary>
+        /// Adds a new segmentation for a given cave.
+        /// </summary>
+        /// <param name="caveId">The cave's id</param>
+        /// <param name="data">The new segmentation data</param>
         [Route("{caveId}/Segmentations")]
         [HttpPost]
         public HttpResponseMessage PostSegmentation(int caveId, [FromBody] SegmentationData data )
@@ -136,6 +161,10 @@ namespace Service.Controllers
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
 
+        /// <summary>
+        /// Returns a list of all segmentations for a given cave.
+        /// </summary>
+        /// <param name="caveId">The cave's id</param>
         [Route("{caveId}/Segmentations")]
         public IEnumerable<SegmentationData> GetSegmentations(int caveId)
         {
@@ -161,16 +190,71 @@ namespace Service.Controllers
             return segs;
         }
 
+        private byte[] GetSegmentationData(string path)
+        {
+            var xml = XDocument.Load(path);
+            return Convert.FromBase64String(xml.Root.Element("SegmentationData").Value);
+        }
+
+        /// <summary>
+        /// Returns a specific segmentation for a given cave.
+        /// </summary>
+        /// <param name="caveId">The cave's id</param>
+        /// <param name="segId">The segmentation's id</param>
+        /// <returns>The binary segmentation data as an attachment (*.caveseg)</returns>
         [Route("{caveId}/Segmentations/{segId}")]
-        public HttpResponseMessage GetSegmentations(int caveId, int segId)
+        public HttpResponseMessage GetSegmentation(int caveId, int segId)
         {
             string root = HttpContext.Current.Server.MapPath("~/App_Data");
 
-            var xml = XDocument.Load(root + "/Caves/" + caveId + "/seg" + segId + ".xml");
+            
             var result = new HttpResponseMessage(HttpStatusCode.OK);
-            result.Content = new ByteArrayContent(Convert.FromBase64String(xml.Root.Element("SegmentationData").Value));
+            try
+            {
+                result.Content = new ByteArrayContent(GetSegmentationData(root + "/Caves/" + caveId + "/seg" + segId + ".xml"));
+            }
+            catch (Exception x)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "The specified segmentation does not exist.");
+            }
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
             result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "segmentation.caveseg" };
+
+            return result;
+            
+        }
+
+        /// <summary>
+        /// Returns a ZIP archive of all segmentations for the specified cave.
+        /// </summary>
+        /// <param name="caveId">The cave's id</param>
+        [Route("{caveId}/Segmentations/zip")]
+        public HttpResponseMessage GetAllSegmentations(int caveId)
+        {
+            var ms = new MemoryStream();
+            var archive = new ZipArchive(ms, ZipArchiveMode.Create, true);
+
+            string root = HttpContext.Current.Server.MapPath("~/App_Data");
+            foreach(var segmentation in System.IO.Directory.GetFiles(root + "/Caves/" + caveId, "seg*.xml"))
+            {
+                var fi = new FileInfo(segmentation);
+                var entry = archive.CreateEntry(fi.Name.Substring(0, fi.Name.Length - 3) + "caveseg");
+
+                var zipStream = entry.Open();
+                var data = GetSegmentationData(segmentation);
+
+                zipStream.Write(data, 0, data.Length);
+                zipStream.Close();
+            }
+            archive.Dispose();
+
+            ms.Seek(0, SeekOrigin.Begin);
+
+            var result = new HttpResponseMessage(HttpStatusCode.OK);
+            result.Content = new StreamContent(ms);
+
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = "segmentations.zip" };
 
             return result;
         }

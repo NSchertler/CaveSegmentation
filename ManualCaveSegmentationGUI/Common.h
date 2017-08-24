@@ -14,11 +14,12 @@ struct _global
 		dataDirectory = QDir::home();
 		dataDirectory.cd("CaveSegmentation");;
 
-		settings = std::make_shared<QSettings>(dataDirectory.filePath("settings.conf"), QSettings::IniFormat);
-		settings->setValue("server/url", "http://cavesegmentationservice.azurewebsites.net/");
+		settings = std::make_shared<QSettings>(dataDirectory.filePath("settings.conf"), QSettings::IniFormat);		
 	}
 
 	QString serverUrl() const { return settings->value("server/url").toString(); }
+
+	void setServerUrl(const QString& url) { settings->setValue("server/url", url); }
 
 	QDir dataDirectory;
 

@@ -36,6 +36,7 @@ private slots:
 	void distancesChanged();
 
 	void loadOff(bool);
+	void writeBin(bool);
 	void loadSkeleton(bool);
 	void calculateSkeleton(bool);
 	void skeletonComputationFinished();

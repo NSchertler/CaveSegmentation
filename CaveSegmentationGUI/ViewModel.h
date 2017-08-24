@@ -4,7 +4,8 @@
 #include "CaveGLData.h"
 #include "ObservableVariable.h"
 
-class ViewModel : public QObject {
+class ViewModel : public QObject 
+{
 	Q_OBJECT
 
 public:

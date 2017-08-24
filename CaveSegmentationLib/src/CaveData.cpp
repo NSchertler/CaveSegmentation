@@ -1,4 +1,4 @@
-#include "Options.h"
+﻿#include "Options.h"
 
 #include "CaveData.h"
 #include "FileInputOutput.h"
@@ -10,24 +10,18 @@
 
 #include <boost/filesystem/operations.hpp>
 
-//SDF
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
-#include <CGAL/IO/Polyhedron_iostream.h>
-#include <CGAL/mesh_segmentation.h>
-#include <CGAL/property_map.h>
-#include <iostream>
-#include <fstream>
-
-typedef CGAL::Exact_predicates_inexact_constructions_kernel SDFKernel;
-typedef CGAL::Polyhedron_3<SDFKernel> SDFPolyhedron;
-
+//Calculates the gradient field of sphereDistances over the sphere.
 void CalculateGradient(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
 {
 	for (auto it = sphereSampling.begin(); it != sphereSampling.end(); ++it)
 	{
 		double currentDistance = sphereSampling.AccessContainerData(sphereDistances, it);
 		Vector currentPos = *it;
+
+		//Calculate a 3D gradient from directional derivatives.
+		//Solve
+		//    arg min  Σ ( dot(g, direction_i) - derivative_i )^2
+		//       g
 
 		//parameters of the linear system
 		// | a  b  c | | x |   | g |
@@ -55,6 +49,7 @@ void CalculateGradient(const RegularUniformSphereSampling& sphereSampling, const
 			i += direction.z() * derivative;
 		}
 
+		//Solve the linear system
 		double denom = c * c * d - 2 * b * c * e + a * e * e + b * b * f - a * d * f;
 		Vector gradient(
 			(e * e * g - d * f * g - c * e * h + b * f * h + c * d * i - b * e * i) / denom,
@@ -74,6 +69,7 @@ void CalculateGradient(const RegularUniformSphereSampling& sphereSampling, const
 	}
 }
 
+//Finds strong local extrema of sphereDistances, i.e. points that are extreme in a neighborhood of extremumSearchRadius
 template <typename TSphereVisualizer>
 void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& sphereDistances, double extremumSearchRadius, std::vector<PositionValue>& maxima, std::vector<PositionValue>& minima, TSphereVisualizer& visualizer)
 {
@@ -226,51 +222,7 @@ void CaveData::LoadMesh(const std::string & offFile)
 
 	reset_bounding_box();
 	for (auto& v : _meshVertices)
-		add_point(v.x(), v.y(), v.z());
-
-	//SDF test
-	//std::cout << "Calculating SDF segmentation .." << std::endl;
-
-	//// create and read Polyhedron
-	//SDFPolyhedron mesh;
-	//std::ifstream input(offFile);
-	//if ( !input || !(input >> mesh) || mesh.empty() )
-	//{
-	//	std::cerr << "Not a valid off file." << std::endl;  
-	//	return;
-	//}    
-	//// create a property-map for segment-ids   
-	//typedef std::map<SDFPolyhedron::Facet_const_handle, std::size_t> Facet_int_map;  
-	//Facet_int_map internal_segment_map;  
-	//boost::associative_property_map<Facet_int_map> segment_property_map(internal_segment_map);    
-	//// calculate SDF values and segment the mesh using default parameters.    
-	//std::size_t number_of_segments = CGAL::segmentation_via_sdf_values(mesh, segment_property_map, 2 * M_PI / 3, 23u, 5u, 0.5); 
-	//std::cout << "Number of segments: " << number_of_segments << std::endl;    
-	//// print segment-ids    
-	//std::ofstream coff(offFile + ".sdf.off");
-	//coff << "COFF" << std::endl;
-	//coff << 3 * mesh.size_of_facets() << " " << mesh.size_of_facets() << " 0" << std::endl;
-	//
-	//for(SDFPolyhedron::Facet_const_iterator facet_it = mesh.facets_begin();
-	//	facet_it != mesh.facets_end(); ++facet_it) 
-	//{   
-	//	auto v_it = facet_it->facet_begin();
-	//	do
-	//	{
-	//		int segment = segment_property_map[facet_it];
-	//		const int* color = GetSegmentColor(segment);	
-	//		auto p = v_it->vertex()->point();
-	//		coff << p.x() << " " << p.y() << " " << p.z() << " " << color[0] << " " << color[1] << " " << color[2] << std::endl;
-	//	} while (++v_it != facet_it->facet_begin());
-	//}
-	//for (int i = 0; i < mesh.size_of_facets(); ++i)
-	//{
-	//	coff << "3 " << 3 * i << " " << 3 * i + 1 << " " << 3 * i + 2 << std::endl;
-	//}
-
-	//coff.close();
-	//std::cout << std::endl;
-	//std::cout << "done." << std::endl;
+		add_point(v.x(), v.y(), v.z());	
 }
 
 void CaveData::SetSkeleton(CurveSkeleton * skeleton)
@@ -285,6 +237,7 @@ void CaveData::SetSkeleton(CurveSkeleton * skeleton)
 		ResizeSkeletonAttributes(0, 0);
 }
 
+//Calculates the cave size at a single skeleton vertex and stores it in caveSizeUnsmoothed.
 template <typename TSphereVisualizer>
 bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent)
 {
@@ -301,6 +254,7 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent)
 template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert, float exponent);
 template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert, float exponent);
 
+//Calculates the cave size at a single skeleton vertex and stores it in caveSizeUnsmoothed.
 template <typename TSphereVisualizer>
 bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
 {
@@ -365,7 +319,7 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent, std::ve
 #ifdef WRITE_SPHERE_STATS
 	auto sphereStatsFilename = outputDirectory + "/sphereStats" + std::to_string(iVert) + ".csv";
 	std::ofstream sphereStats(sphereStatsFilename.c_str());
-	sphereStats.imbue(std::locale("de-DE"));
+	sphereStats.imbue(std::locale(""));
 #endif
 
 
@@ -449,6 +403,7 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent, std::ve
 template bool CaveData::CalculateDistancesSingleVertex<SphereVisualizer>(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
 template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int iVert, float exponent, std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient);
 
+//Calculates the cave sizes for the entire skeleton and stores them in caveSizeUnsmoothed.
 bool CaveData::CalculateDistances(float exponent)
 {	
 #ifndef NON_VERBOSE
@@ -482,7 +437,7 @@ bool CaveData::CalculateDistances(float exponent)
 
 	std::deque<int> invalidWork(invalidVertices.begin(), invalidVertices.end());
 	//TODO: instead of reconstruction, move skeleton vertices inside shape
-	//try to reconstruct invalid skeleton vertices
+	//try to reconstruct invalid skeleton vertices by interpolating from valid neighbors
 	while (!invalidWork.empty())
 	{
 		auto it = invalidWork.begin();
@@ -534,6 +489,7 @@ void CaveData::SaveDistances(const std::string & file) const
 	distanceFile.close();
 }
 
+//Calculates additional measures from the unsmoothed cave sizes.
 void CaveData::SmoothAndDeriveDistances()
 {
 	if (skeleton == nullptr)
@@ -559,23 +515,19 @@ void CaveData::SmoothAndDeriveDistances()
 		break;
 	}	
 
-	//Derive per vertex
+	//Smooth cave sizes: caveSizes <- smooth(caveSizeUnsmoothed)
 	smooth(skeleton->vertices, adjacency, [this](int iVert) { return CAVE_SIZE_KERNEL_FACTOR * caveScale.at(iVert); }, caveSizeUnsmoothed, caveSizes);
-	//memcpy(&caveSizes[0], &smoothWorkDouble[0], caveSizes.size() * sizeof(double));
 
-	/*derive(rootVertex, skeleton->vertices, children, caveSizes, smoothWorkDouble);
-	smooth(skeleton->vertices, adjacency, [this](int iVert) { return 0.2 * caveScale.at(iVert); }, smoothWorkDouble, caveSizeDerivatives);
-
-	derive(rootVertex, skeleton->vertices, children, caveSizeDerivatives, caveSizeCurvatures);*/
-
-	//Derive per edge
+	//Derive cave sizes: smoothWorkDouble <- derive(caveSizes)
 	derivePerEdgeFromVertices(skeleton, caveSizes, smoothWorkDouble);
+	//Smooth derivatives: caveSizeDerivativesPerEdge <- smooth(smoothWorkDouble) = smooth(derive(caveSizes))
 	smoothPerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, [this](int iEdge)
 	{
 		auto edge = skeleton->edges.at(iEdge);
 		return CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR * 0.5 * (caveScale.at(edge.first) + caveScale.at(edge.second));
 	}, smoothWorkDouble, caveSizeDerivativesPerEdge);
 
+	//Derive second derivatives: caveSizeCurvaturesPerEdge <- derive(caveSizeDerivativesPerEdge)
 	derivePerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, caveSizeDerivativesPerEdge, caveSizeCurvaturesPerEdge);
 
 #ifndef NON_VERBOSE
@@ -586,87 +538,6 @@ void CaveData::SmoothAndDeriveDistances()
 void CaveData::SetOutputDirectory(const std::wstring & outputDirectory)
 {
 	outputDirectoryW = outputDirectory;
-}
-
-void CaveData::WriteBranchStatistics(const std::string & directory) const
-{
-	std::cout << "Writing branch statistics..." << std::endl;
-
-	std::stack<int> branchStarts;
-	branchStarts.push(rootVertex);
-
-	std::ofstream f;
-	f.open(directory + "/Branches.csv");
-	f.imbue(std::locale(""));
-
-	int iBranch = 0;
-	while (!branchStarts.empty())
-	{
-		auto currentV = branchStarts.top();
-		branchStarts.pop();
-
-		f << "New branch" << std::endl;
-		f << "ID;t;mean distance;min distance;max distance;cave size;cave scale;1st derivative;2nd derivative;t;1st derivative per edge;2nd derivative per edge" << std::endl;
-		CurveSkeleton s;
-		s.vertices.push_back(skeleton->vertices[currentV]);
-
-		int lastV = -1;
-
-		double dist = 0;
-		while (currentV > 0)
-		{
-			int nextV = -1;
-
-			f << currentV << ";" 
-				<< dist << "; " 
-				<< meanDistances[currentV] << ";" 
-				<< minDistances[currentV] << ";" 
-				<< maxDistances[currentV] << ";" 
-				<< caveSizes[currentV] << "; " 
-				<< caveScale[currentV] << "; " 
-				<< caveSizeDerivatives[currentV] << "; " 
-				<< caveSizeCurvatures[currentV];
-
-			if (lastV != -1)
-			{
-				int edge = vertexPairToEdge.at(std::pair<int, int>(lastV, currentV));
-				double inv = 1.0;
-				//for direction dependent measures...
-				if (lastV != skeleton->edges.at(edge).first)
-					inv = -1.0;
-				f << ";" << (dist - (skeleton->vertices.at(lastV).position - skeleton->vertices.at(currentV).position).norm() / 2)
-					<< "; " << caveSizeDerivativesPerEdge.at(edge) * inv
-					<< "; " << caveSizeCurvaturesPerEdge.at(edge);
-			}
-
-			f << std::endl;
-
-			for (auto& adj : children.at(currentV))
-			{
-				if (nextV == -1)
-				{
-					//Continue to the first next child
-					nextV = adj;
-					dist += (skeleton->vertices.at(nextV).position - skeleton->vertices.at(currentV).position).norm();
-					s.vertices.push_back(skeleton->vertices.at(nextV));
-					s.edges.push_back(std::make_pair((int)s.vertices.size() - 2, (int)s.vertices.size() - 1));
-				}
-				else
-					//Push every other child on the stack
-					branchStarts.push(adj);
-			}
-			lastV = currentV;
-			currentV = nextV;
-		}
-		f << std::endl;
-#ifdef EXPORT_BRANCHES
-		std::stringstream ss;
-		ss << outputDirectory << "/Branch" << (iBranch++) << ".obj";
-		s.SaveToObjWithCorrespondences(ss.str().c_str(), offFile);
-#endif
-	}
-
-	f.close();
 }
 
 void CaveData::ResizeMeshAttributes(size_t vertexCount)
@@ -681,10 +552,6 @@ void CaveData::ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount)
 	minDistances.resize(vertexCount);
 	caveSizes.resize(vertexCount);
 	nodeRadii.resize(vertexCount);
-	parents.resize(vertexCount);
-	children.resize(vertexCount);
-	caveSizeDerivatives.resize(vertexCount);
-	caveSizeCurvatures.resize(vertexCount);
 	caveScale.resize(vertexCount);	
 	adjacency.clear(); adjacency.resize(vertexCount);
 
@@ -741,18 +608,7 @@ void CaveData::CalculateBasicSkeletonData()
 		adjacency[edge.second].push_back(edge.first);
 		vertexPairToEdge[edge] = iEdge;
 		vertexPairToEdge[std::pair<int, int>(edge.second, edge.first)] = iEdge;
-	}
-
-	//find root
-	/*rootVertex = -1;
-	for (int v = 0; v < skeleton->vertices.size(); ++v)
-		if (adjacency[v].size() == 1)
-		{
-			rootVertex = v;
-			break;
-		}
-
-	buildTree(rootVertex, skeleton->vertices.size(), adjacency, parents, children);*/
+	}	
 
 	//Clean correspondences (use the closer skeleton vertex of local neighbors)
 	std::vector<std::vector<int>> cleanedCorrespondences(skeleton->vertices.size());

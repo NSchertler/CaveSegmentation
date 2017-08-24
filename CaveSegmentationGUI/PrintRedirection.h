@@ -1,3 +1,5 @@
+//From: https://stackoverflow.com/a/28900432/1210053
+
 #pragma once
 
 #ifdef WIN32

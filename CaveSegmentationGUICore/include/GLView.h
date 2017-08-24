@@ -15,6 +15,7 @@
 
 class CAVESEGMENTATIONGUICORE_EXPORT HoldCameraEvents;
 
+//A simple stereo rendering-capable OpenGL widget with camera controls.
 class CAVESEGMENTATIONGUICORE_EXPORT GLView : public QOpenGLWidget, public CameraProvider, public OpenGLContextProvider
 {
 	Q_OBJECT

@@ -110,35 +110,11 @@ void GLCaveView::paintGL()
 	
 	renderSky();
 
-	/*if (measuring)
-	{
-		glColor3f(0.8f, 0.8f, 0.4f);
-		glBegin(GL_LINES);
-		glVertex3f(measureStart.x, measureStart.y, measureStart.z);
-		glVertex3f(measureEnd.x, measureEnd.y, measureEnd.z);
-		glEnd();
-	}*/
-	
 	if (data->getMesh())
 	{
 		data->getMesh()->draw(this, measuring);
 
 		int northX, northY, eastX, eastY;
 		data->getMesh()->getAxisEnds(this, northX, northY, eastX, eastY);
-
-		//painter.setPen(QColor(0.8f, 0.8f, 0.4f, 1.0f));
-		//painter.drawText(northX + 2, northY + 3, "North");
-		//painter.drawText(eastX + 2,  eastY + 3,  "East");
 	}
-	
-	/*QPainter painter(this);
-	painter.fillRect(0, 0, 100, 100, Qt::SolidPattern);
-
-	painter.setPen(QColor(1.0f, 1.0f, 1.0f, 1.0f));
-	painter.drawText(10, 20, QString("Viewpoint Azimuth: ").append(QString::number(-round(tilt / 3.1415926 * 180.0 * 10) / 10)).append(QString::fromStdWString(L" °")));
-	painter.drawText(10, 35, QString("Viewpoint Elevation: ").append(QString::number(-round(pan / 3.1415926 * 180.0 * 10) / 10)).append(QString::fromStdWString(L" °")));
-	if (measuring)
-		painter.drawText(10, 50, QString("Measure Length: ").append(QString::number(round(glm::length(measureEnd - measureStart) * 10.0f) / 10.0f).append(" m")));
-
-	painter.end();*/
 }

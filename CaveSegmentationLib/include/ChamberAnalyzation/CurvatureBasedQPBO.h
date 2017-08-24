@@ -8,6 +8,7 @@
 #include <opengm/graphicalmodel/graphicalmodel.hxx>
 #include <opengm/inference/external/qpbo.hxx>
 
+//Finds the minimizer of the energy presented in the paper through QPBO 
 class CurvatureBasedQPBO
 {
 	static constexpr double ENTRANCE_MIN_DISTANCE_TO_END = 20.0; //entrances must have at least this distance from the nearest cave end

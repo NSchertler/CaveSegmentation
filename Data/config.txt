@@ -1,0 +1,11 @@
+0 1          <-- The cave scale algorithms to test (0 = Max, 1 = Smooth, 2 = Advect)
+1    2    3  <-- Exponent
+6    14   5  <-- Scale Kernel
+0.1  0.5  5  <-- Size Kernel
+0.1  0.5  5  <-- Size Derivative Kernel
+0.1  0.6  5  <-- Tipping Curvature
+0.05 0.25 5  <-- Direction Tolerance
+  ^    ^  ^
+  |    |  +-- Number of steps in range
+  |    +----- Maximum of range	  
+  +---------- Minimum of range

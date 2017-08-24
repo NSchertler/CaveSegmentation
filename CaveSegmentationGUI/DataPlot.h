@@ -2,7 +2,9 @@
 #include "QCustomPlot/qcustomplot.h"
 #include "ViewModel.h"
 
-class DataPlot : public QCustomPlot {
+//Widget for charts.
+class DataPlot : public QCustomPlot
+{
 	Q_OBJECT
 
 public:

@@ -154,9 +154,6 @@
     <CustomBuild Include="ManualCaveSegmentation.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="_GLView.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IHasBoundingBox.h">

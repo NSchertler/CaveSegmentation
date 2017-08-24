@@ -19,9 +19,9 @@ RegularUniformSphereSampling::RegularUniformSphereSampling(const int nPhi)
 	assert(nPhi > 2);
 	const int nThetaEq = (nPhi - 1) * 2; //number of samples along the equator	
 
-	directionSamples = new Vector*[nPhi];
-	nTheta = new int[nPhi];
-	areaElements = new double[nPhi];
+	directionSamples.resize(nPhi);
+	nTheta.resize(nPhi);
+	areaElements.resize(nPhi);
 
 	int nDirectionSamples = 0;
 	_maxNTheta = closestPowerOfTwo(nThetaEq);
@@ -29,7 +29,7 @@ RegularUniformSphereSampling::RegularUniformSphereSampling(const int nPhi)
 	{
 		double phi = iPhi * M_PI / (nPhi - 1);
 		nTheta[iPhi] = closestPowerOfTwo(sin(phi)*nThetaEq);
-		directionSamples[iPhi] = new Vector[nTheta[iPhi]];
+		directionSamples[iPhi] .resize(nTheta[iPhi]);
 		if (iPhi == 0 || iPhi == nPhi - 1)
 			areaElements[iPhi] = (1 - cos(M_PI / (nPhi - 1) / 2.0)) * 2 * M_PI;
 		else
@@ -46,11 +46,6 @@ RegularUniformSphereSampling::RegularUniformSphereSampling(const int nPhi)
 
 RegularUniformSphereSampling::~RegularUniformSphereSampling()
 {
-	for (int iPhi = 0; iPhi < nPhi; ++iPhi)
-		delete[] directionSamples[iPhi];
-	delete[] directionSamples;
-	delete[] nTheta;
-	delete[] areaElements;
 }
 
 Vector RegularUniformSphereSampling::Point(double phi, double theta) const
@@ -113,16 +108,6 @@ RegularUniformSphereSampling::sample_iterator RegularUniformSphereSampling::Clos
 int RegularUniformSphereSampling::MaxNTheta() const
 {
 	return _maxNTheta;
-}
-
-RegularUniformSphereSampling::opposite_neighbor_helper RegularUniformSphereSampling::Opposite_neighbors(int iPhi, int iTheta) const
-{
-	return opposite_neighbor_helper(this, iPhi, iTheta);
-}
-
-RegularUniformSphereSampling::opposite_neighbor_helper RegularUniformSphereSampling::Opposite_neighbors(sample_iterator it) const
-{
-	return Opposite_neighbors(it.iPhi, it.iTheta);
 }
 
 // -----  RegularUniformSphereSampling::sample_iterator -----
@@ -257,6 +242,7 @@ const RegularUniformSphereSampling::sample_iterator RegularUniformSphereSampling
 	case 3: //bottom row neighbors
 		return sample_iterator(sampling, iPhi + 1, bottomRowTo - subState);
 	}
+	throw; //Invalid state
 }
 bool RegularUniformSphereSampling::neighbor_iterator::operator!=(const neighbor_iterator& rhs) const
 {
@@ -445,81 +431,4 @@ RegularUniformSphereSampling::range_iterator RegularUniformSphereSampling::range
 RegularUniformSphereSampling::range_iterator RegularUniformSphereSampling::range_helper::end() const
 {
 	return RegularUniformSphereSampling::range_iterator(sampling, center, angularDistance, true);
-}
-
-// -----  RegularUniformSphereSampling::opposite_neighbor_iterator -----
-
-RegularUniformSphereSampling::opposite_neighbor_iterator::opposite_neighbor_iterator(const RegularUniformSphereSampling* sampling, int iPhi, int iTheta, int state)
-	: sampling(sampling), iPhi(iPhi), iTheta(iTheta), state(state)
-{
-	topRow = iPhi - 1;
-	bottomRow = iPhi + 1;
-
-	states = 1;
-
-	if (iPhi == 0 || iPhi == sampling->nPhi - 1)
-	{
-		if (iPhi == 0)
-			topRow = 1;
-		else
-			bottomRow = sampling->nPhi - 2;
-		topThetaFrom = 0;
-		topThetaTo = sampling->nTheta[topRow] / 2 - 1;
-		bottomThetaFrom = topThetaTo + 1;
-		bottomThetaTo = sampling->nTheta[topRow] - 1;
-
-		states = bottomThetaFrom;
-	}
-	else
-	{
-		calculateRowRange(sampling->nTheta[iPhi], sampling->nTheta[topRow], iTheta, topThetaFrom, topThetaTo);
-		calculateRowRange(sampling->nTheta[iPhi], sampling->nTheta[bottomRow], iTheta, bottomThetaFrom, bottomThetaTo);
-		states = std::max(topThetaTo + 1 - topThetaFrom, bottomThetaTo + 1 - bottomThetaTo) + 1;
-	}
-	if (state < 0)
-		this->state = states;
-}
-
-const std::pair<RegularUniformSphereSampling::sample_iterator, RegularUniformSphereSampling::sample_iterator> RegularUniformSphereSampling::opposite_neighbor_iterator::operator*() const
-{
-	if(iPhi == 0 || iPhi == sampling->nPhi - 1)
-		return std::make_pair(sample_iterator(sampling, topRow, topThetaFrom + state), sample_iterator(sampling, bottomRow, bottomThetaTo - state));
-
-	if(state == 0)
-		return std::make_pair(sample_iterator(sampling, iPhi, iTheta - 1), sample_iterator(sampling, iPhi, iTheta + 1));
-	else
-	{
-		double stateFraction = (double)(state - 1) / (states - 1);
-		int topTheta = topThetaFrom + (int)std::round(stateFraction * (topThetaTo - topThetaFrom));
-		int bottomTheta = bottomThetaTo + (int)std::round(stateFraction * (bottomThetaFrom - bottomThetaTo));
-		return std::make_pair(sample_iterator(sampling, topRow, topTheta), sample_iterator(sampling, bottomRow, bottomTheta));
-	}
-}
-
-bool RegularUniformSphereSampling::opposite_neighbor_iterator::operator!=(const opposite_neighbor_iterator & rhs) const
-{
-	return state != rhs.state || iPhi != rhs.iPhi || iTheta != rhs.iTheta;
-}
-
-RegularUniformSphereSampling::opposite_neighbor_iterator & RegularUniformSphereSampling::opposite_neighbor_iterator::operator++()
-{
-	++state;
-	return *this;
-}
-
-// -----  RegularUniformSphereSampling::opposite_neighbor_helper -----
-
-RegularUniformSphereSampling::opposite_neighbor_helper::opposite_neighbor_helper(const RegularUniformSphereSampling * sampling, int iPhi, int iTheta)
-	: sampling(sampling), iPhi(iPhi), iTheta(iTheta)
-{
-}
-
-RegularUniformSphereSampling::opposite_neighbor_iterator RegularUniformSphereSampling::opposite_neighbor_helper::begin() const
-{
-	return RegularUniformSphereSampling::opposite_neighbor_iterator(sampling, iPhi, iTheta);
-}
-
-RegularUniformSphereSampling::opposite_neighbor_iterator RegularUniformSphereSampling::opposite_neighbor_helper::end() const
-{
-	return RegularUniformSphereSampling::opposite_neighbor_iterator(sampling, iPhi, iTheta, -1);
 }

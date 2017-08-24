@@ -1,2 +1,0 @@
-set PATH=%PATH%;%MCFSKELETON_ROOT%/bin/x64/;%CGAL_DIR%/build/bin;%CGAL_ROOT%/auxiliary/gmp/lib;%BOOST_LIBRARYDIR%;%ACML_ROOT%/ifort64_mp/lib;D:\Qt\Qt5.6.0\5.6\msvc2015_64\bin
-call "../x64/DebugNSight/CaveSegmentationGUI.exe"

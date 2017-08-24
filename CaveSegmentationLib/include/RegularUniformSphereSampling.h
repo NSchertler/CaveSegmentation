@@ -4,13 +4,17 @@
 
 #include "CGALCommon.h"
 
+//Represents a regular and uniform point sampling of a sphere.
 class RegularUniformSphereSampling
 {
 public:
 	RegularUniformSphereSampling(const int nPhi);
 	~RegularUniformSphereSampling();
 
+	//Convert sphere parameters to a 3D point
 	Vector Point(double phi, double theta) const;
+
+	//Convert a 3D point to sphere coordinates
 	void ParametersFromPoint(const Vector& point, double& phi, double& theta) const;
 
 	class sample_iterator
@@ -92,46 +96,31 @@ public:
 		const RegularUniformSphereSampling* sampling;
 		const Vector& center;
 		double angularDistance;
-	};
+	};	
 
-	class opposite_neighbor_iterator
-	{
-	public:
-		opposite_neighbor_iterator(const RegularUniformSphereSampling* sampling, int iPhi, int iTheta, int state = 0);
-		const std::pair<sample_iterator, sample_iterator> operator*() const;
-		bool operator!=(const opposite_neighbor_iterator& rhs) const;
-		opposite_neighbor_iterator& operator++();
-
-	private:
-		int iPhi, iTheta, state, states;
-		int topRow, bottomRow;
-		int topThetaFrom, topThetaTo, bottomThetaFrom, bottomThetaTo;
-		const RegularUniformSphereSampling* sampling;
-	};
-
-	class opposite_neighbor_helper
-	{
-	public:
-		opposite_neighbor_helper(const RegularUniformSphereSampling* sampling, int iPhi, int iTheta);
-		RegularUniformSphereSampling::opposite_neighbor_iterator begin() const;
-		RegularUniformSphereSampling::opposite_neighbor_iterator end() const;
-
-	private:
-		const RegularUniformSphereSampling* sampling;
-		int iPhi, iTheta;
-	};
-
+	//Iterator for all samples
 	sample_iterator begin() const;
 	sample_iterator end() const;
+
+	//Iterator for all neighbors of a given sample
 	neighbor_helper Neighbors(int iPhi, int iTheta) const;
+
+	//Iterator for all neighbors of a given sample
 	neighbor_helper Neighbors(sample_iterator it) const;
+
+	//Iterator for all samples that are closer than angularDistance to center.
 	range_helper Neighbors(const Vector& center, double angularDistance) const;
-	opposite_neighbor_helper Opposite_neighbors(int iPhi, int iTheta) const;
-	opposite_neighbor_helper Opposite_neighbors(sample_iterator it) const;
+
+	//Returns the area occupied by a given sample
 	double Area(const sample_iterator&) const;
+
+	//Returns the closest sample to a position on the sphere
 	sample_iterator ClosestSample(double phi, double theta) const;
+
+	//Returns the number of samples along the equator
 	int MaxNTheta() const;
 
+	//Resizes the container to hold values for every sample.
 	// TContainer must be a 2D container with a resize() method, e.g. std::vector<std::vector<DATA>>
 	template<typename TContainer>
 	void PrepareDataContainer(TContainer& container) const
@@ -143,18 +132,21 @@ public:
 		}
 	}
 
+	//Accesses a value from a container at a given sample location
 	template<typename TContainer>
 	typename TContainer::value_type::reference AccessContainerData(TContainer& container, sample_iterator it) const
 	{
 		return container[it.iPhi][it.iTheta];
 	}
 
+	//Accesses a value from a container at a given sample location
 	template<typename TContainer>
 	typename TContainer::value_type::const_reference AccessContainerData(const TContainer& container, sample_iterator it) const
 	{
 		return container[it.iPhi][it.iTheta];
 	}
 
+	//Interpolates a value from a container at a given position on the sphere
 	template<typename TContainer, typename T = TContainer::value_type::value_type>
 	const T AccessInterpolatedContainerData(const TContainer& container, double phi, double theta) const
 	{
@@ -230,6 +222,7 @@ public:
 		return (1 - alphaPhi) * interpolLower + alphaPhi * interpolUpper;
 	}
 
+	//Interpolates a value from a container at a given position on the sphere
 	template<typename TContainer, typename T = TContainer::value_type::value_type>
 	const T AccessInterpolatedContainerData(const TContainer& container, const Vector& p) const
 	{
@@ -244,11 +237,17 @@ public:
 	}
 	
 private:
+	//Number latitudes
 	const int nPhi;
-	Vector** directionSamples;
 
-	int* nTheta;
-	double* areaElements;
+	//The actual samples
+	std::vector < std::vector< Vector> > directionSamples;
+
+	//Number of samples for every latitude
+	std::vector<int> nTheta;
+
+	//Area elements of samples per latitude
+	std::vector<double> areaElements;
 
 	int _maxNTheta;
 

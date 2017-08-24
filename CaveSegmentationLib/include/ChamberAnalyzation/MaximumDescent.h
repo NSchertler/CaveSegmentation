@@ -5,6 +5,7 @@
 #include <queue>
 #include <iostream>
 
+//Simple greedy chamber detector that starts at a local maximum of the cave size and grows a chamber until it hits a possible entrance (identified by a constant ratio of the size).
 class MaximumDescent
 {
 	static const int NO_SEGMENTATION = -2;

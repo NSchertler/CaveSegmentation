@@ -38,24 +38,3 @@ void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAt
 		}
 	}
 }
-
-
-void buildTreeDfs(const int currentVertex, const int prevVertex, const std::vector<std::vector<int>>& adjacency, std::vector<bool>& visited, std::vector<int>& parents, std::vector<std::vector<int>>& children)
-{
-	parents[currentVertex] = prevVertex;
-	visited[currentVertex] = true;
-	for (auto n : adjacency[currentVertex])
-	{
-		if (!visited[n])
-		{
-			buildTreeDfs(n, currentVertex, adjacency, visited, parents, children);
-			children[currentVertex].push_back(n);
-		}
-	}
-}
-
-void buildTree(const int root, const int vertexCount, const std::vector<std::vector<int>>& adjacency, std::vector<int>& parents, std::vector<std::vector<int>>& children)
-{
-	std::vector<bool> visited(vertexCount, false);
-	buildTreeDfs(root, -1, adjacency, visited, parents, children);
-}

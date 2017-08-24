@@ -1,24 +1,34 @@
-﻿<div class="jumbotron">
-    <h1>Manual Cave Segmentation Web Service</h1>    
+﻿<style type="text/css">
+    label
+    {
+        width: 9em;
+        float:left;
+    }
+</style>
+<div class="jumbotron">
+    Welcome to the Manual Cave Segmentation Web Service. This service is used to distribute cave data and to gather manual cave segmentations.
 </div>
 <div class="row">
-    <div class="col-md-4">
-        <h2>Upload new Cave</h2>
+    <div>
+        <h2>Upload New Cave</h2>
         <form method="post" enctype="multipart/form-data" action="~/api/Caves">
             <div>
                 <label for="name">Cave Name: </label>
                 <input name="name" type="text" />
+                <br style="clear:left;"/>
             </div>
             <div>
                 <label for="pass">Password: </label>
                 <input name="pass" type="text" />
+                <br style="clear:left;" />
             </div>
             <div>
                 <label for="file">Binary Cave File: </label>
-                <input name="file" type="file" />
+                <input name="file" type="file" />                
+                <br style="clear:left;" />
             </div>
-            <div>
-                <input type="submit" value="Submit" />
+            <div>                
+                <input type="submit" value="Submit" style="margin-left:9em;" />
             </div>
         </form>
     </div>    

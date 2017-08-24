@@ -19,7 +19,7 @@ PCPlot::PCPlot(QWidget *parent)
 {
 	ui.setupUi(this);
 
-	auto fname = QFileDialog::getOpenFileName(this, "Open Evaluation Result", QString(), "*.bin"); //"C:/Users/Nico/Desktop/Evaluation/Evaluation/coarse/result.bin";//
+	auto fname = QFileDialog::getOpenFileName(this, "Open Evaluation Result", QString(), "*.bin");
 	if (fname.isEmpty())
 		return;	
 

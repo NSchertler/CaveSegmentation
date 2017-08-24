@@ -3,4 +3,24 @@
         <file>Icon/main.ico</file>
         <file>cursor.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>glsl/cave.frag</file>
+        <file>glsl/cave.geom</file>
+        <file>glsl/cave.vert</file>
+        <file>glsl/clear.frag</file>
+        <file>glsl/clear.vert</file>
+        <file>glsl/correspondence.frag</file>
+        <file>glsl/correspondence.geom</file>
+        <file>glsl/correspondence.vert</file>
+        <file>glsl/cursor.frag</file>
+        <file>glsl/cursor.vert</file>
+        <file>glsl/marker.frag</file>
+        <file>glsl/marker.vert</file>
+        <file>glsl/skeleton.frag</file>
+        <file>glsl/skeleton.geom</file>
+        <file>glsl/skeleton.vert</file>
+        <file>glsl/skeletonPoint.frag</file>
+        <file>glsl/skeletonPoint.vert</file>
+        <file>glsl/skeletonPointSelection.frag</file>
+    </qresource>
 </RCC>

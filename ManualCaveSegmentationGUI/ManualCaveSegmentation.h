@@ -1,5 +1,4 @@
-#ifndef KOMPLEX2_H
-#define KOMPLEX2_H
+#pragma once
 
 #include <QtWidgets/QMainWindow>
 #include "ui_ManualCaveSegmentation.h"
@@ -20,10 +19,10 @@ private slots:
 	void brushType_changed(bool);
 	void downloadCaves();
 	void nearClipChanged();
-	void loadExternalModel();
 	void saveSegmentation();
 	void loadSegmentation();
 	void uploadSegmentation();
+	void updateServerURL();
 
 private:
 
@@ -32,5 +31,3 @@ private:
 	
 	std::shared_ptr<SharedData> data;
 };
-
-#endif // KOMPLEX2_H

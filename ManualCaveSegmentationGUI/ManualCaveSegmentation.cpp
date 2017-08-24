@@ -3,6 +3,7 @@
 #include <qmessagebox.h>
 #include <qformlayout>
 #include <qlabel>
+#include <qinputdialog>
 #include <memory>
 
 #include "CaveListDialog.h"
@@ -27,15 +28,13 @@ ManualCaveSegmentation::ManualCaveSegmentation(QWidget *parent)
 	connect(ui.btnSaveSegmentation, &QPushButton::clicked, this, &ManualCaveSegmentation::saveSegmentation);
 	connect(ui.btnLoadSegmentation, &QPushButton::clicked, this, &ManualCaveSegmentation::loadSegmentation);
 	connect(ui.btnUploadSegmentation, &QPushButton::clicked, this, &ManualCaveSegmentation::uploadSegmentation);
+	connect(ui.btnUpdateServerURL, &QPushButton::clicked, this, &ManualCaveSegmentation::updateServerURL);
+
+	if (GlobalData.serverUrl().isEmpty())
+		updateServerURL();
 
 	glView->setBrushType(ui.rbChamber->isChecked() ? Chamber : Passage);
 	glView->setBrushSize(ui.sldBrushSize->value());
-
-#ifdef ADMIN
-	QPushButton* loadExternal = new QPushButton("Load External Cave", ui.grpData);
-	ui.verticalLayout_4->addWidget(loadExternal);
-	connect(loadExternal, &QPushButton::clicked, this, &ManualCaveSegmentation::loadExternalModel);
-#endif
 
 	data->view = glView;
 
@@ -78,15 +77,6 @@ void ManualCaveSegmentation::load_model()
 	auto dialog = new AvailableCaveListDialog(data, this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->show();
-}
-
-void ManualCaveSegmentation::loadExternalModel()
-{
-	auto filename = QFileDialog::getOpenFileName(this, "External Cave", QString(), "3D Models (*.off *.obj *.bin)");
-	if (filename != nullptr)
-	{
-		data->setMesh(std::make_shared<Mesh>(data->view, filename.toStdString()));
-	}
 }
 
 void ManualCaveSegmentation::saveSegmentation()
@@ -142,4 +132,12 @@ void ManualCaveSegmentation::uploadSegmentation()
 	auto dialog = new UploadSegmentationDialog(data, this);
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->show();
+}
+
+void ManualCaveSegmentation::updateServerURL()
+{
+	bool ok;
+	QString newURL = QInputDialog::getText(this, "Specify Server URL", "Please specify the URL of the Manual Cave Segmentation Service", QLineEdit::Normal, GlobalData.serverUrl(), &ok);
+	if (ok)
+		GlobalData.setServerUrl(newURL);
 }

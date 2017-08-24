@@ -25,6 +25,7 @@ struct Empty
 
 };
 
+//Calculates the cave size by averaging the spherical radius over the Voronoi diagram defined by the minima of the radius field.
 class CaveSizeCalculatorVoronoi
 {
 	struct CellCenter
@@ -107,6 +108,7 @@ public:
 	}
 };
 
+//Calculates the cave size by averaging the spherical radius field over a path network defined through line flow.
 class CaveSizeCalculatorLineFlow 
 {
 public:

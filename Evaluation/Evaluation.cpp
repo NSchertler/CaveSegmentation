@@ -137,6 +137,7 @@ std::ostream& operator<<(std::ostream& os, CaveData::Algorithm a)
 	case CaveData::Advect:
 		return os << "Advect";
 	}
+	throw; //Invalid algorithm
 }
 
 std::ostream& operator<<(std::ostream& os, const ParameterSet& p)
@@ -285,7 +286,7 @@ int main(int argc, char* argv[])
 	csvFile.imbue(std::locale("en-US"));
 	csvFile << "Distance Power;Scale Algorithm;Scale Kernel;Size Kernel;Size Derivative Kernel;Curvature Tipping Point;Direction Tolerance;Mean Plausability;Min Plausability;";
 	for (int i = 0; i < caves.size(); ++i)
-		csvFile << "Plausability Cave " << i << ";";
+		csvFile << "Plausibility Cave " << i << ";";
 	csvFile << std::endl;
 	
 	Timer<> timer;
@@ -343,7 +344,7 @@ int main(int argc, char* argv[])
 									float p = caves.at(i)->segmentationPlausability();
 
 									plausabilities.at(i) = p;
-									int c = caves.at(i)->data.meshVertices().size();
+									int c = (int)caves.at(i)->data.meshVertices().size();
 									countVertices += c;
 									params.meanPlausibility += (float)c / countVertices * (p - params.meanPlausibility);
 									params.minPlausibility = std::min(params.minPlausibility, p);

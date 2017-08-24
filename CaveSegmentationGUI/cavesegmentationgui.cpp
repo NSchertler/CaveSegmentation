@@ -65,6 +65,7 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 	connect(&vm.directionTolerance, &ObservableVariable<double>::changed, this, &CaveSegmentationGUI::segmentationParametersChanged);
 
 	connect(ui.btnLoadOff, &QPushButton::clicked, this, &CaveSegmentationGUI::loadOff);	
+	connect(ui.btnWriteBin, &QPushButton::clicked, this, &CaveSegmentationGUI::writeBin);
 	connect(ui.btnLoadSkeleton, &QPushButton::clicked, this, &CaveSegmentationGUI::loadSkeleton);
 	connect(ui.btnCalculateSkeleton, &QPushButton::clicked, this, &CaveSegmentationGUI::calculateSkeleton);
 	connect(ui.btnAbortSkeleton, &QPushButton::clicked, this, &CaveSegmentationGUI::abortSkeleton);
@@ -188,6 +189,20 @@ void CaveSegmentationGUI::loadOff(bool)
 		vm.caveData.LoadMesh(filename.toStdString());
 		dataDirectory = QDir(filename);
 		dataDirectory.cdUp();
+	}
+}
+
+void CaveSegmentationGUI::writeBin(bool)
+{
+	if (vm.caveData.meshVertices().size() == 0)
+	{
+		QMessageBox::critical(this, "Write BIN", "You need to load a model before you can export it as BIN.");
+		return;
+	}
+	auto filename = QFileDialog::getSaveFileName(this, "Write BIN", QString(), "Binary File (*.bin)");
+	if (!filename.isEmpty())
+	{
+		vm.caveData.WriteBIN(filename.toStdString());
 	}
 }
 
