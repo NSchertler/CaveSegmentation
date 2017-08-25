@@ -1,12 +1,8 @@
-#include "Options.h"
+#include <ICaveData.h>
 
-#include "ImageProc.h"
-#include "CGALCommon.h"
-
-#include "CaveData.h"
-#include "ChamberAnalyzation/CurvatureBasedQPBO.h"
-#include "ChamberAnalyzation/Utils.h"
-#include "FileInputOutput.h"
+#include <ChamberAnalyzation/CurvatureBasedQPBO.h>
+#include <ChamberAnalyzation/Utils.h>
+#include <FileInputOutput.h>
 
 #include <boost/filesystem.hpp>
 
@@ -107,17 +103,18 @@ int main(int argc, char* argv[])
 
 	std::cout << "Model file: " << offFile << std::endl;
 
-	CaveData data;
+	ICaveData* data = CreateCaveData();
 	try
 	{
-		data.LoadMesh(offFile);
+		data->LoadMesh(offFile);
 	}
 	catch (...)
 	{
 		std::cerr << "Cannot load mesh from " << offFile << std::endl;
+		DestroyCaveData(data);
 		return 2;
 	}
-	data.SetOutputDirectory(outputDirectoryW);
+	data->SetOutputDirectory(outputDirectoryW);
 
 	StartImageProc();	
 
@@ -162,12 +159,6 @@ int main(int argc, char* argv[])
 	}
 	std::cout << "Smoothing and deriving distances..." << std::endl;
 	data.SmoothAndDeriveDistances();
-	
-
-
-#ifdef WRITE_BRANCH_STATISTICS
-	data.WriteBranchStatistics(outputDirectory);
-#endif
 	
 	std::cout << "Finding chambers..." << std::endl;
 
@@ -244,6 +235,7 @@ int main(int argc, char* argv[])
 	WriteOff(segmentedMeshFile.c_str(), data.meshVertices(), data.meshTriIndices(), [&](int i, int& r, int& g, int& b) {colorFunc(data.meshVertexCorrespondsTo[i], r, g, b); } );
 
 	DestroySkeleton(skeleton);
+	DestroyCaveData(data);
 
 	StopImageProc();
 

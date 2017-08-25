@@ -237,6 +237,11 @@ void CaveData::SetSkeleton(CurveSkeleton * skeleton)
 		ResizeSkeletonAttributes(0, 0);
 }
 
+bool CaveData::CalculateDistancesSingleVertexWithDebugOutput(int iVert, float exponent)
+{
+	return CalculateDistancesSingleVertex<SphereVisualizer>(iVert, exponent);
+}
+
 //Calculates the cave size at a single skeleton vertex and stores it in caveSizeUnsmoothed.
 template <typename TSphereVisualizer>
 bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent)
@@ -521,14 +526,14 @@ void CaveData::SmoothAndDeriveDistances()
 	//Derive cave sizes: smoothWorkDouble <- derive(caveSizes)
 	derivePerEdgeFromVertices(skeleton, caveSizes, smoothWorkDouble);
 	//Smooth derivatives: caveSizeDerivativesPerEdge <- smooth(smoothWorkDouble) = smooth(derive(caveSizes))
-	smoothPerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, [this](int iEdge)
+	smoothPerEdge<double, true>(*this, [this](int iEdge)
 	{
 		auto edge = skeleton->edges.at(iEdge);
 		return CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR * 0.5 * (caveScale.at(edge.first) + caveScale.at(edge.second));
 	}, smoothWorkDouble, caveSizeDerivativesPerEdge);
 
 	//Derive second derivatives: caveSizeCurvaturesPerEdge <- derive(caveSizeDerivativesPerEdge)
-	derivePerEdge<double, true>(skeleton, adjacency, vertexPairToEdge, caveSizeDerivativesPerEdge, caveSizeCurvaturesPerEdge);
+	derivePerEdge<double, true>(*this, caveSizeDerivativesPerEdge, caveSizeCurvaturesPerEdge);
 
 #ifndef NON_VERBOSE
 	std::cout << "Finished smoothing." << std::endl;

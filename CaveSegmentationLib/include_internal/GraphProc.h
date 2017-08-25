@@ -6,6 +6,8 @@
 #include <set>
 #include <unordered_set>
 
+#include "IGraph.h"
+
 //Returns the unnormalized value of the Gaussian normal distribution
 extern double gauss(double x, double variance);
 
@@ -236,17 +238,16 @@ struct EdgeOrientationDistance
 	}
 };
 
-extern void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const CurveSkeleton* s, const std::vector<std::vector<int>>& adjacency, const std::map<std::pair<int, int>, int>& vertexPairToEdge, std::set<EdgeOrientationDistance>& edgeSet, std::map<int, double>& distances);
+extern void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const IGraph& graph, std::set<EdgeOrientationDistance>& edgeSet, std::map<int, double>& distances);
 
 template <typename T, bool DirectionDependentMeasure>
-T smoothSingleEdge(const CurveSkeleton* skeleton, int iEdge, const std::vector<std::vector<int>>& adjacency, const std::map<std::pair<int, int>, int>& vertexPairToEdge, double smoothDeviation, std::vector<T>& source)
+T smoothSingleEdge(const IGraph& graph, int iEdge, double smoothDeviation, const std::vector<T>& source)
 {
 	double smoothVariance = smoothDeviation * smoothDeviation;
 
-	auto& edge = skeleton->edges.at(iEdge);
-	auto& firstV = skeleton->vertices.at(edge.first);
-	auto& secondV = skeleton->vertices.at(edge.second);
-	double halfEdgeLength = (firstV.position - secondV.position).norm() / 2;
+	size_t firstV, secondV;
+	graph.IncidentVertices(iEdge, firstV, secondV);	
+	double halfEdgeLength = (graph.VertexPosition(firstV) - graph.VertexPosition(secondV)).norm() / 2;
 
 	double distanceThreshold = 3 * smoothDeviation; //Gaussian is practically 0 after 3 * standardDeviation
 
@@ -258,9 +259,9 @@ T smoothSingleEdge(const CurveSkeleton* skeleton, int iEdge, const std::vector<s
 	T sumMeasure = sumWeight * source.at(iEdge);
 
 	EdgeOrientationDistance initialEdge = { iEdge, 0, false, false };
-	addEdgeNeighborsToSet(initialEdge, halfEdgeLength, skeleton, adjacency, vertexPairToEdge, activeEdges, minDistances);
+	addEdgeNeighborsToSet(initialEdge, halfEdgeLength, graph, activeEdges, minDistances);
 	initialEdge.propagationReversed = true;
-	addEdgeNeighborsToSet(initialEdge, halfEdgeLength, skeleton, adjacency, vertexPairToEdge, activeEdges, minDistances);
+	addEdgeNeighborsToSet(initialEdge, halfEdgeLength, graph, activeEdges, minDistances);
 
 	while(!activeEdges.empty())
 	{
@@ -269,9 +270,10 @@ T smoothSingleEdge(const CurveSkeleton* skeleton, int iEdge, const std::vector<s
 		if (eod.distanceAtBase > distanceThreshold)
 			break;
 
-		auto& edge = skeleton->edges.at(eod.edge);
+		size_t currentV1, currentV2;
+		graph.IncidentVertices(eod.edge, currentV1, currentV2);
 
-		double edgeLength = (skeleton->vertices.at(edge.first).position - skeleton->vertices.at(edge.second).position).norm();
+		double edgeLength = (graph.VertexPosition(currentV1) - graph.VertexPosition(currentV2)).norm();
 		double distanceAtTip = eod.distanceAtBase + edgeLength;
 		double weight = gaussIntegrate(smoothDeviation, eod.distanceAtBase, distanceAtTip);
 
@@ -281,7 +283,7 @@ T smoothSingleEdge(const CurveSkeleton* skeleton, int iEdge, const std::vector<s
 			v = -v;
 		sumMeasure += static_cast<T>(weight * v);
 
-		addEdgeNeighborsToSet(eod, distanceAtTip, skeleton, adjacency, vertexPairToEdge, activeEdges, minDistances);
+		addEdgeNeighborsToSet(eod, distanceAtTip, graph, activeEdges, minDistances);
 	}
 
 	return (T)((sumMeasure) / (sumWeight));
@@ -289,20 +291,20 @@ T smoothSingleEdge(const CurveSkeleton* skeleton, int iEdge, const std::vector<s
 
 /// DirectionDependentMeasure: Set to true if the measure T must be inverted if an edge is traversed in its backwards direction.
 template <typename T, bool DirectionDependentMeasure>
-void smoothPerEdge(const CurveSkeleton* skeleton, const std::vector<std::vector<int>>& adjacency, const std::map<std::pair<int, int>, int>& vertexPairToEdge, double smoothDeviation, std::vector<T>& source, std::vector<T>& target)
+void smoothPerEdge(const IGraph& graph, double smoothDeviation, const std::vector<T>& source, std::vector<T>& target)
 {
 	for (int iEdge = 0; iEdge < skeleton->edges.size(); ++iEdge)
 	{
-		target.at(iEdge) = smoothSingleEdge<T, DirectionDependentMeasure>(skeleton, iEdge, adjacency, vertexPairToEdge, smoothDeviation, source);
+		target.at(iEdge) = smoothSingleEdge<T, DirectionDependentMeasure>(graph, iEdge, smoothDeviation, source);
 	}
 }
 
 template <typename T, bool DirectionDependentMeasure>
-void smoothPerEdge(const CurveSkeleton* skeleton, const std::vector<std::vector<int>>& adjacency, const std::map<std::pair<int, int>, int>& vertexPairToEdge, std::function<double(int)> smoothDeviation, std::vector<T>& source, std::vector<T>& target)
+void smoothPerEdge(const IGraph& graph, std::function<double(int)> smoothDeviation, const std::vector<T>& source, std::vector<T>& target)
 {
-	for (int iEdge = 0; iEdge < skeleton->edges.size(); ++iEdge)
+	for (int iEdge = 0; iEdge < graph.NumberOfEdges(); ++iEdge)
 	{
-		target.at(iEdge) = smoothSingleEdge<T, DirectionDependentMeasure>(skeleton, iEdge, adjacency, vertexPairToEdge, smoothDeviation(iEdge), source);
+		target.at(iEdge) = smoothSingleEdge<T, DirectionDependentMeasure>(graph, iEdge, smoothDeviation(iEdge), source);
 	}
 }
 
@@ -350,35 +352,38 @@ void derive(const int root, const std::vector<CurveSkeleton::Vertex>& vertices, 
 /// Estimates the first derivative of source with central differences and saves it in target.
 /// DirectionDependentMeasure: Set to true if the measure T must be inverted if an edge is traversed in its backwards direction.
 template <typename T, bool DirectionDependentMeasure>
-void derivePerEdge(CurveSkeleton* skeleton, const std::vector<std::vector<int>>& adjacency, const std::map<std::pair<int, int>, int>& vertexPairToEdge, std::vector<T>& source, std::vector<T>& target)
+void derivePerEdge(const IGraph& graph, const std::vector<T>& source, std::vector<T>& target)
 {
-	for (int iEdge = 0; iEdge < skeleton->edges.size(); ++iEdge)
+	for (int iEdge = 0; iEdge < graph.NumberOfEdges(); ++iEdge)
 	{
 		//calculate central difference
 
-		auto& edge = skeleton->edges.at(iEdge);
-		double edgeLength = (skeleton->vertices[edge.first].position - skeleton->vertices[edge.second].position).norm();
+		size_t v1, v2;
+		graph.IncidentVertices(iEdge, v1, v2);
+		double edgeLength = (graph.VertexPosition(v1) - graph.VertexPosition(v2)).norm();
 		T currentValue = source.at(iEdge);
 
 		T sumIn = 0, sumOut = 0;
 		double distanceIn = 0, distanceOut = 0;
 
 		//iterate neighbors of first vertex
-		auto& inNeighbors = adjacency.at(edge.first);
+		auto& inNeighbors = graph.AdjacentNodes(v1);
 		int neighborCount = 0;
 		for (auto neighbor : inNeighbors)
 		{
-			if (neighbor == edge.second)
+			if (neighbor == v2)
 				continue;
-			int edgeId = vertexPairToEdge.at(std::pair<int, int>(neighbor, edge.first));
+			int edgeId = graph.EdgeIdFromVertexPair(neighbor, v1);
 			T measure = source.at(edgeId);
 			if (DirectionDependentMeasure)
 			{
-				if (skeleton->edges.at(edgeId).first != neighbor)
+				size_t incident1, incident2;
+				graph.IncidentVertices(edgeId, incident1, incident2);
+				if (incident1 != neighbor)
 					measure = -measure;
 			}
 			sumIn += measure;
-			distanceIn += (skeleton->vertices.at(neighbor).position - skeleton->vertices.at(edge.first).position).norm();
+			distanceIn += (graph.VertexPosition(neighbor) - graph.VertexPosition(v1)).norm();
 			++neighborCount;
 		}
 		if (inNeighbors.size() == 1) //no incoming edges
@@ -393,21 +398,23 @@ void derivePerEdge(CurveSkeleton* skeleton, const std::vector<std::vector<int>>&
 		}
 
 		//iterate neighbors of second vertex
-		auto& outNeighbors = adjacency.at(edge.second);
+		auto& outNeighbors = graph.AdjacentNodes(v2);
 		neighborCount = 0;
 		for (auto neighbor : outNeighbors)
 		{
-			if (neighbor == edge.first)
+			if (neighbor == v1)
 				continue;
-			int edgeId = vertexPairToEdge.at(std::pair<int, int>(edge.second, neighbor));
+			int edgeId = graph.EdgeIdFromVertexPair(v2, neighbor);
 			T measure = source.at(edgeId);
 			if (DirectionDependentMeasure)
 			{
-				if (skeleton->edges.at(edgeId).second != neighbor)
+				size_t incident1, incident2;
+				graph.IncidentVertices(edgeId, incident1, incident2);
+				if (incident2 != neighbor)
 					measure = -measure;
 			}
 			sumOut += measure;
-			distanceOut += (skeleton->vertices.at(neighbor).position - skeleton->vertices.at(edge.second).position).norm();
+			distanceOut += (graph.VertexPosition(neighbor) - graph.VertexPosition(v2)).norm();
 			++neighborCount;
 		}
 		if (outNeighbors.size() == 1) //no outgoing edges
@@ -438,15 +445,15 @@ void derivePerEdgeFromVertices(CurveSkeleton* skeleton, std::vector<T>& source, 
 
 //Checks if all edges between the reference vertex and its neighbors (excluding a given neighbor) have a lower or equal value than the given value.
 //values - per edge values
-template <typename T>
-bool checkEdgeMaximum(const std::vector<std::vector<int>>& adjacency, const std::vector<T>& values, const std::map<std::pair<int, int>, int>& vertexPairToEdge, int referenceVertex, int excludeNeighbor, T maxValue)
+template <typename TAccessor, typename T>
+bool IsEdgeLocalMaximum(const IGraph& graph, const TAccessor& valueAccessor, int referenceVertex, int excludeNeighbor, T maxValue)
 {
-	for (int neighbor : adjacency.at(referenceVertex))
+	for (int neighbor : graph.AdjacentNodes(referenceVertex))
 	{
 		if (neighbor == excludeNeighbor)
 			continue;
 
-		T neighborEdgeValue = values.at(vertexPairToEdge.at(std::pair<int, int>(referenceVertex, neighbor)));
+		T neighborEdgeValue = valueAccessor(graph.EdgeIdFromVertexPair(referenceVertex, neighbor));
 		if (neighborEdgeValue > maxValue)
 		{
 			return false;

@@ -1,8 +1,9 @@
 #pragma once
 
 #include <Eigen/Dense>
+#include <CaveSegmentationLib.h>
 
-class IHasBoundingBox
+class CAVESEGMENTATIONLIB_API IHasBoundingBox
 {
 public:
 	IHasBoundingBox(void);

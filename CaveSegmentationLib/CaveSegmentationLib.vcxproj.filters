@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Header Files\ChamberAnalyzation">
       <UniqueIdentifier>{a2e0dd26-e515-415e-9a6a-bb94a5cc5272}</UniqueIdentifier>
     </Filter>
@@ -21,49 +17,55 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CaveData.h">
+    <ClInclude Include="include_internal\CGALCommon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\CGALCommon.h">
+    <ClInclude Include="include_internal\GraphProc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\FileInputOutput.h">
+    <ClInclude Include="include_internal\ImageProc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\GraphProc.h">
+    <ClInclude Include="include_internal\LineProc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ImageProc.h">
+    <ClInclude Include="include_internal\MeshProc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\LineProc.h">
+    <ClInclude Include="include_internal\Options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshProc.h">
+    <ClInclude Include="include_internal\RegularUniformSphereSampling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\Options.h">
+    <ClInclude Include="include_internal\SignedUnionFind.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\RegularUniformSphereSampling.h">
+    <ClInclude Include="include_internal\SizeCalculation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SignedUnionFind.h">
+    <ClInclude Include="include_internal\SphereVisualizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\SizeCalculation.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\SphereVisualizer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\ChamberAnalyzation\energies.h">
+    <ClInclude Include="include_internal\ChamberAnalyzation\energies.h">
       <Filter>Header Files\ChamberAnalyzation</Filter>
     </ClInclude>
-    <ClInclude Include="include\ChamberAnalyzation\MaximumDescent.h">
-      <Filter>Header Files\ChamberAnalyzation</Filter>
+    <ClInclude Include="include\IHasBoundingBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CaveSegmentationLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ICaveData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include_internal\CaveData.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ChamberAnalyzation\SizeBasedQPBO.h">
+      <Filter>Header Files\ChamberAnalyzation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ChamberAnalyzation\Utils.h">
       <Filter>Header Files\ChamberAnalyzation</Filter>
     </ClInclude>
     <ClInclude Include="include\ChamberAnalyzation\CurvatureBasedAStar.h">
@@ -72,10 +74,16 @@
     <ClInclude Include="include\ChamberAnalyzation\CurvatureBasedQPBO.h">
       <Filter>Header Files\ChamberAnalyzation</Filter>
     </ClInclude>
-    <ClInclude Include="include\ChamberAnalyzation\Utils.h">
+    <ClInclude Include="include\ChamberAnalyzation\MaximumDescent.h">
       <Filter>Header Files\ChamberAnalyzation</Filter>
     </ClInclude>
-    <ClInclude Include="include\IHasBoundingBox.h">
+    <ClInclude Include="include\FileInputOutput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include_internal\CaveDataAccessors.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,11 +112,17 @@
     <ClCompile Include="src\ChamberAnalyzation\Utils.cpp">
       <Filter>Source Files\ChamberAnalyzation</Filter>
     </ClCompile>
-    <ClCompile Include="include\ChamberAnalyzation\energies.cpp">
-      <Filter>Source Files\ChamberAnalyzation</Filter>
-    </ClCompile>
     <ClCompile Include="src\IHasBoundingBox.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChamberAnalyzation\energies.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ICaveData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CurvatureBasedAStar.cpp">
+      <Filter>Source Files\ChamberAnalyzation</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

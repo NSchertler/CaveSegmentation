@@ -11,28 +11,31 @@ double gaussIntegrate(double standardDeviation, double lower, double upper)
 	return std::erf(upper / sqrt2sigma) - std::erf(lower / sqrt2sigma);
 }
 
-void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const CurveSkeleton* s, const std::vector<std::vector<int>>& adjacency, const std::map<std::pair<int, int>, int>& vertexPairToEdge, std::set<EdgeOrientationDistance>& edgeSet, std::map<int, double>& distances)
+void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const IGraph& graph, std::set<EdgeOrientationDistance>& edgeSet, std::map<int, double>& distances)
 {
-	auto& edge = s->edges.at(eod.edge);
-	const int baseVertex = (eod.propagationReversed ? edge.second : edge.first);
-	const int tipVertex = (eod.propagationReversed ? edge.first : edge.second);
+	size_t v1, v2;
+	graph.IncidentVertices(eod.edge, v1, v2);
+	const int baseVertex = (eod.propagationReversed ? v2 : v1);
+	const int tipVertex = (eod.propagationReversed ? v1 : v2);
 	//propagation direction is baseVertex--->tipVertex
 
-	const std::vector<int>& adj = adjacency.at(tipVertex);
+	const std::vector<int>& adj = graph.AdjacentNodes(tipVertex);
 
-	auto& tipPosition = s->vertices.at(tipVertex).position;
+	auto& tipPosition = graph.VertexPosition(tipVertex);
 	for (auto adjV : adj)
 	{
 		if (adjV == baseVertex) //wrong direction
 			continue;
 
-		int e = vertexPairToEdge.at(std::pair<int, int>(adjV, tipVertex));
+		size_t e = graph.EdgeIdFromVertexPair(adjV, tipVertex);
 		auto distanceEntry = distances.find(adjV);
 		if (distanceEntry == distances.end() || distanceEntry->second > distanceAtTip)
 		{
 			if (distanceEntry != distances.end())
 				edgeSet.erase(EdgeOrientationDistance(e, distanceEntry->second));
-			bool propReversed = (s->edges.at(e).first == adjV);
+			size_t incident1, incident2;
+			graph.IncidentVertices(e, incident1, incident2);
+			bool propReversed = (incident1 == adjV);
 			edgeSet.insert(EdgeOrientationDistance(e, distanceAtTip, propReversed, eod.measureReversed ^ eod.propagationReversed ^ propReversed));
 			distances[e] = distanceAtTip;
 		}

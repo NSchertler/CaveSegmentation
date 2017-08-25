@@ -26,7 +26,7 @@ void AssignUniqueChamberIndices(const CaveData & data, std::vector<int32_t>& seg
 				continue;
 			assignedNewIndex[currentVertex] = true;
 			segmentation[currentVertex] = nextSegment;
-			for (auto n : data.adjacency[currentVertex])
+			for (auto n : data.AdjacentNodes(currentVertex))
 				traversalStack.push(n);
 		}
 		++nextSegment;
