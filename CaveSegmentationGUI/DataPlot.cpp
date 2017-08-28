@@ -92,7 +92,7 @@ DataPlot::~DataPlot()
 
 void DataPlot::updatePlot(bool keepXAxis)
 {
-	if (vm.selectedPath.size() == 0 || !vm.caveData.skeleton || vm.caveData.caveSizes.size() == 0)
+	if (vm.selectedPath.size() == 0 || vm.caveData.Skeleton() == nullptr || !vm.caveData.HasCaveSizes())
 	{
 		for(int i = 0; i < graphCount(); ++i)
 			graph(i)->clearData();
@@ -107,7 +107,7 @@ void DataPlot::updatePlot(bool keepXAxis)
 	double t = 0;
 	for (int i = 1; i < vm.selectedPath.size(); ++i)
 	{
-		double edgeLength = (vm.caveData.skeleton->vertices.at(vm.selectedPath.at(i)).position - vm.caveData.skeleton->vertices.at(vm.selectedPath.at(i - 1)).position).norm();
+		double edgeLength = (vm.caveData.VertexPosition(vm.selectedPath.at(i)) - vm.caveData.VertexPosition(vm.selectedPath.at(i - 1))).norm();
 		tValuesPerEdge[i - 1] = t + edgeLength / 2;
 		t += edgeLength;
 		tValuesPerVertex[i] = t;
@@ -118,9 +118,9 @@ void DataPlot::updatePlot(bool keepXAxis)
 	QVector<double> globalSize(vm.selectedPath.size());
 	for (int i = 0; i < vm.selectedPath.size(); ++i)
 	{
-		caveSizes[i] = vm.caveData.caveSizes.at(vm.selectedPath.at(i));
-		caveSizesUnsmoothed[i] = vm.caveData.caveSizeUnsmoothed.at(vm.selectedPath.at(i));
-		globalSize[i] = vm.caveData.caveScale.at(vm.selectedPath.at(i));
+		caveSizes[i] = vm.caveData.CaveSize(vm.selectedPath.at(i));
+		caveSizesUnsmoothed[i] = vm.caveData.CaveSizeUnsmoothed(vm.selectedPath.at(i));
+		globalSize[i] = vm.caveData.CaveScale(vm.selectedPath.at(i));
 	}
 
 	QVector<double> caveSizeDerivatives(vm.selectedPath.size() - 1);
@@ -132,15 +132,17 @@ void DataPlot::updatePlot(bool keepXAxis)
 	{
 		int v1 = vm.selectedPath.at(i);
 		int v2 = vm.selectedPath.at(i + 1);
-		int edge = vm.caveData.vertexPairToEdge.at(std::pair<int, int>(v1, v2));
+		int edge = vm.caveData.EdgeIdFromVertexPair(v1, v2);
 		double inv = 1.0;
 		//for direction dependent measures...
-		if (v1 != vm.caveData.skeleton->edges.at(edge).first)
+		size_t e1, e2;
+		vm.caveData.IncidentVertices(edge, e1, e2);
+		if (v1 != e1)
 			inv = -1.0;
 
-		caveSizeDerivatives[i] = vm.caveData.caveSizeDerivativesPerEdge.at(edge) * inv;
-		caveSizeCurvatures[i] = vm.caveData.caveSizeCurvaturesPerEdge.at(edge);
-		normalizedCurvature[i] = caveSizeCurvatures[i] * 0.5 * (vm.caveData.caveScale.at(v1) + vm.caveData.caveScale.at(v2));
+		caveSizeDerivatives[i] = vm.caveData.CaveSizeDerivative(edge) * inv;
+		caveSizeCurvatures[i] = vm.caveData.CaveSizeCurvature(edge);
+		normalizedCurvature[i] = caveSizeCurvatures[i] * 0.5 * (vm.caveData.CaveScale(v1) + vm.caveData.CaveScale(v2));
 
 		entranceProb[i] = entranceProbability(normalizedCurvature[i]);
 		directionProb[i] = directionProbability(caveSizeDerivatives[i]);
@@ -221,7 +223,7 @@ void DataPlot::mouseMoveEvent(QMouseEvent *e)
 	}
 
 	double interpol = (t - tValuesPerVertex.at(lower)) / (tValuesPerVertex.at(upper) - tValuesPerVertex.at(lower));
-	auto pos = (1 - interpol) * vm.caveData.skeleton->vertices.at(vm.selectedPath.at(lower)).position + interpol * vm.caveData.skeleton->vertices.at(vm.selectedPath.at(upper)).position;
+	auto pos = (1 - interpol) * vm.caveData.VertexPosition(vm.selectedPath.at(lower)) + interpol * vm.caveData.VertexPosition(vm.selectedPath.at(upper));
 	vm.setMarker(glm::vec3(pos.x(), pos.y(), pos.z()));
 }
 

@@ -217,15 +217,15 @@ void smooth(const std::vector<CurveSkeleton::Vertex>& vertices, const std::vecto
 
 struct EdgeOrientationDistance
 {
-	EdgeOrientationDistance(int edge, double distanceAtBase, bool propagationReversed, bool measureReversed)
+	EdgeOrientationDistance(size_t edge, double distanceAtBase, bool propagationReversed, bool measureReversed)
 		: edge(edge), distanceAtBase(distanceAtBase), propagationReversed(propagationReversed), measureReversed(measureReversed)
 	{ }
 
-	EdgeOrientationDistance(int edge, double distanceAtBase)
+	EdgeOrientationDistance(size_t edge, double distanceAtBase)
 		: edge(edge), distanceAtBase(distanceAtBase)
 	{ }
 
-	int edge;
+	size_t edge;
 	double distanceAtBase;
 	bool propagationReversed;
 	bool measureReversed;
@@ -238,10 +238,10 @@ struct EdgeOrientationDistance
 	}
 };
 
-extern void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const IGraph& graph, std::set<EdgeOrientationDistance>& edgeSet, std::map<int, double>& distances);
+extern void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const IGraph& graph, std::set<EdgeOrientationDistance>& edgeSet, std::map<size_t, double>& distances);
 
 template <typename T, bool DirectionDependentMeasure>
-T smoothSingleEdge(const IGraph& graph, int iEdge, double smoothDeviation, const std::vector<T>& source)
+T smoothSingleEdge(const IGraph& graph, size_t iEdge, double smoothDeviation, const std::vector<T>& source)
 {
 	double smoothVariance = smoothDeviation * smoothDeviation;
 
@@ -253,7 +253,7 @@ T smoothSingleEdge(const IGraph& graph, int iEdge, double smoothDeviation, const
 
 	//perform Dijkstra
 	std::set<EdgeOrientationDistance> activeEdges;
-	std::map<int, double> minDistances;
+	std::map<size_t, double> minDistances;
 
 	double sumWeight = gaussIntegrate(smoothDeviation, -halfEdgeLength, halfEdgeLength);
 	T sumMeasure = sumWeight * source.at(iEdge);
@@ -373,7 +373,7 @@ void derivePerEdge(const IGraph& graph, const std::vector<T>& source, std::vecto
 		{
 			if (neighbor == v2)
 				continue;
-			int edgeId = graph.EdgeIdFromVertexPair(neighbor, v1);
+			auto edgeId = graph.EdgeIdFromVertexPair(neighbor, v1);
 			T measure = source.at(edgeId);
 			if (DirectionDependentMeasure)
 			{
@@ -404,7 +404,7 @@ void derivePerEdge(const IGraph& graph, const std::vector<T>& source, std::vecto
 		{
 			if (neighbor == v1)
 				continue;
-			int edgeId = graph.EdgeIdFromVertexPair(v2, neighbor);
+			auto edgeId = graph.EdgeIdFromVertexPair(v2, neighbor);
 			T measure = source.at(edgeId);
 			if (DirectionDependentMeasure)
 			{

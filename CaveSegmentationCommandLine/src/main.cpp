@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 
 	std::cout << "Model file: " << offFile << std::endl;
 
-	ICaveData* data = CreateCaveData();
+	auto data = CreateCaveData();
 	try
 	{
 		data->LoadMesh(offFile);
@@ -111,19 +111,18 @@ int main(int argc, char* argv[])
 	catch (...)
 	{
 		std::cerr << "Cannot load mesh from " << offFile << std::endl;
-		DestroyCaveData(data);
 		return 2;
 	}
 	data->SetOutputDirectory(outputDirectoryW);
 
-	StartImageProc();	
+	ICaveData::StartCaveSeg();	
 
 	CurveSkeleton* skeleton;
 	if (calculateSkeleton)
 	{
 		std::cout << "Calculating skeleton..." << std::endl;
 		AbortHandle abort;
-		float edgeCollapseThreshold = edgeCollapseThresholdPercent * (data.getMax() - data.getMin()).norm() / 100.0f;
+		float edgeCollapseThreshold = edgeCollapseThresholdPercent * (data->GetMax() - data->GetMin()).norm() / 100.0f;
 		std::cout << "Edge collapse threshold: " << edgeCollapseThreshold << std::endl;
 		std::cout << "w_smooth: " << w_smooth << std::endl;
 		std::cout << "w_velocity: " << w_velocity << std::endl;
@@ -141,62 +140,42 @@ int main(int argc, char* argv[])
 		std::cout << "Loading skeleton from " << skeletonFile << std::endl;
 		skeleton = LoadCurveSkeleton(skeletonFile.c_str());		
 	}
-	data.SetSkeleton(skeleton);
+	data->SetSkeleton(skeleton);
 	
 	
 	if (calculateDistances)
 	{
 		std::cout << "Calculating distances..." << std::endl;
-		data.CalculateDistances();
+		data->CalculateDistances();
 
 		std::cout << "Saving distances to " << distancesFile << std::endl;
-		data.SaveDistances(distancesFile);
+		data->SaveDistances(distancesFile);
 	}
 	else
 	{
 		std::cout << "Loading distances from " << distancesFile << std::endl;
-		data.LoadDistances(distancesFile);
+		data->LoadDistances(distancesFile);
 	}
 	std::cout << "Smoothing and deriving distances..." << std::endl;
-	data.SmoothAndDeriveDistances();
+	data->SmoothAndDeriveDistances();
 	
 	std::cout << "Finding chambers..." << std::endl;
 
 	std::vector<int> segmentation;
-	CurvatureBasedQPBO::FindChambers(data, segmentation);
+	CurvatureBasedQPBO::FindChambers(*data, segmentation);
 
-	AssignUniqueChamberIndices(data, segmentation);
+	AssignUniqueChamberIndices(*data, segmentation);
 	
 	std::cout << "Writing segmentation to " << segmentationFile << std::endl;
 	WriteSegmentation(segmentationFile, segmentation);
 
-	int colors[10][3] = 
-	{
-		{166, 206, 227},
-		{31,120,180},
-		{251,154,153},
-		{227,26,28},
-		{253,191,111},
-		{255,127,0},
-		{202,178,214},
-		{106,61,154},
-		{255,255,153},
-		{177,89,40}
-	};
-
 	auto colorFunc = [&](int i, int& r, int& g, int& b)
 	{
-		if (segmentation[i] < 0)
-		{
-			r = 0; g = 175; b = 0;
-		}
-		else
-		{
-			int* color = colors[segmentation[i] % 10];
-			r = color[0];
-			g = color[1];
-			b = color[2];
-		}
+		auto color = ICaveData::GetSegmentColor(segmentation[i]);
+		r = color[0];
+		g = color[1];
+		b = color[2];
+
 		/* curvature visualization
 		r = g = b = 100;	
 		if (data.caveSizeCurvatures[i] > 0)
@@ -229,15 +208,15 @@ int main(int argc, char* argv[])
 	std::cout << "Saving colored skeleton to " << skeletonObjFile << std::endl;
 	skeleton->SaveToObj(skeletonObjFile.c_str(), colorVertexFunc);
 	std::cout << "Saving skeleton with cave size encoded as z-coordinates to " << skeletonHeightCodedFile << std::endl;
-	skeleton->SaveToObj(skeletonHeightCodedFile.c_str(), colorVertexFunc, [&](const CurveSkeleton::Vertex& v, int i, float& newX, float& newY, float& newZ) { newX = v.position.x(), newY = v.position.y(), newZ = (float)data.caveSizes.at(i); });
+	skeleton->SaveToObj(skeletonHeightCodedFile.c_str(), colorVertexFunc, [&](const CurveSkeleton::Vertex& v, int i, float& newX, float& newY, float& newZ) { newX = v.position.x(), newY = v.position.y(), newZ = (float)data->CaveSize(i); });
 
 	std::cout << "Saving segmented model to " << segmentedMeshFile << std::endl;
-	WriteOff(segmentedMeshFile.c_str(), data.meshVertices(), data.meshTriIndices(), [&](int i, int& r, int& g, int& b) {colorFunc(data.meshVertexCorrespondsTo[i], r, g, b); } );
+
+	data->WriteMesh(segmentedMeshFile.c_str(), [&](int i, int& r, int& g, int& b) {colorFunc(data->MeshVertexCorrespondsTo(i), r, g, b); } );
 
 	DestroySkeleton(skeleton);
-	DestroyCaveData(data);
 
-	StopImageProc();
+	ICaveData::StopCaveSeg();
 
 	return 0;
 }

@@ -39,14 +39,20 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\CGAL.props" />
     <Import Project="..\Boost.props" />
+    <Import Project="..\OpenGM.props" />
+    <Import Project="..\Eigen.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\CGAL.props" />
     <Import Project="..\Boost.props" />
+    <Import Project="..\OpenGM.props" />
+    <Import Project="..\Eigen.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>$(ProjectName)d</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>
@@ -54,10 +60,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>CAVESEGMENTATIONLIB_EXPORT;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(EIGEN3_ROOT);$(ProjectDir)\include;$(ProjectDir)\include_internal;$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\MCFSkeleton\include;$(SolutionDir)\dependencies\QPBO-opengm;$(SolutionDir)\dependencies\opengm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include_internal;$(SolutionDir)\MCFSkeleton\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -69,7 +76,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>CAVESEGMENTATIONLIB_EXPORT;_USE_MATH_DEFINES;_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(EIGEN3_ROOT);$(ProjectDir)\include;$(ProjectDir)\include_internal;$(SolutionDir)\CaveSegmentationGUICore\include;$(SolutionDir)\MCFSkeleton\include;$(SolutionDir)\dependencies\QPBO-opengm;$(SolutionDir)\dependencies\opengm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\include;$(ProjectDir)\include_internal;$(SolutionDir)\MCFSkeleton\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
@@ -82,6 +89,7 @@
     <ClInclude Include="include\CaveSegmentationLib.h" />
     <ClInclude Include="include\ChamberAnalyzation\CurvatureBasedAStar.h" />
     <ClInclude Include="include\ChamberAnalyzation\CurvatureBasedQPBO.h" />
+    <ClInclude Include="include\ChamberAnalyzation\energies.h" />
     <ClInclude Include="include\ChamberAnalyzation\MaximumDescent.h" />
     <ClInclude Include="include\ChamberAnalyzation\SizeBasedQPBO.h" />
     <ClInclude Include="include\ChamberAnalyzation\Utils.h" />
@@ -91,10 +99,12 @@
     <ClInclude Include="include\IHasBoundingBox.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\IMesh.h" />
+    <ClInclude Include="include\IndexedTriangle.h" />
+    <ClInclude Include="include_internal\BoundingBoxAccumulator.h" />
     <ClInclude Include="include_internal\CaveData.h" />
     <ClInclude Include="include_internal\CaveDataAccessors.h" />
     <ClInclude Include="include_internal\CGALCommon.h" />
-    <ClInclude Include="include_internal\ChamberAnalyzation\energies.h" />
     <ClInclude Include="include_internal\GraphProc.h" />
     <ClInclude Include="include_internal\ImageProc.h" />
     <ClInclude Include="include_internal\LineProc.h" />
@@ -106,14 +116,17 @@
     <ClInclude Include="include_internal\SphereVisualizer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ChamberAnalyzation\energies.cpp" />
+    <ClCompile Include="src\ChamberAnalyzation\CurvatureBasedAStar.cpp" />
+    <ClCompile Include="src\ChamberAnalyzation\CurvatureBasedQPBO.cpp" />
     <ClCompile Include="src\CaveData.cpp" />
+    <ClCompile Include="src\ChamberAnalyzation\energies.cpp" />
+    <ClCompile Include="src\ChamberAnalyzation\MaximumDescent.cpp" />
+    <ClCompile Include="src\ChamberAnalyzation\SizeBasedQPBO.cpp" />
     <ClCompile Include="src\ChamberAnalyzation\Utils.cpp" />
-    <ClCompile Include="src\CurvatureBasedAStar.cpp" />
     <ClCompile Include="src\FileInputOutput.cpp" />
     <ClCompile Include="src\GraphProc.cpp" />
     <ClCompile Include="src\ICaveData.cpp" />
-    <ClCompile Include="src\IHasBoundingBox.cpp" />
+    <ClCompile Include="src\BoundingBoxAccumulator.cpp" />
     <ClCompile Include="src\ImageProc.cpp" />
     <ClCompile Include="src\MeshProc.cpp" />
     <ClCompile Include="src\RegularUniformSphereSampling.cpp" />

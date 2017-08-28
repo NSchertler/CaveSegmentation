@@ -1,9 +1,12 @@
 #include <iostream>
 
-#include "CaveData.h"
-#include "ChamberAnalyzation/CurvatureBasedQPBO.h"
+#include <ICaveData.h>
+#include <ChamberAnalyzation/CurvatureBasedQPBO.h>
+#include <ChamberAnalyzation/energies.h>
 
+#include <chrono>
 #include <boost/filesystem.hpp>
+#include <iomanip>
 
 struct CaveInfo
 {
@@ -12,17 +15,17 @@ struct CaveInfo
 		const std::string offFile = dataDirectory + "/model.off";
 		const std::string skeletonFile = dataDirectory + "/model.skel";
 
-		data.LoadMesh(offFile);
+		data->LoadMesh(offFile);
 
 		CurveSkeleton* skeleton = LoadCurveSkeleton(skeletonFile.c_str());
-		data.SetSkeleton(skeleton);
+		data->SetSkeleton(skeleton);
 
-		chamberProbability.resize(data.meshVertices().size(), 0.5);
-		segmentation.resize(data.meshVertices().size());
+		chamberProbability.resize(data->NumberOfVertices(), 0.5);
+		segmentation.resize(data->NumberOfVertices());
 
 		boost::filesystem::path p(dataDirectory + "/segmentations");
 		int nSegs = 0;
-		std::vector<int> manualSeg(data.meshVertices().size());
+		std::vector<int> manualSeg(data->NumberOfVertices());
 		for (auto it = boost::filesystem::directory_iterator(p); it != boost::filesystem::directory_iterator(); ++it)
 		{
 			boost::filesystem::path file = *it;
@@ -30,7 +33,7 @@ struct CaveInfo
 			{
 				++nSegs;				
 				FILE* manualSegFile = fopen(file.string().c_str(), "rb");
-				fread(manualSeg.data(), sizeof(int), data.meshVertices().size(), manualSegFile);
+				fread(manualSeg.data(), sizeof(int), data->MeshVertices().size(), manualSegFile);
 				fclose(manualSegFile);
 
 				//in manual cave segmentation:
@@ -41,7 +44,7 @@ struct CaveInfo
 				Passage = 2,
 				};*/
 
-				for (int i = 0; i < data.meshVertices().size(); ++i)
+				for (int i = 0; i < data->MeshVertices().size(); ++i)
 				{
 					if (manualSeg.at(i) == 1)
 						chamberProbability.at(i) += (1.0 - chamberProbability.at(i)) / nSegs;
@@ -54,7 +57,7 @@ struct CaveInfo
 
 	void segment()
 	{
-		CurvatureBasedQPBO::FindChambers(data, segmentation);
+		CurvatureBasedQPBO::FindChambers(*data, segmentation);
 	}
 
 	float segmentationPlausability() const
@@ -64,9 +67,9 @@ struct CaveInfo
 		//-1 -> passage
 
 		double unplausability = 0;
-		for (int i = 0; i < data.skeleton->vertices.size(); ++i)
+		for (size_t i = 0; i < data->NumberOfVertices(); ++i)
 		{
-			auto& v = data.skeleton->vertices.at(i);
+			auto& v = data->Skeleton()->vertices.at(i);
 			for (int meshVertex : v.correspondingOriginalVertices)
 			{
 				if (chamberProbability.at(meshVertex) < 0.5 && segmentation.at(i) == 0)
@@ -76,10 +79,10 @@ struct CaveInfo
 			}
 		}
 
-		return (float)(1 - unplausability / data.meshVertices().size());
+		return (float)(1 - unplausability / data->MeshVertices().size());
 	}
 
-	CaveData data;
+	std::shared_ptr<ICaveData> data;
 	std::vector<double> chamberProbability;
 	std::vector<int> segmentation;
 };
@@ -118,7 +121,7 @@ struct ParameterRange
 struct ParameterSet
 {
 	float power;
-	CaveData::Algorithm algo;
+	ICaveData::Algorithm algo;
 	float scale, size, sizeDerivative;
 	float tipPoint, directionTolerance;
 
@@ -126,15 +129,15 @@ struct ParameterSet
 	float minPlausibility = 0;
 };
 
-std::ostream& operator<<(std::ostream& os, CaveData::Algorithm a)
+std::ostream& operator<<(std::ostream& os, ICaveData::Algorithm a)
 {
 	switch (a)
 	{
-	case CaveData::Max:
+	case ICaveData::Max:
 		return os << "Max";
-	case CaveData::Smooth:
+	case ICaveData::Smooth:
 		return os << "Smooth";
-	case CaveData::Advect:
+	case ICaveData::Advect:
 		return os << "Advect";
 	}
 	throw; //Invalid algorithm
@@ -228,14 +231,14 @@ int main(int argc, char* argv[])
 	std::string line;
 	std::getline(config, line);
 	std::istringstream ss(line);
-	std::vector<CaveData::Algorithm> algos;
+	std::vector<ICaveData::Algorithm> algos;
 	while (!ss.eof())
 	{
 		int algo;
 		ss >> algo;
 		if (ss.fail())
 			break;
-		auto realAlgo = static_cast<CaveData::Algorithm>(algo);
+		auto realAlgo = static_cast<ICaveData::Algorithm>(algo);
 		algos.push_back(realAlgo);
 		std::cout << "Scheduling algorithm for evaluation: " << realAlgo << std::endl;
 	}
@@ -295,7 +298,7 @@ int main(int argc, char* argv[])
 		params.power = _power;
 
 		for (int i = 0; i < caves.size(); ++i)
-			caves.at(i)->data.CalculateDistances(params.power);
+			caves.at(i)->data->CalculateDistances(params.power);
 
 		for (auto _algo : algos)
 		{
@@ -316,12 +319,12 @@ int main(int argc, char* argv[])
 #pragma omp parallel for
 						for (int i = 0; i < caves.size(); ++i)
 						{
-							caves.at(i)->data.CAVE_SCALE_ALGORITHM = params.algo;
-							caves.at(i)->data.CAVE_SCALE_KERNEL_FACTOR = params.scale;
-							caves.at(i)->data.CAVE_SIZE_KERNEL_FACTOR = params.size;
-							caves.at(i)->data.CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR = params.sizeDerivative;
+							caves.at(i)->data->CaveScaleAlgorithm() = params.algo;
+							caves.at(i)->data->CaveScaleKernelFactor() = params.scale;
+							caves.at(i)->data->CaveSizeKernelFactor() = params.size;
+							caves.at(i)->data->CaveSizeDerivativeKernelFactor() = params.sizeDerivative;
 
-							caves.at(i)->data.SmoothAndDeriveDistances();
+							caves.at(i)->data->SmoothAndDeriveDistances();
 						}
 
 						for (auto _tipPoint : tipPointRange)
@@ -344,7 +347,7 @@ int main(int argc, char* argv[])
 									float p = caves.at(i)->segmentationPlausability();
 
 									plausabilities.at(i) = p;
-									int c = (int)caves.at(i)->data.meshVertices().size();
+									int c = (int)caves.at(i)->data->MeshVertices().size();
 									countVertices += c;
 									params.meanPlausibility += (float)c / countVertices * (p - params.meanPlausibility);
 									params.minPlausibility = std::min(params.minPlausibility, p);

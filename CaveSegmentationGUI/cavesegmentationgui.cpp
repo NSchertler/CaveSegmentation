@@ -164,17 +164,17 @@ CaveSegmentationGUI::~CaveSegmentationGUI()
 
 void CaveSegmentationGUI::meshChanged()
 {
-	ui.grpSkeleton->setEnabled(vm.caveData.meshVertices().size() > 0);
+	ui.grpSkeleton->setEnabled(vm.caveData.MeshVertices().size() > 0);
 }
 
 void CaveSegmentationGUI::skeletonChanged()
 {
-	ui.grpData->setEnabled(vm.caveData.skeleton != nullptr);
+	ui.grpData->setEnabled(vm.caveData.Skeleton() != nullptr);
 }
 
 void CaveSegmentationGUI::distancesChanged()
 {
-	ui.grpSegmentation->setEnabled(vm.caveData.caveSizes.size() > 0);
+	ui.grpSegmentation->setEnabled(vm.caveData.HasCaveSizes());
 }
 
 
@@ -194,7 +194,7 @@ void CaveSegmentationGUI::loadOff(bool)
 
 void CaveSegmentationGUI::writeBin(bool)
 {
-	if (vm.caveData.meshVertices().size() == 0)
+	if (vm.caveData.MeshVertices().size() == 0)
 	{
 		QMessageBox::critical(this, "Write BIN", "You need to load a model before you can export it as BIN.");
 		return;
@@ -233,7 +233,7 @@ void CaveSegmentationGUI::loadSkeleton(bool)
 void CaveSegmentationGUI::calculateSkeleton(bool)
 {
 	QApplication::setOverrideCursor(Qt::WaitCursor);
-	float edgeCollapseThreshold = (vm.caveData.getMax() - vm.caveData.getMin()).norm() * vm.edgeCollapseThreshold.get() / 100.0f;
+	float edgeCollapseThreshold = (vm.caveData.GetMax() - vm.caveData.GetMin()).norm() * vm.edgeCollapseThreshold.get() / 100.0f;
 	skeletonComputation = QtConcurrent::run(std::bind(ComputeCurveSkeleton, modelFilename, &skeletonAbort, edgeCollapseThreshold, vm.skeletonSmooth.get(), vm.skeletonVelocity.get(), vm.skeletonMedial.get()));
 	skeletonWatcher.setFuture(skeletonComputation);
 	ui.btnCalculateSkeleton->setEnabled(false);
@@ -258,7 +258,7 @@ void CaveSegmentationGUI::saveSkeleton(bool)
 	QString filename = QFileDialog::getSaveFileName(this, "Save Skeleton", QString(), "Skeleton File (*.skel)");
 	if (!filename.isEmpty())
 	{
-		vm.caveData.skeleton->Save(filename.toStdString().c_str());
+		vm.caveData.Skeleton()->Save(filename.toStdString().c_str());
 	}
 }
 
@@ -278,14 +278,14 @@ void CaveSegmentationGUI::calculateDistances(bool)
 	if (!vm.caveData.CalculateDistances(vm.distanceExponent.get()))
 	{		
 #pragma omp parallel for
-		for (int i = 0; i < vm.caveData.skeleton->vertices.size(); ++i)
+		for (int i = 0; i < vm.caveData.NumberOfVertices(); ++i)
 			vm.caveData.colorLayer.at(i) = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
-		for(int i : vm.caveData.invalidVertices)			
+		for(int i : vm.caveData.VerticesWithInvalidSize())			
 			vm.caveData.colorLayer.at(i) = glm::vec4(1.0f, 0.2f, 0.2f, 1.0f);
 				
 		vm.caveData.UpdateColorLayer();
-		QMessageBox::critical(this, "Calculate Distances", QStringLiteral("There are %1 vertices with invalid distances. Make sure that the skeleton is valid and is completely contained within the cave.").arg(vm.caveData.invalidVertices.size()));
+		QMessageBox::critical(this, "Calculate Distances", QStringLiteral("There are %1 vertices with invalid distances. Make sure that the skeleton is valid and is completely contained within the cave.").arg(vm.caveData.VerticesWithInvalidSize().size()));
 	}
 	vm.caveData.SmoothAndDeriveDistances();
 }
@@ -295,8 +295,8 @@ void CaveSegmentationGUI::calculateSpecificVertexDistances(bool)
 	if (vm.selectedVertex.get() < 0)
 		return;
 	
-	vm.caveData.CalculateDistancesSingleVertex<SphereVisualizer>(vm.selectedVertex.get(), vm.distanceExponent.get());
-	QMessageBox::information(this, "Distance Calculation", "Calculated Cave Size at vertex " + QString::number(vm.selectedVertex.get()) + ": " + QString::number(vm.caveData.caveSizeUnsmoothed.at(vm.selectedVertex.get())));
+	vm.caveData.CalculateDistancesSingleVertexWithDebugOutput(vm.selectedVertex.get(), vm.distanceExponent.get());
+	QMessageBox::information(this, "Distance Calculation", "Calculated Cave Size at vertex " + QString::number(vm.selectedVertex.get()) + ": " + QString::number(vm.caveData.CaveSizeUnsmoothed(vm.selectedVertex.get())));
 }
 
 void CaveSegmentationGUI::saveDistances(bool)
@@ -329,7 +329,7 @@ void CaveSegmentationGUI::lookThroughChanged(int state)
 
 void CaveSegmentationGUI::segmentationParametersChanged()
 {
-	if (ui.chkUpdateSegmentation->isChecked() && vm.caveData.skeleton && vm.caveData.caveSizes.size() > 0 && vm.caveData.caveSizes.at(0) > 0)
+	if (ui.chkUpdateSegmentation->isChecked() && vm.caveData.Skeleton() != nullptr && vm.caveData.HasCaveSizes() && vm.caveData.CaveSize(0) > 0)
 	{
 		vm.caveData.RunSegmentation();
 	}

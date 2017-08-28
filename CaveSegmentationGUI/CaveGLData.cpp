@@ -8,6 +8,7 @@
 
 #include <set>
 #include <queue>
+#include <fstream>
 
 #include <ChamberAnalyzation/CurvatureBasedQPBO.h>
 #include <ChamberAnalyzation/Utils.h>
@@ -23,6 +24,7 @@ CaveGLData::CaveGLData(QObject * parent)
 	: QObject(parent), meshVB(QOpenGLBuffer::VertexBuffer), meshIB(QOpenGLBuffer::IndexBuffer), meshSegColor(QOpenGLBuffer::VertexBuffer), 
 	  skeletonVB(QOpenGLBuffer::VertexBuffer), skeletonIB(QOpenGLBuffer::IndexBuffer), correspondenceVB(QOpenGLBuffer::VertexBuffer), colorLayerVBO(QOpenGLBuffer::VertexBuffer), skeletonSegColor(QOpenGLBuffer::VertexBuffer)
 {
+	decoratee = CreateCaveData();
 	connect(this, &CaveGLData::segmentationChanged, this, &CaveGLData::segmentationChangedHandler);
 }
 
@@ -40,7 +42,7 @@ void CaveGLData::RunSegmentation()
 
 void CaveGLData::LoadSegmentation(const std::string& path)
 {
-	ReadSegmentation(path, segmentation, skeleton);
+	ReadSegmentation(path, segmentation, NumberOfVertices());
 	AssignUniqueChamberIndices(*this, segmentation);
 
 	emit segmentationChanged();
@@ -54,17 +56,17 @@ glm::vec4 CaveGLData::segmentColor(int32_t segment)
 
 void CaveGLData::segmentationChangedHandler()
 {
-	std::vector<glm::vec4> meshSegColors(_meshVertices.size());
-	for (int i = 0; i < _meshVertices.size(); ++i)
+	std::vector<glm::vec4> meshSegColors(MeshVertices().size());
+	for (int i = 0; i < MeshVertices().size(); ++i)
 	{
-		int segment = segmentation.at(meshVertexCorrespondsTo.at(i));
+		int segment = segmentation.at(MeshVertexCorrespondsTo(i));
 		meshSegColors.at(i) = segmentColor(segment);
 	}
 	meshSegColor.bind();
 	meshSegColor.write(0, &meshSegColors[0], sizeof(glm::vec4) * meshSegColors.size());
 
-	std::vector<glm::vec4> skelSegColors(skeleton->vertices.size());
-	for (int i = 0; i < skeleton->vertices.size(); ++i)
+	std::vector<glm::vec4> skelSegColors(NumberOfVertices());
+	for (int i = 0; i < NumberOfVertices(); ++i)
 	{
 		int segment = segmentation.at(i);
 		skelSegColors.at(i) = segmentColor(segment);
@@ -76,7 +78,7 @@ void CaveGLData::segmentationChangedHandler()
 
 void CaveGLData::LoadMesh(const std::string & offFile)
 {
-	CaveData::LoadMesh(offFile);
+	decoratee->LoadMesh(offFile);
 
 	QDir outDir(QString::fromStdString(offFile));
 	outDir.cdUp();
@@ -91,9 +93,9 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 
 	meshVB.create();
 	meshVB.bind();
-	std::vector<glm::vec4> positions(_meshVertices.size());
-	for(int i = 0; i < _meshVertices.size(); ++i)
-		positions[i] = glm::vec4(_meshVertices.at(i).x(), _meshVertices.at(i).y(), _meshVertices.at(i).z(), 1);
+	std::vector<glm::vec4> positions(MeshVertices().size());
+	for(int i = 0; i < MeshVertices().size(); ++i)
+		positions[i] = glm::vec4(MeshVertices().at(i).x(), MeshVertices().at(i).y(), MeshVertices().at(i).z(), 1);
 
 	meshVB.allocate(&positions[0], sizeof(glm::vec4) * positions.size());
 	
@@ -103,8 +105,8 @@ void CaveGLData::LoadMesh(const std::string & offFile)
 	
 	meshIB.create();
 	meshIB.bind();
-	int* indices = reinterpret_cast<int*>(&_meshTriIndices[0]);
-	int indexCount = sizeof(IndexedTriangle) * _meshTriIndices.size();
+	const int* indices = reinterpret_cast<const int*>(MeshTriIndices().data());
+	int indexCount = sizeof(IndexedTriangle) * MeshTriIndices().size();
 	meshIB.allocate(indices, indexCount);
 
 	for (auto& c : contextSpecificData)
@@ -149,7 +151,7 @@ void CaveGLData::drawCave(CameraProvider* cam)
 
 	meshProgram->setUniformValue("hasSegmentation", segmentation.size() == 0 ? 0 : 1);
 
-	glDrawElements(GL_TRIANGLES, _meshTriIndices.size() * 3, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, MeshTriIndices().size() * 3, GL_UNSIGNED_INT, 0);
 
 	meshProgram->release();
 	data.meshVAO.release();
@@ -170,7 +172,7 @@ void CaveGLData::UpdateColorLayer()
 
 void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 {
-	CaveData::SetSkeleton(skeleton);	
+	decoratee->SetSkeleton(skeleton);	
 	if (skeleton)
 	{
 		ctx->MakeOpenGLContextCurrent();		
@@ -225,13 +227,13 @@ void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 		{
 			//Create correspondences											
 
-			uint32_t* correspondingSkeletonVertices = new uint32_t[_meshVertices.size()];
+			uint32_t* correspondingSkeletonVertices = new uint32_t[MeshVertices().size()];
 			for (int v = 0; v < skeleton->vertices.size(); ++v)
 				for (int corr : skeleton->vertices.at(v).correspondingOriginalVertices)
 					correspondingSkeletonVertices[corr] = v;
 			correspondenceVB.create();
 			correspondenceVB.bind();
-			correspondenceVB.allocate(correspondingSkeletonVertices, _meshVertices.size() * sizeof(uint32_t));			
+			correspondenceVB.allocate(correspondingSkeletonVertices, MeshVertices().size() * sizeof(uint32_t));			
 
 			delete[] correspondingSkeletonVertices;
 
@@ -247,9 +249,9 @@ void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 
 				correspondenceVB.bind();
 				correspondenceProgram->enableAttributeArray("in_correspondence");
-				glVertexAttribIPointer(correspondenceProgram->attributeLocation("in_correspondence"), 1, GL_UNSIGNED_INT, 0, 0);
+				gl.glVertexAttribIPointer(correspondenceProgram->attributeLocation("in_correspondence"), 1, GL_UNSIGNED_INT, 0, 0);
 
-				glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, skeletonVB.bufferId());
+				gl.glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, skeletonVB.bufferId());
 
 				c.second.correspondenceVAO.release();
 			}			
@@ -270,9 +272,9 @@ void CaveGLData::SetSkeleton(CurveSkeleton * skeleton)
 
 void CaveGLData::SmoothAndDeriveDistances()
 {	
-	if (caveSizeUnsmoothed.size() > 0 && caveSizeUnsmoothed.at(0) > 0)
+	if (HasUnsmoothedCaveSizes() && CaveSizeUnsmoothed(0) > 0)
 	{
-		CaveData::SmoothAndDeriveDistances();
+		decoratee->SmoothAndDeriveDistances();
 		emit distancesChanged();
 	}
 }
@@ -291,7 +293,7 @@ void CaveGLData::drawSkeleton(CameraProvider* cam)
 	auto m = QMatrix4x4(glm::value_ptr(MVP));
 	skeletonProgram->setUniformValue("mvp", m);
 
-	glDrawElements(GL_LINES, skeleton->edges.size() * 2, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_LINES, NumberOfEdges() * 2, GL_UNSIGNED_INT, 0);
 
 	skeletonProgram->release();
 	data.skeletonVAO.release();
@@ -317,7 +319,7 @@ void CaveGLData::drawSkeletonPoints(CameraProvider* cam)
 	skeletonPointProgram->setUniformValue("sizeMultiplier", 0.5f);
 	skeletonPointProgram->setUniformValue("hasSegmentation", static_cast<GLuint>(segmentation.size() > 0));
 
-	glDrawArrays(GL_POINTS, 0, skeleton->vertices.size());
+	glDrawArrays(GL_POINTS, 0, NumberOfVertices());
 
 	skeletonPointProgram->release();
 	data.skeletonVAO.release();
@@ -363,7 +365,7 @@ void CaveGLData::drawCorrespondence(CameraProvider* cam, int specificSkeletonVer
 
 	correspondenceProgram->setUniformValue("mvp", m);	
 	correspondenceProgram->setUniformValue("specificSkeletonVertex", specificSkeletonVertex);
-	glDrawArrays(GL_POINTS, 0, _meshVertices.size());
+	glDrawArrays(GL_POINTS, 0, MeshVertices().size());
 
 	correspondenceProgram->release();
 	data.correspondenceVAO.release();
@@ -374,7 +376,7 @@ void CaveGLData::initGL(OpenGLContextProvider* ctx, bool primary)
 	if (primary)
 	{
 		this->ctx = ctx;
-		initializeOpenGLFunctions();
+		gl.initializeOpenGLFunctions();
 	}
 
 	if (meshProgram == nullptr)
@@ -421,7 +423,7 @@ void CaveGLData::FindPath(int startVertex, int targetVertex, std::deque<int>& re
 	predecessors[startVertex] = -1;
 	minCost[startVertex] = 0;
 
-	openSet.emplace(startVertex, 0.0, (skeleton->vertices.at(targetVertex).position - skeleton->vertices.at(startVertex).position).norm());
+	openSet.emplace(startVertex, 0.0, (VertexPosition(targetVertex) - VertexPosition(startVertex)).norm());
 
 	while (!openSet.empty())
 	{
@@ -434,18 +436,18 @@ void CaveGLData::FindPath(int startVertex, int targetVertex, std::deque<int>& re
 			continue;
 
 		closedSet.insert(closedSet.end(), active.vertex);
-		for (int neighbor : adjacency.at(active.vertex))
+		for (int neighbor : AdjacentNodes(active.vertex))
 		{
 			if (closedSet.find(neighbor) != closedSet.end())
 				continue;
 
-			double cost = active.costSoFar + (skeleton->vertices.at(active.vertex).position - skeleton->vertices.at(neighbor).position).norm();
+			double cost = active.costSoFar + (VertexPosition(active.vertex) - VertexPosition(neighbor)).norm();
 			auto minCostEntry = minCost.find(neighbor);
 			if (minCostEntry == minCost.end() || cost < minCostEntry->second)
 			{
 				minCost[neighbor] = cost;
 				predecessors[neighbor] = active.vertex;
-				openSet.emplace(neighbor, cost, (skeleton->vertices.at(targetVertex).position - skeleton->vertices.at(neighbor).position).norm());
+				openSet.emplace(neighbor, cost, (VertexPosition(targetVertex) - VertexPosition(neighbor)).norm());
 			}
 		}
 	}
@@ -462,12 +464,12 @@ void CaveGLData::WriteBIN(const std::string& filename) const
 {
 	std::ofstream binaryOutput(filename, std::ios::binary);
 
-	int nVertices = meshVertices().size();
-	int nIndices = 3 * meshTriIndices().size();
+	int nVertices = MeshVertices().size();
+	int nIndices = 3 * MeshTriIndices().size();
 	binaryOutput.write(reinterpret_cast<const char*>(&nVertices), sizeof(int));
 	binaryOutput.write(reinterpret_cast<const char*>(&nIndices), sizeof(int));
-	binaryOutput.write(reinterpret_cast<const char*>(meshVertices().data()), nVertices * sizeof(Eigen::Vector3f));
-	binaryOutput.write(reinterpret_cast<const char*>(meshTriIndices().data()), meshTriIndices().size() * sizeof(IndexedTriangle));
+	binaryOutput.write(reinterpret_cast<const char*>(MeshVertices().data()), nVertices * sizeof(Eigen::Vector3f));
+	binaryOutput.write(reinterpret_cast<const char*>(MeshTriIndices().data()), MeshTriIndices().size() * sizeof(IndexedTriangle));
 
 	binaryOutput.close();
 }

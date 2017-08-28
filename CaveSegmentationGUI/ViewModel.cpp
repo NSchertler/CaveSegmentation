@@ -4,7 +4,7 @@
 
 ViewModel::ViewModel(QObject * parent) : QObject(parent), lookThrough(true), 
 	tippingCurvature(Energies::CURVATURE_TIP_POINT), directionTolerance(Energies::DIRECTION_TOLERANCE),
-	caveScaleKernelFactor(caveData.CAVE_SCALE_KERNEL_FACTOR), caveSizeKernelFactor(caveData.CAVE_SIZE_KERNEL_FACTOR), caveSizeDerivativeKernelFactor(caveData.CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR),
+	caveScaleKernelFactor(caveData.CaveScaleKernelFactor()), caveSizeKernelFactor(caveData.CaveSizeKernelFactor()), caveSizeDerivativeKernelFactor(caveData.CaveSizeDerivativeKernelFactor()),
 	hoveredElement(_hoveredElement), selectedVertex(_selectedVertex), cursorPos(_cursorPos),
 	distanceExponent(_distanceExponent),
 	edgeCollapseThreshold(_edgeCollapseThreshold), skeletonSmooth(_skeletonSmooth), skeletonVelocity(_skeletonVelocity), skeletonMedial(_skeletonMedial)

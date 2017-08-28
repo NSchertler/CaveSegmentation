@@ -436,7 +436,7 @@ void CurvatureBasedAStar::FindChambers(const ICaveData& data, std::vector<int>& 
 
 	//contract vertices and keep track of maximum cave size
 	SignedUnionFind<false> vertexPatches;
-	vertexPatches.addItems(data.Skeleton()->vertices.size(), false);
+	vertexPatches.addItems((int)data.Skeleton()->vertices.size(), false);
 	std::vector<double> ufCaveSizeMaxima;
 	ufCaveSizeMaxima.resize(data.Skeleton()->vertices.size());
 #pragma omp parallel for
@@ -475,7 +475,7 @@ void CurvatureBasedAStar::FindChambers(const ICaveData& data, std::vector<int>& 
 		Patch& patch = patches.back();
 		patch.caveSize = ufCaveSizeMaxima.at(representative);
 		patch.representativeVertex = representative;
-		seedCandidates.insert(patches.size() - 1);
+		seedCandidates.insert((int)patches.size() - 1);
 	}
 	for (int i : preservedEdges)
 	{

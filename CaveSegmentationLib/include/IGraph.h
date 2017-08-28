@@ -18,6 +18,9 @@ public:
 
 	virtual const Eigen::Vector3f& VertexPosition(size_t vertexId) const = 0;
 
+	//Returns the average half distance of a node to its neighbors.
+	virtual double NodeRadius(size_t vertexId) const = 0;
+
 	virtual size_t NumberOfVertices() const = 0;
 	virtual size_t NumberOfEdges() const = 0;
 };

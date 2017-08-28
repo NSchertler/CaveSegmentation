@@ -1,33 +1,28 @@
-#include "IHasBoundingBox.h"
+#include "BoundingBoxAccumulator.h"
 
 
-IHasBoundingBox::IHasBoundingBox(void)
+BoundingBoxAccumulator::BoundingBoxAccumulator(void)
 {
-	reset_bounding_box();
+	ResetBoundingBox();
 }
 
-void IHasBoundingBox::reset_bounding_box()
+void BoundingBoxAccumulator::ResetBoundingBox()
 {
 	max = Eigen::Vector3f(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity());
 	min = Eigen::Vector3f(std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity());
 }
 
-
-IHasBoundingBox::~IHasBoundingBox(void)
-{
-}
-
-Eigen::Vector3f IHasBoundingBox::getMin()
+const Eigen::Vector3f& BoundingBoxAccumulator::GetMin() const
 {
 	return min;
 }
 
-Eigen::Vector3f IHasBoundingBox::getMax()
+const Eigen::Vector3f& BoundingBoxAccumulator::GetMax() const
 {
 	return max;
 }
 
-void IHasBoundingBox::add_point(float x, float y, float z)
+void BoundingBoxAccumulator::AddPoint(float x, float y, float z)
 {
 	if (x < min.x())
 		min.x() = x;
@@ -43,7 +38,7 @@ void IHasBoundingBox::add_point(float x, float y, float z)
 		max.z() = z;
 }
 
-void IHasBoundingBox::add_point(const Eigen::Vector3f& p)
+void BoundingBoxAccumulator::AddPoint(const Eigen::Vector3f& p)
 {
-	add_point(p.x(), p.y(), p.z());
+	AddPoint(p.x(), p.y(), p.z());
 }

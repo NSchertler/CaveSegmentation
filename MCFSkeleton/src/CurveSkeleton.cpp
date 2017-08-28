@@ -46,7 +46,7 @@ void DestroySkeleton(CurveSkeleton* s)
 	delete s;
 }
 
-void CurveSkeleton::Save(const char* filename)
+void CurveSkeleton::Save(const char* filename) const
 {
 	FILE* f = fopen(filename, "wb");
 	if (f == nullptr)
@@ -116,7 +116,7 @@ CurveSkeleton* LoadCurveSkeleton(const char* filename)
 	return skel;
 }
 
-void ToObj(CurveSkeleton* skel, const char* filename, SurfaceMeshModel* originalMesh, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc, std::function<void(const CurveSkeleton::Vertex& v, int i, float& newX, float& newY, float& newZ)> positionFunc)
+void ToObj(const CurveSkeleton* skel, const char* filename, SurfaceMeshModel* originalMesh, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc, std::function<void(const CurveSkeleton::Vertex& v, int i, float& newX, float& newY, float& newZ)> positionFunc)
 {
 	std::ofstream f;
 	f.open(filename, std::ios::out);
@@ -164,22 +164,22 @@ void ToObj(CurveSkeleton* skel, const char* filename, SurfaceMeshModel* original
 void defaultPosFunc(const CurveSkeleton::Vertex& v, int, float& x, float& y, float& z){ x = v.position.x(); y = v.position.y(); z = v.position.z(); }
 void defaultColorFunc(const CurveSkeleton::Vertex& v, int i, int& r, int& g, int& b) { r = g = b = 255; }
 
-void CurveSkeleton::SaveToObj(const char* filename, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc)
+void CurveSkeleton::SaveToObj(const char* filename, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc) const
 {
 	ToObj(this, filename, nullptr, colorFunc, defaultPosFunc);
 }
 
-void CurveSkeleton::SaveToObj(const char* filename)
+void CurveSkeleton::SaveToObj(const char* filename) const
 {
 	ToObj(this, filename, nullptr, defaultColorFunc, defaultPosFunc);
 }
 
-void CurveSkeleton::SaveToObj(const char* filename, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc, std::function<void(const CurveSkeleton::Vertex& v, int i, float& newX, float& newY, float& newZ)> positionFunc)
+void CurveSkeleton::SaveToObj(const char* filename, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc, std::function<void(const CurveSkeleton::Vertex& v, int i, float& newX, float& newY, float& newZ)> positionFunc) const
 {
 	ToObj(this, filename, nullptr, colorFunc, positionFunc);
 }
 
-void CurveSkeleton::SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc)
+void CurveSkeleton::SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh, std::function<void(const CurveSkeleton::Vertex&, int i, int& r, int& g, int& b)> colorFunc) const
 {
 	auto mesh = new SurfaceMeshModel;
 
@@ -189,7 +189,7 @@ void CurveSkeleton::SaveToObjWithCorrespondences(const char* filename, const std
 	ToObj(this, filename, mesh, colorFunc, defaultPosFunc);
 }
 
-void CurveSkeleton::SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh)
+void CurveSkeleton::SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh) const
 {
 	SaveToObjWithCorrespondences(filename, originalMesh, defaultColorFunc);
 }

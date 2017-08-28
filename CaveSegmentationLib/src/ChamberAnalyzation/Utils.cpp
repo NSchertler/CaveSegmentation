@@ -2,7 +2,7 @@
 
 #include <stack>
 
-void AssignUniqueChamberIndices(const CaveData & data, std::vector<int32_t>& segmentation)
+void AssignUniqueChamberIndices(const ICaveData & data, std::vector<int32_t>& segmentation)
 {
 	//assign unique chamber indices
 	int nextSegment = 0;

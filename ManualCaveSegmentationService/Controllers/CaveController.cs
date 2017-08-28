@@ -213,7 +213,7 @@ namespace Service.Controllers
             {
                 result.Content = new ByteArrayContent(GetSegmentationData(root + "/Caves/" + caveId + "/seg" + segId + ".xml"));
             }
-            catch (Exception x)
+            catch (Exception)
             {
                 return Request.CreateErrorResponse(HttpStatusCode.NotFound, "The specified segmentation does not exist.");
             }

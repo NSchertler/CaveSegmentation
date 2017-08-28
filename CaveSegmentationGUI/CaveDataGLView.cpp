@@ -9,7 +9,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::clearProgram(nullptr);
-std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::skyProgram(nullptr);
 std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::markerProgram(nullptr);
 std::unique_ptr<QOpenGLShaderProgram> CaveDataGLView::cursorProgram(nullptr);
 
@@ -60,10 +59,10 @@ void CaveDataGLView::mouseMoveEvent(QMouseEvent *e)
 		//Find what is in the index buffer at the current mouse location
 		makeCurrent();
 		auto oldHovered = vm.hoveredElement.get();
-		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-		glReadBuffer(GL_COLOR_ATTACHMENT0 + 1);
+		gl.glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		gl.glReadBuffer(GL_COLOR_ATTACHMENT0 + 1);
 		int32_t newHovered;
-		glReadPixels(e->x() + cursorOffset * width() / 2, height() - e->y(), 1, 1, GL_RED_INTEGER, GL_INT, &newHovered);
+		gl.glReadPixels(e->x() + cursorOffset * width() / 2, height() - e->y(), 1, 1, GL_RED_INTEGER, GL_INT, &newHovered);
 		if (newHovered != oldHovered)
 			vm.hoveredElement.set(newHovered);
 #else
@@ -85,7 +84,7 @@ void CaveDataGLView::mousePressEvent(QMouseEvent * e)
 {
 	if (e->buttons() == Qt::LeftButton)
 	{
-		if (vm.hoveredElement.get() > 0 && vm.caveData.skeleton)
+		if (vm.hoveredElement.get() > 0 && vm.caveData.Skeleton() != nullptr)
 		{
 			if (e->modifiers() == 0)
 			{
@@ -165,12 +164,12 @@ template <typename T> int sgn(T val) {
 
 void CaveDataGLView::meshChanged()
 {
-	auto& min = vm.caveData.getMin();
-	auto& max = vm.caveData.getMax();
+	auto& min = vm.caveData.GetMin();
+	auto& max = vm.caveData.GetMax();
 	align_to_bounding_box(glm::vec3(min.x(), min.y(), min.z()), glm::vec3(max.x(), max.y(), max.z()));
 	if (eyeOffset != 0)
 	{		
-		eyeOffset = (vm.caveData.getMax() - vm.caveData.getMin()).norm() * 0.001f * sgn(eyeOffset);
+		eyeOffset = (vm.caveData.GetMax() - vm.caveData.GetMin()).norm() * 0.001f * sgn(eyeOffset);
 		recalculateView();
 		recalculateProjection();
 	}
@@ -203,7 +202,7 @@ void CaveDataGLView::initializeGL()
 {	
 	vm.caveData.initGL(this, isPrimary);
 
-	initializeOpenGLFunctions();
+	gl.initializeOpenGLFunctions();
 
 	if (clearProgram == nullptr)
 	{
@@ -233,23 +232,23 @@ void CaveDataGLView::paintGL()
 
 		glBindTexture(GL_TEXTURE_2D, pickingTexture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, width(), height(), 0, GL_RED_INTEGER, GL_INT, nullptr);		
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + 1, GL_TEXTURE_2D, pickingTexture, 0);
+		gl.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + 1, GL_TEXTURE_2D, pickingTexture, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		recreatePickingResources = false;
 	}
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + 1, GL_TEXTURE_2D, pickingTexture, 0);	
+	gl.glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + 1, GL_TEXTURE_2D, pickingTexture, 0);
 
 	GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT0 + 1 };
 
-	glDrawBuffers(2, bufs);
+	gl.glDrawBuffers(2, bufs);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	glDepthMask(GL_FALSE);
 	emptyVAO.bind();
 	clearProgram->bind();
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	clearProgram->release();
-	glDrawBuffers(1, bufs);
+	gl.glDrawBuffers(1, bufs);
 	glDepthMask(GL_TRUE);
 
 	renderSky();
@@ -274,9 +273,9 @@ void CaveDataGLView::paintGL()
 	}
 	
 	vm.caveData.drawSkeleton(this);
-	glDrawBuffers(2, bufs);
+	gl.glDrawBuffers(2, bufs);
 	vm.caveData.drawSkeletonPoints(this);
-	glDrawBuffers(1, bufs);
+	gl.glDrawBuffers(1, bufs);
 
 	if(vm.hoveredElement.get() > 0)
 		vm.caveData.drawCorrespondence(this, vm.hoveredElement.get() - 1);

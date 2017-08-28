@@ -37,14 +37,14 @@ struct CurveSkeleton
 	std::vector<Vertex> vertices;
 	std::vector<TEdge> edges;
 
-	MCF_SKELETON_API void SaveToObj(const char* filename);
-	MCF_SKELETON_API void SaveToObj(const char* filename, std::function<void(const Vertex&, int i, int& r, int& g, int& b)> colorFunc);
-	MCF_SKELETON_API void SaveToObj(const char* filename, std::function<void(const Vertex&, int i, int& r, int& g, int& b)> colorFunc, std::function<void(const Vertex& v, int i, float& newX, float& newY, float& newZ)> positionFunc);
+	MCF_SKELETON_API void SaveToObj(const char* filename) const;
+	MCF_SKELETON_API void SaveToObj(const char* filename, std::function<void(const Vertex&, int i, int& r, int& g, int& b)> colorFunc) const;
+	MCF_SKELETON_API void SaveToObj(const char* filename, std::function<void(const Vertex&, int i, int& r, int& g, int& b)> colorFunc, std::function<void(const Vertex& v, int i, float& newX, float& newY, float& newZ)> positionFunc) const;
 
-	MCF_SKELETON_API void SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh);
-	MCF_SKELETON_API void SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh, std::function<void(const Vertex&, int i, int& r, int& g, int& b)> colorFunc);
+	MCF_SKELETON_API void SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh) const;
+	MCF_SKELETON_API void SaveToObjWithCorrespondences(const char* filename, const std::string originalMesh, std::function<void(const Vertex&, int i, int& r, int& g, int& b)> colorFunc) const;
 
-	MCF_SKELETON_API void Save(const char* filename);
+	MCF_SKELETON_API void Save(const char* filename) const;
 };
 
 extern MCF_SKELETON_API CurveSkeleton* ComputeCurveSkeleton(const std::string filename, AbortHandle* abort, float edgeCollapseThreshold, float w_smooth = 1.0f, float w_velocity = 0.1f, float w_medial = 0.2f);

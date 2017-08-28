@@ -10,6 +10,72 @@
 
 #include <boost/filesystem/operations.hpp>
 
+void ReadOff(std::string filename, std::vector<Eigen::Vector3f>& vertices, std::vector<Triangle>& triangles, std::vector<IndexedTriangle>& triIndices)
+{
+	std::cout << "Reading file..." << std::endl;
+
+	std::ifstream f;
+	f.open(filename, std::ios::in);
+	if (!f.good())
+		throw;
+	std::string line;
+	int nVertices = -1, nFaces = -1, nEdges = -1;
+
+	std::vector<Eigen::Vector3f>::iterator nextVertex;
+	auto nextTriangle = triangles.begin();
+	auto nextTriIndex = triIndices.begin();
+
+	while (std::getline(f, line))
+	{
+		if (line.size() == 0)
+			continue;
+		if (line[0] == '#')
+			continue;
+		if (line == "OFF")
+			continue;
+
+		std::stringstream str(line);
+		if (nVertices < 0)
+		{
+			str >> nVertices >> nFaces >> nEdges;
+			vertices.resize(nVertices);
+			triangles.resize(nFaces);
+			triIndices.resize(nFaces);
+			nextVertex = vertices.begin();
+			nextTriangle = triangles.begin();
+			nextTriIndex = triIndices.begin();
+		}
+		else
+		{
+			if (nVertices > 0)
+			{
+				str >> nextVertex->x() >> nextVertex->y() >> nextVertex->z();
+				++nextVertex;
+				--nVertices;
+			}
+			else if (nFaces > 0)
+			{
+				int n, a, b, c;
+				str >> n >> a >> b >> c;
+				if (n != 3)
+					throw;
+				(*nextTriangle) = Triangle(
+					Point(vertices[a].x(), vertices[a].y(), vertices[a].z()),
+					Point(vertices[b].x(), vertices[b].y(), vertices[b].z()),
+					Point(vertices[c].x(), vertices[c].y(), vertices[c].z()));
+				(*nextTriIndex).i[0] = a;
+				(*nextTriIndex).i[1] = b;
+				(*nextTriIndex).i[2] = c;
+
+				++nextTriangle;
+				++nextTriIndex;
+				--nFaces;
+			}
+		}
+	}
+	f.close();
+}
+
 //Calculates the gradient field of sphereDistances over the sphere.
 void CalculateGradient(const RegularUniformSphereSampling& sphereSampling, const std::vector<std::vector<double>>& sphereDistances, std::vector<std::vector<Vector>>& distanceGradient)
 {
@@ -220,9 +286,27 @@ void CaveData::LoadMesh(const std::string & offFile)
 		}
 	}	
 
-	reset_bounding_box();
+	ResetBoundingBox();
 	for (auto& v : _meshVertices)
-		add_point(v.x(), v.y(), v.z());	
+		AddPoint(v);	
+}
+
+void CaveData::WriteMesh(const std::string& offFile, std::function<void(int i, int& r, int& g, int& b)> colorFunc) const
+{
+	WriteOff(offFile, MeshVertices(), MeshTriIndices(), colorFunc);
+}
+
+void CaveData::WriteSegmentationColoredOff(const std::string & path, const std::vector<int32_t>& segmentation) const
+{
+	auto colorFunc = [&](int i, int& r, int& g, int& b)
+	{
+		const int* color = ICaveData::GetSegmentColor(segmentation.at(i));
+		r = color[0];
+		g = color[1];
+		b = color[2];
+	};
+
+	WriteMesh(path.c_str(), [&](int i, int& r, int& g, int& b) {colorFunc(meshVertexCorrespondsTo[i], r, g, b); });
 }
 
 void CaveData::SetSkeleton(CurveSkeleton * skeleton)
@@ -564,42 +648,6 @@ void CaveData::ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount)
 
 	caveSizeDerivativesPerEdge.resize(edgeCount);
 	caveSizeCurvaturesPerEdge.resize(edgeCount);
-}
-
-int noSegmentColor[3] = { 128, 128, 128 };
-int segmentColors[10][3] =
-{
-	{ 166, 206, 227 },
-	{ 31,120,180 },
-	{ 251,154,153 },
-	{ 227,26,28 },
-	{ 253,191,111 },
-	{ 255,127,0 },
-	{ 202,178,214 },
-	{ 106,61,154 },
-	{ 255,255,153 },
-	{ 177,89,40 }
-};
-
-const int* CaveData::GetSegmentColor(int segmentIndex)
-{
-	if (segmentIndex < 0)
-		return noSegmentColor;
-	else
-		return segmentColors[segmentIndex % 10];
-}
-
-void CaveData::WriteSegmentationColoredOff(const std::string & path, const std::vector<int32_t>& segmentation)
-{
-	auto colorFunc = [&](int i, int& r, int& g, int& b)
-	{
-		const int* color = GetSegmentColor(segmentation[i]);
-		r = color[0];
-		g = color[1];
-		b = color[2];
-	};
-
-	WriteOff(path.c_str(), meshVertices(), meshTriIndices(), [&](int i, int& r, int& g, int& b) {colorFunc(meshVertexCorrespondsTo[i], r, g, b); });
 }
 
 void CaveData::CalculateBasicSkeletonData()

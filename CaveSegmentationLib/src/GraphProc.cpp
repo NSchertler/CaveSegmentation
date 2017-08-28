@@ -11,15 +11,15 @@ double gaussIntegrate(double standardDeviation, double lower, double upper)
 	return std::erf(upper / sqrt2sigma) - std::erf(lower / sqrt2sigma);
 }
 
-void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const IGraph& graph, std::set<EdgeOrientationDistance>& edgeSet, std::map<int, double>& distances)
+void addEdgeNeighborsToSet(const EdgeOrientationDistance& eod, double distanceAtTip, const IGraph& graph, std::set<EdgeOrientationDistance>& edgeSet, std::map<size_t, double>& distances)
 {
 	size_t v1, v2;
 	graph.IncidentVertices(eod.edge, v1, v2);
-	const int baseVertex = (eod.propagationReversed ? v2 : v1);
-	const int tipVertex = (eod.propagationReversed ? v1 : v2);
+	auto baseVertex = (eod.propagationReversed ? v2 : v1);
+	auto tipVertex = (eod.propagationReversed ? v1 : v2);
 	//propagation direction is baseVertex--->tipVertex
 
-	const std::vector<int>& adj = graph.AdjacentNodes(tipVertex);
+	auto& adj = graph.AdjacentNodes(tipVertex);
 
 	auto& tipPosition = graph.VertexPosition(tipVertex);
 	for (auto adjV : adj)

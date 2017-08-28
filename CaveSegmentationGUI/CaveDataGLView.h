@@ -9,7 +9,7 @@
 #include <QKeyEvent>
 
 //Main renderer
-class CaveDataGLView : public GLView, QOpenGLFunctions_3_3_Core 
+class CaveDataGLView : public GLView
 {
 public:
 	CaveDataGLView(ViewModel& vm, float eyeOffset = 0.0f, QWidget * parent = Q_NULLPTR, GLView* masterCam = nullptr);
@@ -32,11 +32,12 @@ protected slots:
 #endif
 
 private:
+	QOpenGLFunctions_3_3_Core gl;
+
 	virtual void paintGL();
 	virtual void initializeGL();
 
 	static std::unique_ptr<QOpenGLShaderProgram> clearProgram;
-	static std::unique_ptr<QOpenGLShaderProgram> skyProgram;
 	static std::unique_ptr<QOpenGLShaderProgram> markerProgram;
 	static std::unique_ptr<QOpenGLShaderProgram> cursorProgram;
 
