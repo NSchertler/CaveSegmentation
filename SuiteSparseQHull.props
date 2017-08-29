@@ -2,8 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <SUITESPARSE_ROOT>C:\Libraries\suitesparse</SUITESPARSE_ROOT>
-    <SUITESPARSE_INSTALL_DIR>$(SUITESPARSE_ROOT)/build/install</SUITESPARSE_INSTALL_DIR>
+    <SUITESPARSE_INSTALL_DIR>E:\Libraries\SuiteSparse\install-msvc14-x64</SUITESPARSE_INSTALL_DIR>
     <QHULL_ROOT>$(SolutionDir)/dependencies/qhull</QHULL_ROOT>
   </PropertyGroup>
   <PropertyGroup />
@@ -16,9 +15,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <BuildMacro Include="SUITESPARSE_ROOT">
-      <Value>$(SUITESPARSE_ROOT)</Value>
-    </BuildMacro>
     <BuildMacro Include="SUITESPARSE_INSTALL_DIR">
       <Value>$(SUITESPARSE_INSTALL_DIR)</Value>
     </BuildMacro>

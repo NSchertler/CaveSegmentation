@@ -1,17 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|x64">
       <Configuration>Release</Configuration>
@@ -27,44 +19,29 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="Shared" />
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="..\Qt.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\QtGLM.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="..\Qt.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="..\Qt.props" />
+    <Import Project="..\CGAL.props" />
+    <Import Project="..\SuiteSparseQHull.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="..\Qt.props" />
+    <Import Project="..\CGAL.props" />
+    <Import Project="..\SuiteSparseQHull.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -84,14 +61,14 @@
       <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(CGAL_DIR)\build\bin\CGAL_Core-vc140-mt-gd-4.9.dll" "$(TargetDir)"
-copy /Y "$(CGAL_DIR)\build\bin\CGAL-vc140-mt-gd-4.9.dll" "$(TargetDir)"
+      <Command>copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL_Core-vc140-mt-gd-4.9.dll" "$(TargetDir)"
+copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL-vc140-mt-gd-4.9.dll" "$(TargetDir)"
 
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libgfortran-3.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libquadmath-0.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libgcc_s_sjlj-1.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libgfortran-3.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libquadmath-0.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libgcc_s_sjlj-1.dll" "$(TargetDir)"
 
 copy /Y "$(QTDIR)\bin\Qt5Cored.dll" "$(TargetDir)"
 copy /Y "$(QTDIR)\bin\Qt5Guid.dll" "$(TargetDir)"
@@ -100,36 +77,6 @@ copy /Y "$(QTDIR)\bin\Qt5OpenGLd.dll" "$(TargetDir)"
 copy /Y "$(QTDIR)\bin\Qt5Concurrentd.dll" "$(TargetDir)"
 mkdir "$(TargetDir)platforms"
 copy /Y "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(TargetDir)platforms"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>QT_CORE_LIB;COPYDEPENDENCIESTOOUTPUT_LIB;UNICODE;WIN32;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <Optimization>Disabled</Optimization>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalOptions> /SUBSYSTEM:WINDOWS</AdditionalOptions>
-    </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(CGAL_DIR)\build\bin\CGAL_Core-vc140-mt-4.9.dll" "$(TargetDir)"
-copy /Y "$(CGAL_DIR)\build\bin\CGAL-vc140-mt-4.9.dll" "$(TargetDir)"
-
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libgfortran-3.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libquadmath-0.dll" "$(TargetDir)"
-
-copy /Y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(TargetDir)\platforms"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,14 +95,14 @@ copy /Y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(TargetDir)\platforms"</Comm
       <AdditionalDependencies>qtmain.lib;Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(CGAL_DIR)\build\bin\CGAL_Core-vc140-mt-4.9.dll" "$(TargetDir)"
-copy /Y "$(CGAL_DIR)\build\bin\CGAL-vc140-mt-4.9.dll" "$(TargetDir)"
+      <Command>copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL_Core-vc140-mt-4.9.dll" "$(TargetDir)"
+copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL-vc140-mt-4.9.dll" "$(TargetDir)"
 
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libgfortran-3.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libquadmath-0.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libgcc_s_sjlj-1.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libgfortran-3.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libquadmath-0.dll" "$(TargetDir)"
+copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libgcc_s_sjlj-1.dll" "$(TargetDir)"
 
 copy /Y "$(QTDIR)\bin\Qt5Core.dll" "$(TargetDir)"
 copy /Y "$(QTDIR)\bin\Qt5Gui.dll" "$(TargetDir)"
@@ -163,36 +110,6 @@ copy /Y "$(QTDIR)\bin\Qt5Widgets.dll" "$(TargetDir)"
 copy /Y "$(QTDIR)\bin\Qt5OpenGL.dll" "$(TargetDir)"
 copy /Y "$(QTDIR)\bin\Qt5Concurrent.dll" "$(TargetDir)"
 mkdir "$(TargetDir)platforms"
-copy /Y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(TargetDir)platforms"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PreprocessorDefinitions>QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;COPYDEPENDENCIESTOOUTPUT_LIB;UNICODE;WIN32;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat>
-      </DebugInformationFormat>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalOptions> /SUBSYSTEM:WINDOWS</AdditionalOptions>
-    </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(CGAL_DIR)\build\bin\CGAL_Core-vc140-mt-4.9.dll" "$(TargetDir)"
-copy /Y "$(CGAL_DIR)\build\bin\CGAL-vc140-mt-4.9.dll" "$(TargetDir)"
-
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libgfortran-3.dll" "$(TargetDir)"
-copy /Y "$(SUITESPARSE_ROOT)\lib64\lapack_blas_windows\libquadmath-0.dll" "$(TargetDir)"
-
 copy /Y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(TargetDir)platforms"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
