@@ -3,6 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <QTDIR>E:\Qt\5.9.1\msvc2015_64</QTDIR>
+    <GLM_ROOT>$(SolutionDir)\dependencies\glm</GLM_ROOT>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
@@ -10,12 +11,15 @@
       <AdditionalLibraryDirectories>$(QTDIR)\lib</AdditionalLibraryDirectories>
     </Link>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\dependencies\glm;$(ProjectDir)GeneratedFiles;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(GLM_ROOT);$(ProjectDir)GeneratedFiles;$(ProjectDir)GeneratedFiles\$(ConfigurationName);$(QTDIR)\include;$(QTDIR)\include\QtCore;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtGui</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="QTDIR">
       <Value>$(QTDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GLM_ROOT">
+      <Value>$(GLM_ROOT)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

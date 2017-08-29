@@ -4,11 +4,12 @@
   <PropertyGroup Label="UserMacros">
     <SUITESPARSE_ROOT>C:\Libraries\suitesparse</SUITESPARSE_ROOT>
     <SUITESPARSE_INSTALL_DIR>$(SUITESPARSE_ROOT)/build/install</SUITESPARSE_INSTALL_DIR>
+    <QHULL_ROOT>$(SolutionDir)/dependencies/qhull</QHULL_ROOT>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SUITESPARSE_INSTALL_DIR)/include/suitesparse;$(SolutionDir)/dependencies/qhull/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SUITESPARSE_INSTALL_DIR)/include/suitesparse;$(QHULL_ROOT)/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SUITESPARSE_INSTALL_DIR)/lib64/lapack_blas_windows;$(SUITESPARSE_INSTALL_DIR)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -20,6 +21,9 @@
     </BuildMacro>
     <BuildMacro Include="SUITESPARSE_INSTALL_DIR">
       <Value>$(SUITESPARSE_INSTALL_DIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="QHULL_ROOT">
+      <Value>$(QHULL_ROOT)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>
