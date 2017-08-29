@@ -2,20 +2,24 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <SUITESPARSE_BUILD_DIR>$(SUITESPARSE_ROOT)/build</SUITESPARSE_BUILD_DIR>
+    <SUITESPARSE_ROOT>C:\Libraries\suitesparse</SUITESPARSE_ROOT>
+    <SUITESPARSE_INSTALL_DIR>$(SUITESPARSE_ROOT)/build/install</SUITESPARSE_INSTALL_DIR>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SUITESPARSE_ROOT)/include/suitesparse;$(SolutionDir)/dependencies/qhull/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SUITESPARSE_INSTALL_DIR)/include/suitesparse;$(SolutionDir)/dependencies/qhull/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SUITESPARSE_ROOT)/lapack_windows/x64;$(SUITESPARSE_BUILD_DIR)/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SUITESPARSE_INSTALL_DIR)/lib64/lapack_blas_windows;$(SUITESPARSE_INSTALL_DIR)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <BuildMacro Include="SUITESPARSE_BUILD_DIR">
-      <Value>$(SUITESPARSE_BUILD_DIR)</Value>
+    <BuildMacro Include="SUITESPARSE_ROOT">
+      <Value>$(SUITESPARSE_ROOT)</Value>
+    </BuildMacro>
+    <BuildMacro Include="SUITESPARSE_INSTALL_DIR">
+      <Value>$(SUITESPARSE_INSTALL_DIR)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>
