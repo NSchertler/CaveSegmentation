@@ -137,8 +137,16 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cout << "Loading skeleton from " << skeletonFile << std::endl;
-		skeleton = LoadCurveSkeleton(skeletonFile.c_str());		
+		try
+		{
+			std::cout << "Loading skeleton from " << skeletonFile << std::endl;
+			skeleton = LoadCurveSkeleton(skeletonFile.c_str());
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Cannot load skeleton from " << skeletonFile << ": " << e.what() << std::endl;
+			return 3;
+		}
 	}
 	data->SetSkeleton(skeleton);
 	
@@ -153,8 +161,16 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		std::cout << "Loading distances from " << distancesFile << std::endl;
-		data->LoadDistances(distancesFile);
+		try
+		{
+			std::cout << "Loading distances from " << distancesFile << std::endl;
+			data->LoadDistances(distancesFile);
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Cannot load distances from " << distancesFile << ": " << e.what() << std::endl;
+			return 4;
+		}
 	}
 	std::cout << "Smoothing and deriving distances..." << std::endl;
 	data->SmoothAndDeriveDistances();

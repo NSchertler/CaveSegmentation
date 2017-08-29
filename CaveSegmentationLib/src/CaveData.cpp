@@ -561,6 +561,8 @@ void CaveData::LoadDistances(const std::string & file)
 	std::cout << "Loading distances from file..." << std::endl;
 
 	std::ifstream distanceFile(file.c_str(), std::ios::binary);
+	if (!distanceFile.good())
+		throw std::exception("Cannot open file");
 	distanceFile.read(reinterpret_cast<char*>(&maxDistances[0]), sizeof(double) * maxDistances.size());
 	distanceFile.read(reinterpret_cast<char*>(&minDistances[0]), sizeof(double) * minDistances.size());
 	distanceFile.read(reinterpret_cast<char*>(&meanDistances[0]), sizeof(double) * meanDistances.size());
@@ -571,6 +573,8 @@ void CaveData::LoadDistances(const std::string & file)
 void CaveData::SaveDistances(const std::string & file) const
 {
 	std::ofstream distanceFile(file.c_str(), std::ios::binary);
+	if (!distanceFile.good())
+		throw std::exception("Cannot open file");
 	distanceFile.write(reinterpret_cast<const char*>(&maxDistances[0]), sizeof(double) * maxDistances.size());
 	distanceFile.write(reinterpret_cast<const char*>(&minDistances[0]), sizeof(double) * minDistances.size());
 	distanceFile.write(reinterpret_cast<const char*>(&meanDistances[0]), sizeof(double) * meanDistances.size());

@@ -79,7 +79,7 @@ CurveSkeleton* LoadCurveSkeleton(const char* filename)
 {
 	FILE* f = fopen(filename, "rb");
 	if (f == nullptr)
-		throw;
+		throw std::exception("Cannot open file");
 
 	auto skel = new CurveSkeleton();
 
