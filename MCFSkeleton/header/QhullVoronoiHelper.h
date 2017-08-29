@@ -58,7 +58,7 @@ public:
 		{
 			if (f.isUpperDelaunay()) continue;
 
-			QhullPoint qhpnt = f.voronoiVertex(qhull.runId());
+			QhullPoint qhpnt = f.voronoiVertex();
 			Vector3 p(qhpnt[0], qhpnt[1], qhpnt[2]);
 
 			if (!mesh->bbox().contains(p)) continue;

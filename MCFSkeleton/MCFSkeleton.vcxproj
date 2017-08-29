@@ -65,7 +65,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libamdd.lib;libcamdd.lib;libccolamdd.lib;libcholmodd.lib;libcolamdd.lib;suitesparseconfigd.lib;lapack_blas_windows/libblas.lib;lapack_blas_windows/liblapack.lib;metis.lib;qhullcppd.lib;qhullstatic_pd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libamdd.lib;libcamdd.lib;libccolamdd.lib;libcholmodd.lib;libcolamdd.lib;suitesparseconfigd.lib;lapack_blas_windows/libblas.lib;lapack_blas_windows/liblapack.lib;metis.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -84,7 +84,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libamd.lib;libcamd.lib;libccolamd.lib;libcholmod.lib;libcolamd.lib;suitesparseconfig.lib;metis.lib;lapack_blas_windows/libblas.lib;lapack_blas_windows/liblapack.lib;qhullcpp.lib;qhullstatic_p.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libamd.lib;libcamd.lib;libccolamd.lib;libcholmod.lib;libcolamd.lib;suitesparseconfig.lib;metis.lib;lapack_blas_windows/libblas.lib;lapack_blas_windows/liblapack.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
@@ -119,6 +119,14 @@
     <ClCompile Include="src\surface_mesh\IO_stl.cpp" />
     <ClCompile Include="src\surface_mesh\Surface_mesh.cpp" />
     <ClCompile Include="src\WingedEdgeMeshModel.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\dependencies\qhullcpp-64.vcxproj">
+      <Project>{939f1f43-f252-486c-bb92-3166e44713a5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\dependencies\qhullstatic-64.vcxproj">
+      <Project>{f9af9bc6-2ca5-4e0c-982b-cf7974723a0b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

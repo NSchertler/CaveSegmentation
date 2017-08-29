@@ -11,3 +11,6 @@
 	path = dependencies/eigen
 	url = https://github.com/RLovelett/eigen.git
 	branch = branches/3.3
+[submodule "dependencies/qhull"]
+	path = dependencies/qhull
+	url = https://github.com/qhull/qhull
