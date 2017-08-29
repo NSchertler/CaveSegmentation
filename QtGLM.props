@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <QTDIR>E:\Qt\5.9.1\msvc2015_64</QTDIR>
     <GLM_ROOT>$(SolutionDir)\dependencies\glm</GLM_ROOT>
   </PropertyGroup>
   <PropertyGroup />
@@ -15,9 +14,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <BuildMacro Include="QTDIR">
-      <Value>$(QTDIR)</Value>
-    </BuildMacro>
     <BuildMacro Include="GLM_ROOT">
       <Value>$(GLM_ROOT)</Value>
     </BuildMacro>

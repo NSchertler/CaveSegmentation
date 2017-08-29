@@ -2,8 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <CGAL_INSTALL_DIR>$(CGAL_DIR)/install</CGAL_INSTALL_DIR>
-    <CGAL_VERSION>4.10</CGAL_VERSION>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup>
@@ -15,11 +13,5 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <BuildMacro Include="CGAL_INSTALL_DIR">
-      <Value>$(CGAL_INSTALL_DIR)</Value>
-    </BuildMacro>
-    <BuildMacro Include="CGAL_VERSION">
-      <Value>$(CGAL_VERSION)</Value>
-    </BuildMacro>
   </ItemGroup>
 </Project>
