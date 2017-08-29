@@ -12,7 +12,6 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{396D6EDD-CF62-4315-A64A-6DE77FF7AB86}</ProjectGuid>
-    <Keyword>Qt4VSv1.0</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -45,24 +44,9 @@
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_CORE_LIB;COPYDEPENDENCIESTOOUTPUT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <Optimization>Disabled</Optimization>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>qtmaind.lib;Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL_Core-vc140-mt-gd-4.9.dll" "$(TargetDir)"
-copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL-vc140-mt-gd-4.9.dll" "$(TargetDir)"
+      <Command>copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL_Core-vc140-mt-gd-$(CGAL_VERSION).dll" "$(TargetDir)"
+copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL-vc140-mt-gd-$(CGAL_VERSION).dll" "$(TargetDir)"
 
 copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
 copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
@@ -80,23 +64,9 @@ copy /Y "$(QTDIR)\plugins\platforms\qwindowsd.dll" "$(TargetDir)platforms"</Comm
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <PreprocessorDefinitions>UNICODE;WIN32;WIN64;QT_NO_DEBUG;NDEBUG;QT_CORE_LIB;COPYDEPENDENCIESTOOUTPUT_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\GeneratedFiles;.;$(QTDIR)\include;.\GeneratedFiles\$(ConfigurationName);$(QTDIR)\include\QtCore;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <DebugInformationFormat />
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <OutputFile>$(OutDir)\$(ProjectName).dll</OutputFile>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <AdditionalDependencies>qtmain.lib;Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL_Core-vc140-mt-4.9.dll" "$(TargetDir)"
-copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL-vc140-mt-4.9.dll" "$(TargetDir)"
+      <Command>copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL_Core-vc140-mt-$(CGAL_VERSION).dll" "$(TargetDir)"
+copy /Y "$(CGAL_INSTALL_DIR)\bin\CGAL-vc140-mt-$(CGAL_VERSION).dll" "$(TargetDir)"
 
 copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\libblas.dll" "$(TargetDir)"
 copy /Y "$(SUITESPARSE_INSTALL_DIR)\lib64\lapack_blas_windows\liblapack.dll" "$(TargetDir)"
@@ -118,9 +88,4 @@ copy /Y "$(QTDIR)\plugins\platforms\qwindows.dll" "$(TargetDir)platforms"</Comma
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties MocDir=".\GeneratedFiles\$(ConfigurationName)" UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" lupdateOptions="" lupdateOnBuild="0" lreleaseOptions="" Qt5Version_x0020_Win32="5.9.1-msvc2015" Qt5Version_x0020_x64="5.9.1-msvc2015x64" MocOptions="" />
-    </VisualStudio>
-  </ProjectExtensions>
 </Project>
