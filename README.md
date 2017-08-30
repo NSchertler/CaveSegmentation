@@ -255,6 +255,6 @@ To visualize the evaluation result with a Parallel Coordinates rendering, simply
   [software]: doc/Dependencies.jpg
   [gui]: doc/CaveSegmentationGUI.JPG
   [service]: doc/ManualCaveSegmentationService.JPG
-  [download]: doc/ManualCaveSegmentationDownload.JPG
-  [paint]: doc/ManualCaveSegmentationPaint.JPG
+  [download]: doc/ManualSegmentationDownload.JPG
+  [paint]: doc/ManualSegmentationPaint.JPG
   [pc]: doc/PCPlot.JPG
