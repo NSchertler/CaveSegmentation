@@ -86,6 +86,12 @@ private:
 	AbortHandle skeletonAbort;
 	QFutureWatcher<CurveSkeleton*> skeletonWatcher;
 	QFuture<CurveSkeleton*> skeletonComputation;
+
+	double defaultCaveScaleKernelFactor;
+	double defaultCaveSizeKernelFactor;
+	double defaultCaveSizeDerivativeKernelFactor;
+	double defaultTippingCurvature;
+	double defaultDirectionTolerance;
 };
 
 class Secondary : public QMainWindow

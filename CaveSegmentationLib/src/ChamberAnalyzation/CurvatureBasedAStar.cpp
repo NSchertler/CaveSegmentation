@@ -409,10 +409,11 @@ static void VisualizeState(const State* state, const std::vector<Patch>& patches
 #endif
 }
 
-void CurvatureBasedAStar::FindChambers(const ICaveData& data, std::vector<int>& segmentation)
+void CurvatureBasedAStar::FindChambers(const ICaveData& data, std::vector<int>& segmentation, bool verbose)
 {
 	//Contract the graph at non-local maximum edges
-	std::cout << "Contracting graph..." << std::endl;
+	if(verbose)
+		std::cout << "Contracting graph..." << std::endl;
 
 	std::vector<bool> keepEdge(data.Skeleton()->edges.size());
 
@@ -528,7 +529,8 @@ void CurvatureBasedAStar::FindChambers(const ICaveData& data, std::vector<int>& 
 
 			VisualizeState(currentState, patches, edges, data.Skeleton()->vertices, "Iteration" + std::to_string(iteration) + "_Base.png");
 
-			std::cout << "current optimum: " << minimumEnergy << "; current energy: " << currentState->currentEnergy.Sum() << "; lower bound: " << currentState->minEnergyAtTarget.Sum() << "; open states: " << openStates.size() << "; seeds: " << currentState->seeds.size() << "; entrances: " << currentState->entrances.size() << "     ";
+			if(verbose)
+				std::cout << "current optimum: " << minimumEnergy << "; current energy: " << currentState->currentEnergy.Sum() << "; lower bound: " << currentState->minEnergyAtTarget.Sum() << "; open states: " << openStates.size() << "; seeds: " << currentState->seeds.size() << "; entrances: " << currentState->entrances.size() << "     ";
 			std::cout << std::endl;
 
 			if (currentState->minEnergyAtTarget.Sum() >= 0.99 * minimumEnergy)
@@ -581,7 +583,8 @@ void CurvatureBasedAStar::FindChambers(const ICaveData& data, std::vector<int>& 
 			iteration++;
 		}
 
-		std::cout << "Total states: " << visitedStates.size() << std::endl;
+		if(verbose)
+			std::cout << "Total states: " << visitedStates.size() << std::endl;
 
 		//Clean up
 		for (auto state : visitedStates)
@@ -590,10 +593,12 @@ void CurvatureBasedAStar::FindChambers(const ICaveData& data, std::vector<int>& 
 	std::cout << std::endl;
 	if (optimalState)
 	{
-		std::cout << "Optimal state: " << optimalState->currentEnergy.Sum() << std::endl;
+		if(verbose)
+			std::cout << "Optimal state: " << optimalState->currentEnergy.Sum() << std::endl;
 		VisualizeState<false>(optimalState, patches, edges, data.Skeleton()->vertices, "optimum.png");
 	}
 	else
-		std::cout << "No optimal solution exists." << std::endl;
+		if(verbose)
+			std::cout << "No optimal solution exists." << std::endl;
 
 }

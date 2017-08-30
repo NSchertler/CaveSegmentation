@@ -187,7 +187,7 @@ void FindStrongLocalExtrema(const RegularUniformSphereSampling& sphereSampling, 
 }
 
 CaveData::CaveData()
-	: skeleton(nullptr),
+	: skeleton(nullptr), verbose(true),
 	  sphereSampling(SPHERE_SAMPLING_RESOLUTION),
 	  CAVE_SCALE_KERNEL_FACTOR(10.0), CAVE_SIZE_KERNEL_FACTOR(0.2), CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR(0.2), CAVE_SCALE_ALGORITHM(CaveData::Max)
 {
@@ -368,12 +368,11 @@ bool CaveData::CalculateDistancesSingleVertex(int iVert, float exponent, std::ve
 		double visDist = sqrt(GetSqrDistanceToMesh(Point(vert.position.x(), vert.position.y(), vert.position.z()), *it, _meshAABBTree));
 		if (isinf(visDist))
 		{
-#ifndef NON_VERBOSE
+			if(verbose)
 #pragma omp critical
 			{
 				std::cout << "Skeleton vertex " << iVert << " lies outside of mesh!" << std::endl;
 			}
-#endif
 
 			maxDistances.at(iVert) = std::numeric_limits<double>::quiet_NaN();
 			minDistances.at(iVert) = std::numeric_limits<double>::quiet_NaN();
@@ -495,9 +494,8 @@ template bool CaveData::CalculateDistancesSingleVertex<VoidSphereVisualizer>(int
 //Calculates the cave sizes for the entire skeleton and stores them in caveSizeUnsmoothed.
 bool CaveData::CalculateDistances(float exponent)
 {	
-#ifndef NON_VERBOSE
-	std::cout << "Calculating distances..." << std::endl;
-#endif
+	if(verbose)
+		std::cout << "Calculating distances..." << std::endl;
 
 	invalidVertices.clear();
 
@@ -520,9 +518,8 @@ bool CaveData::CalculateDistances(float exponent)
 		}
 	}
 
-#ifndef NON_VERBOSE
-	std::cout << "Finished." << std::endl;
-#endif
+	if(verbose)
+		std::cout << "Finished." << std::endl;	
 
 	std::deque<int> invalidWork(invalidVertices.begin(), invalidVertices.end());
 	//TODO: instead of reconstruction, move skeleton vertices inside shape
@@ -588,9 +585,8 @@ void CaveData::SmoothAndDeriveDistances()
 	if (skeleton == nullptr)
 		return;
 
-#ifndef NON_VERBOSE
-	std::cout << "Smoothing distances..." << std::endl;
-#endif
+	if(verbose)
+		std::cout << "Smoothing distances..." << std::endl;
 
 	std::vector<double> smoothWorkDouble(std::max(skeleton->vertices.size(), skeleton->edges.size()));
 
@@ -623,9 +619,8 @@ void CaveData::SmoothAndDeriveDistances()
 	//Derive second derivatives: caveSizeCurvaturesPerEdge <- derive(caveSizeDerivativesPerEdge)
 	derivePerEdge<double, true>(*this, caveSizeDerivativesPerEdge, caveSizeCurvaturesPerEdge);
 
-#ifndef NON_VERBOSE
-	std::cout << "Finished smoothing." << std::endl;
-#endif
+	if(verbose)
+		std::cout << "Finished smoothing." << std::endl;
 }
 
 void CaveData::SetOutputDirectory(const std::wstring & outputDirectory)
@@ -656,7 +651,8 @@ void CaveData::ResizeSkeletonAttributes(size_t vertexCount, size_t edgeCount)
 
 void CaveData::CalculateBasicSkeletonData()
 {
-	std::cout << "Calculating adjacency list..." << std::endl;
+	if(verbose)
+		std::cout << "Calculating adjacency list..." << std::endl;
 
 	for (int iEdge = 0; iEdge < skeleton->edges.size(); ++iEdge)
 	{
@@ -727,5 +723,6 @@ void CaveData::CalculateBasicSkeletonData()
 		nodeRadii.at(iVert) = nodeRadius / adj.size();
 	}
 
-	std::cout << "Finished correspondences." << std::endl;
+	if(verbose)
+		std::cout << "Finished correspondences." << std::endl;
 }

@@ -73,6 +73,8 @@ struct CaveData : public virtual ICaveData, public BoundingBoxAccumulator
 	double& CaveSizeDerivativeKernelFactor() { return CAVE_SIZE_DERIVATIVE_KERNEL_FACTOR; }
 
 	const std::vector<size_t>& VerticesWithInvalidSize() const { return invalidVertices; }
+
+	void SetVerbose(bool verbose) { this->verbose = verbose; }
 protected:
 
 	template <typename TSphereVisualizer = VoidSphereVisualizer>
@@ -134,4 +136,6 @@ protected:
 	Tree _meshAABBTree;
 
 	std::wstring outputDirectoryW;
+
+	bool verbose;
 };

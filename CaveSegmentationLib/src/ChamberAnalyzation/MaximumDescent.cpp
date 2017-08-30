@@ -32,7 +32,7 @@ bool MaximumDescentDFS(int currentVertex, double passageSize, TAccessor accessor
 	return finalResult;
 }
 
-void MaximumDescent::FindChambers(const ICaveData& data, std::vector<int>& segmentation)
+void MaximumDescent::FindChambers(const ICaveData& data, std::vector<int>& segmentation, bool verbose)
 {
 	struct Maximum
 	{
@@ -86,7 +86,8 @@ void MaximumDescent::FindChambers(const ICaveData& data, std::vector<int>& segme
 		if (segmentation[maximumId] != NO_SEGMENTATION)
 			continue;
 
-		std::cout << "Searching entry with size " << passageSize << " for maximum." << std::endl;
+		if(verbose)
+			std::cout << "Searching entry with size " << passageSize << " for maximum." << std::endl;
 
 		std::vector<int> visitedNodes;
 
@@ -96,7 +97,8 @@ void MaximumDescent::FindChambers(const ICaveData& data, std::vector<int>& segme
 
 		if (foundAdjacentPassage)
 		{
-			std::cout << "Found entry." << std::endl;
+			if(verbose)
+				std::cout << "Found entry." << std::endl;
 			for (int vId : visitedNodes)
 			{
 				segmentation[vId] = nextCaveId;

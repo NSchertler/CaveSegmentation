@@ -5,9 +5,10 @@
 
 #include <iostream>
 
-void SizeBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& segmentation)
+void SizeBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& segmentation, bool verbose)
 {
-	std::cout << "Building graphical model..." << std::endl;
+	if(verbose)
+		std::cout << "Building graphical model..." << std::endl;
 
 	opengm::DiscreteSpace<> labelSpace;
 	typedef opengm::GraphicalModel<double, opengm::Adder> Model;
@@ -94,7 +95,8 @@ void SizeBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& segmen
 		gm.addFactor(gm.addFunction(pairwiseFunction), nodes, nodes + 2);
 	}
 
-	std::cout << "Solving minimization problem..." << std::endl;
+	if(verbose)
+		std::cout << "Solving minimization problem..." << std::endl;
 
 	typedef opengm::external::QPBO<Model> Optimizer;
 
@@ -106,7 +108,8 @@ void SizeBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& segmen
 	Optimizer optimizer(gm, param);
 	optimizer.infer();
 
-	std::cout << "Generating output..." << std::endl;
+	if(verbose)
+		std::cout << "Generating output..." << std::endl;
 
 	std::vector<size_t> argmin;
 	optimizer.arg(argmin);

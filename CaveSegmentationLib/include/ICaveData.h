@@ -64,6 +64,8 @@ public:
 	virtual double CaveSizeDerivative(size_t iEdge) const = 0;
 	virtual double CaveSizeCurvature(size_t iEdge) const = 0;
 
+	virtual void SetVerbose(bool verbose) = 0;
+
 	//Returns the default color for a segment as a 3-component RGB array.
 	static const int* GetSegmentColor(int segmentIndex);
 

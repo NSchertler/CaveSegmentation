@@ -2,6 +2,7 @@
 
 #include <ChamberAnalyzation/CurvatureBasedQPBO.h>
 #include <ChamberAnalyzation/Utils.h>
+#include <ChamberAnalyzation/energies.h>
 #include <FileInputOutput.h>
 
 #include <boost/filesystem.hpp>
@@ -11,17 +12,24 @@
 
 void PrintHelp()
 {
-	std::cout << "Usage: CaveSegmentationCommandLine [options] [dataDirectory]" << std::endl;
-	std::cout << "Options: " << std::endl;
-	std::cout << "\t-d [dataDirectory]    The data directory must contain a \"model.off\"." << std::endl;
-	std::cout << "\t                      The skeleton location is \"[dataDirectory]/model.skel\"." << std::endl;
-	std::cout << "\t                      The distance data location is \"[dataDirectory]/distances.bin\"." << std::endl;
-	std::cout << "\t--calcSkel            Specify this to calculate the skeleton and save it to file. Otherwise, it will be loaded from a file." << std::endl;
-	std::cout << "\t--calcDist            Specify this to calculate distance data and save them to file. Otherwise, they will be loaded from a file." << std::endl;
-	std::cout << "\t--edgeLength [float]  Specify the edge collapse threshold for skeleton calculation in percent of the model's bounding box diagonal." << std::endl;
-	std::cout << "\t--wsmooth [float]    Specify the smoothing weight for skeleton calculation." << std::endl;
-	std::cout << "\t--wvelocity [float]  Specify the velocity weight for skeleton calculation." << std::endl;
-	std::cout << "\t--wmedial [float]    Specify the medial weight for skeleton calculation." << std::endl;
+	std::cout << "Usage: CaveSegmentationCommandLine [options]" << std::endl;
+	std::cout << "Obligatory Options: " << std::endl;
+	std::cout << "\t-d [dataDirectory]     The data directory must contain a \"model.off\"." << std::endl;	
+	std::cout << "\t                       The skeleton location is \"[dataDirectory]/model.skel\"." << std::endl;
+	std::cout << "\t                       The distance data location is \"[dataDirectory]/distances.bin\"." << std::endl;
+	std::cout << "Optional Options: " << std::endl;
+	std::cout << "\t--calcSkel             Specify this to calculate the skeleton and save it to file. Otherwise, it will be loaded from a file." << std::endl;
+	std::cout << "\t--calcDist             Specify this to calculate distance data and save them to file. Otherwise, they will be loaded from a file." << std::endl;
+	std::cout << "\t--edgeLength [float]   Specify the edge collapse threshold for skeleton calculation in percent of the model's bounding box diagonal." << std::endl;
+	std::cout << "\t--wsmooth [float]      Specify the smoothing weight for skeleton calculation." << std::endl;
+	std::cout << "\t--wvelocity [float]    Specify the velocity weight for skeleton calculation." << std::endl;
+	std::cout << "\t--wmedial [float]      Specify the medial weight for skeleton calculation." << std::endl;
+	std::cout << "\t--exp [float]          Specify the exponent for distance calculation." << std::endl;
+	std::cout << "\t--scaleKernel [float]  Specify the width of the cave scale kernel (mu_scale from paper)." << std::endl;
+	std::cout << "\t--sizeKernel [float]   Specify the width of the cave size kernel (mu_size from the paper)." << std::endl;
+	std::cout << "\t--derivKernel [float]  Specify the width of the cave size derivative kernel (mu_size' from the paper)." << std::endl;
+	std::cout << "\t--curvatureTip [float] Specify the curvature tipping point (theta_tip from the paper)." << std::endl;
+	std::cout << "\t--dirTol [float]       Specify the direction tolerance (theta_dir from the paper)." << std::endl;
 	std::cout << "All output will be saved in \"[dataDirectory]/output\"." << std::endl;
 }
 
@@ -35,6 +43,10 @@ int main(int argc, char* argv[])
 	float w_smooth = 1.0f;
 	float w_velocity = 20.0f;
 	float w_medial = 1.0f;
+
+	float exponent = 1.0f;
+
+	auto data = CreateCaveData();
 
 	if (argc < 2)
 	{
@@ -75,6 +87,36 @@ int main(int argc, char* argv[])
 				w_medial = std::stof(argv[i + 1]);
 				++i;
 			}
+			else if (strcmp(argv[i], "--exp") == 0)
+			{
+				exponent = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--scaleKernel") == 0)
+			{
+				data->CaveScaleKernelFactor() = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--sizeKernel") == 0)
+			{
+				data->CaveSizeKernelFactor() = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--derivKernel") == 0)
+			{
+				data->CaveSizeDerivativeKernelFactor() = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--curvatureTip") == 0)
+			{
+				Energies::CURVATURE_TIP_POINT = std::stof(argv[i + 1]);
+				++i;
+			}
+			else if (strcmp(argv[i], "--dirTol") == 0)
+			{
+				Energies::DIRECTION_TOLERANCE = std::stof(argv[i + 1]);
+				++i;
+			}
 		}
 	}
 
@@ -102,8 +144,7 @@ int main(int argc, char* argv[])
 	const std::string segmentationFile = outputDirectory + "/segmentation.seg";
 
 	std::cout << "Model file: " << offFile << std::endl;
-
-	auto data = CreateCaveData();
+	
 	try
 	{
 		data->LoadMesh(offFile);
@@ -152,9 +193,10 @@ int main(int argc, char* argv[])
 	
 	
 	if (calculateDistances)
-	{
+	{		
 		std::cout << "Calculating distances..." << std::endl;
-		data->CalculateDistances();
+		std::cout << "Using exponent " << exponent << std::endl;
+		data->CalculateDistances(exponent);
 
 		std::cout << "Saving distances to " << distancesFile << std::endl;
 		data->SaveDistances(distancesFile);
@@ -172,10 +214,15 @@ int main(int argc, char* argv[])
 			return 4;
 		}
 	}
-	std::cout << "Smoothing and deriving distances..." << std::endl;
+	std::cout << "Smoothing distances and deriving additional measures..." << std::endl;
+	std::cout << "Using cave scale kernel factor " << data->CaveScaleKernelFactor() << std::endl;
+	std::cout << "Using cave size kernel factor " << data->CaveSizeKernelFactor() << std::endl;
+	std::cout << "Using cave size derivative kernel factor " << data->CaveSizeDerivativeKernelFactor() << std::endl;
 	data->SmoothAndDeriveDistances();
 	
 	std::cout << "Finding chambers..." << std::endl;
+	std::cout << "Using curvature tipping point " << Energies::CURVATURE_TIP_POINT << std::endl;
+	std::cout << "Using direction tolerance " << Energies::DIRECTION_TOLERANCE << std::endl;
 
 	std::vector<int> segmentation;
 	CurvatureBasedQPBO::FindChambers(*data, segmentation);

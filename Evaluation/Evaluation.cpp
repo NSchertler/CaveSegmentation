@@ -12,20 +12,23 @@ struct CaveInfo
 {
 	CaveInfo(std::string dataDirectory)
 	{
+		data = CreateCaveData();
+
 		const std::string offFile = dataDirectory + "/model.off";
 		const std::string skeletonFile = dataDirectory + "/model.skel";
 
 		data->LoadMesh(offFile);
+		data->SetVerbose(false);
 
 		CurveSkeleton* skeleton = LoadCurveSkeleton(skeletonFile.c_str());
 		data->SetSkeleton(skeleton);
 
-		chamberProbability.resize(data->NumberOfVertices(), 0.5);
+		chamberProbability.resize(data->MeshVertices().size(), 0.5);
 		segmentation.resize(data->NumberOfVertices());
 
 		boost::filesystem::path p(dataDirectory + "/segmentations");
 		int nSegs = 0;
-		std::vector<int> manualSeg(data->NumberOfVertices());
+		std::vector<int> manualSeg(data->MeshVertices().size());
 		for (auto it = boost::filesystem::directory_iterator(p); it != boost::filesystem::directory_iterator(); ++it)
 		{
 			boost::filesystem::path file = *it;
@@ -57,7 +60,7 @@ struct CaveInfo
 
 	void segment()
 	{
-		CurvatureBasedQPBO::FindChambers(*data, segmentation);
+		CurvatureBasedQPBO::FindChambers(*data, segmentation, false);
 	}
 
 	float segmentationPlausability() const
@@ -213,7 +216,15 @@ int main(int argc, char* argv[])
 	for (int i = 1; i < argc; ++i)
 	{
 		std::cout << "Loading \"" << argv[i] << "\".." << std::endl;
-		caves.push_back(new CaveInfo(std::string(argv[i])));		
+		try
+		{
+			caves.push_back(new CaveInfo(std::string(argv[i])));
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << "Failed to load cave data: " << e.what() << std::endl;
+			return -2;
+		}
 	}
 
 	std::vector<float> plausabilities(caves.size());
@@ -227,6 +238,11 @@ int main(int argc, char* argv[])
 
 	ParameterRange<float>* configurableRanges[] = { &powerRange, &scaleRange, &sizeRange, &sizeDerivativeRange, &tipPointRange, &directionToleranceRange };
 	std::ifstream config("config.txt");
+	if (!config.good())
+	{
+		std::cerr << "Cannot open config.txt.";
+		return -1;
+	}
 
 	std::string line;
 	std::getline(config, line);

@@ -20,7 +20,7 @@ void propagateDistance(const ICaveData& data, int vertex, double currentDistance
 	}
 }
 
-void CurvatureBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& segmentation)
+void CurvatureBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& segmentation, bool verbose)
 {
 	/*std::cout << "Calculating distances from ends" << std::endl;
 
@@ -84,9 +84,10 @@ void CurvatureBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& s
 			++nonsubmodular;
 	}
 
-#ifndef NON_VERBOSE
-	std::cout << "Solving minimization problem (" << gm.numberOfFactors() << " factors, " << nonsubmodular << " non-submodular, " << gm.numberOfVariables() << " variables) ..." << std::endl;
-#endif
+
+	if(verbose)
+		std::cout << "Solving minimization problem (" << gm.numberOfFactors() << " factors, " << nonsubmodular << " non-submodular, " << gm.numberOfVariables() << " variables) ..." << std::endl;
+
 
 	typedef opengm::external::QPBO<Model> Optimizer;
 
@@ -98,9 +99,9 @@ void CurvatureBasedQPBO::FindChambers(const ICaveData& data, std::vector<int>& s
 	Optimizer optimizer(gm, param);
 	optimizer.infer();
 
-#ifndef NON_VERBOSE
-	std::cout << "Generating output..." << std::endl;
-#endif
+	if(verbose)
+		std::cout << "Generating output..." << std::endl;
+
 
 	std::vector<size_t> argmin;
 	optimizer.arg(argmin);

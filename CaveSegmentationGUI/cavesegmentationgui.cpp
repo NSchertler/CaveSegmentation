@@ -25,6 +25,12 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 	ui.chkLookThrough->setChecked(vm.getLookThrough());
 	connect(ui.chkLookThrough, &QCheckBox::stateChanged, this, &CaveSegmentationGUI::lookThroughChanged);
 
+	defaultCaveScaleKernelFactor = vm.caveScaleKernelFactor.get();
+	defaultCaveSizeKernelFactor = vm.caveSizeKernelFactor.get();
+	defaultCaveSizeDerivativeKernelFactor = vm.caveSizeDerivativeKernelFactor.get();
+	defaultTippingCurvature = vm.tippingCurvature.get();
+	defaultDirectionTolerance = vm.directionTolerance.get();
+
 	vm.distanceExponent.set(1.0f);
 	vm.distanceExponent.setupLabel(ui.lblDistanceExponent);
 	vm.distanceExponent.setupSlider(ui.sldDistanceExponent, 0.5f, 3.0f, 0.1f);
@@ -337,11 +343,11 @@ void CaveSegmentationGUI::segmentationParametersChanged()
 
 void CaveSegmentationGUI::resetToDefaults()
 {
-	vm.caveScaleKernelFactor.set(10.0);
-	vm.caveSizeKernelFactor.set(0.2);
-	vm.caveSizeDerivativeKernelFactor.set(0.2);
-	vm.tippingCurvature.set(0.3);
-	vm.directionTolerance.set(0.1);
+	vm.caveScaleKernelFactor.set(defaultCaveScaleKernelFactor);
+	vm.caveSizeKernelFactor.set(defaultCaveSizeKernelFactor);
+	vm.caveSizeDerivativeKernelFactor.set(defaultCaveSizeDerivativeKernelFactor);
+	vm.tippingCurvature.set(defaultTippingCurvature);
+	vm.directionTolerance.set(defaultDirectionTolerance);
 }
 
 void CaveSegmentationGUI::saveSegmentation()

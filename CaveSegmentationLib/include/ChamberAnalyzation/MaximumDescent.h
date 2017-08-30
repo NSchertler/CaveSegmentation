@@ -12,5 +12,5 @@ class CAVESEGMENTATIONLIB_API MaximumDescent
 	
 
 public:
-	static void FindChambers(const ICaveData& data, std::vector<int>& segmentation);
+	static void FindChambers(const ICaveData& data, std::vector<int>& segmentation, bool verbose = true);
 };

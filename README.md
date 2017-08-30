@@ -7,7 +7,7 @@ This repository contains the source code for the following research papers:
 
 and
 
-> **Deterministically Defining Chambers in 3D-Scans of Caves ** <br/>
+> **Deterministically Defining Chambers in 3D-Scans of Caves** <br/>
 > Nico Schertler, Manfred Buchroithner, Donald McFarlane, Guy van Rentergem, Joyce Lundberg, Stefan Gumhold <br/>
 > International Congress of Speleology, 2017 <br/>
 
@@ -146,16 +146,21 @@ The same functionality of the interactive GUI can be used from the command line 
 
     > .\CaveSegmentationCommandLine.exe -d ../../Data/SyntheticCave
 
-	Model file: ../../Data/SyntheticCave/model.off
     3154 direction samples.
+    Model file: ../../Data/SyntheticCave/model.off
     Loading from cache instead of OFF...
     Loading skeleton from ../../Data/SyntheticCave/model.skel
     Calculating adjacency list...
     Finished correspondences.
     Loading distances from ../../Data/SyntheticCave/distances.bin
     Loading distances from file...
-    Smoothing and deriving distances...
+    Smoothing distances and deriving additional measures...
+    Using cave scale kernel factor 10
+    Using cave size kernel factor 0.2
+    Using cave size derivative kernel factor 0.2
     Finding chambers...
+    Using curvature tipping point 0.3
+    Using direction tolerance 0.1
     Solving minimization problem (94 factors, 2 non-submodular, 94 variables) ...
     Generating output...
     Writing segmentation to ../../Data/SyntheticCave/output/segmentation.seg
@@ -166,5 +171,90 @@ The same functionality of the interactive GUI can be used from the command line 
 
 The generated output will be in `/Data/SyntheticCave/output`.
 
+### Manual Cave Segmentation
+
+The manual cave segmentation subsystem is used to gather expert feedback. It consists of a server and a client.
+
+Start the server by running the project `ManualCaveSegmentationService` from within Visual Studio. This should start IIS and install the service on it. When installed successfully, a web browser will open with the service's home page. The service uses a very simplistic GUI:
+
+[![Manual Cave Segmentation Service][service]][service]
+
+The first thing we need to do is upload a cave to the server. Only caves from the server will be available for the clients. To do so, we use the form on the service's home page.
+Enter a cave name and the upload password (this is hard-coded in `Controllers/CaveController.cs - PostFormData()` to an empty string; this should be changed for real use).
+Then choose a binary cave file and upload the cave. Such binary cave files can be created with the *CaveSegmentationGUI* after loading a cave (use the *Write BIN* button at the top). For the test cave, an according `model.bin` is also located in the test cave folder.
+There will be no nice success or failure page because this form sends the data directly to the service. However, in case of failure, you will get a non-200 status code.
+With this, the server is set up completely. Remember the address that opened in the browser (in this example, this is `http://localhost:3563`). You can also inspect the REST service's API documentation via the *API* link.
+
+Now, we can open the `ManualCaveSegmentationGUI`. When you start the application for the first time, you will be asked for the server address. Specify the address that you remembered earlier (i.e. `http://localhost:3563`). This information (and all other local data) will be stored in `%USERPROFILE%\CaveSegmentation`.
+
+After that, you can download the provided caves from the server. Click the *Download Caves From Server* button, check all caves that you want to download, and click *Download*.
+
+[![Manual Cave Segmentation - Download Caves][download]][download]
+
+Once you have downloaded the caves, you can open any of them with the *Load Cave* button. Camera control is a bit different than in the *CaveSegmentationGUI*: You need to hold down the Ctrl-key to control the camera.
+
+Now it's time to paint the segmentation on the cave. Use the settings in the *Paint Segmentation* category and simply paint the appropriate regions of the cave. You can use the *Front View Cutoff* to reach complicated regions.
+
+[![Manual Cave Segmentation - Paint Segmentation][paint]][paint]
+
+Finally, upload the segmentation back to the server with the *Upload Current Segmentation* button. You can also save the segmentation to your computer and continue your work later.
+
+The segmentation files can also be loaded into *CaveSegmentationGUI*.
+
+### Evaluation
+
+After experts have uploaded their segmentations, you can start evaluating the algorithm based on the manual segmentations. For this, you first need to download all segmentations for a specific cave. Open a browser and make the following REST request:
+
+    http://localhost:3563/api/Caves/1/Segmentations/zip
+This will download all segmentations of the cave with id `1` as a zip archive. Extract the archive to the subfolder `segmentations` of the directory that contains the 3D model. The example cave directory already contains such a directory with a single segmentation.
+
+With this, you can run the *Evaluation.exe*. An example call can be found under `/Data/RunEvaluationOnSyntheticCave.bat`. The program will read the `config.txt` that lies in the calling directory. The `config.txt` specifies what parameters should be tested. 
+
+An example call could look like this (called from the `/Data` folder):
+
+    > "../x64/Release/Evaluation.exe" SyntheticCave
+
+    Loading "SyntheticCave"..
+    3,154 direction samples.
+    Loading from cache instead of OFF...
+    Scheduling algorithm for evaluation: Max
+    Scheduling algorithm for evaluation: Smooth
+    Evaluating a total of 62,208 samples.
+    Status: 99.9 %, estimated time to finish: 15.4ms
+
+    Best parameters for maximum minimal plausibility:
+    Mean Plausibility: 100 %
+    Min Plausibility: 100 %
+    Distance Power: 1
+    Scale Algorithm: Max
+    Scale Kernel: 6
+    Size Kernel: 0.1
+    Size Derivative Kernel: 0.34
+    Curvature Tipping Point: 0.6
+    Direction Tolerance: 0.09
+
+    Best parameters for maximum average plausibility:
+    Mean Plausibility: 100 %
+    Min Plausibility: 100 %
+    Distance Power: 1
+    Scale Algorithm: Max
+    Scale Kernel: 6
+    Size Kernel: 0.1
+    Size Derivative Kernel: 0.34
+    Curvature Tipping Point: 0.6
+    Direction Tolerance: 0.09
+	
+The generated detailed results are also written to `result.bin` and `result.csv`. Those can be visualized with *PCPlot*.
+
+### PCPlot
+
+To visualize the evaluation result with a Parallel Coordinates rendering, simply start *PCPlot* and open the `result.bin`. The mapping from plausibility to intensity is hard-coded in `lines.vert` (`quality = ...`) and might need to be modified.
+
+[![Parallel Coordinates Plot][pc]][pc]
+
   [software]: doc/Dependencies.jpg
   [gui]: doc/CaveSegmentationGUI.JPG
+  [service]: doc/ManualCaveSegmentationService.JPG
+  [download]: doc/ManualCaveSegmentationDownload.JPG
+  [paint]: doc/ManualCaveSegmentationPaint.JPG
+  [pc]: doc/PCPlot.JPG

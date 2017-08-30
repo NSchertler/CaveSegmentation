@@ -6,8 +6,6 @@
 
 #include <cmath>
 
-#define NON_VERBOSE
-
 //This option causes the program to write debug images during processing
 //#define DRAW_DEBUG_IMAGES
 

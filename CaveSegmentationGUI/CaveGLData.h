@@ -51,6 +51,7 @@ public:
 	double CaveScale(size_t iVertex) const { return decoratee->CaveScale(iVertex); }
 	double CaveSizeDerivative(size_t iEdge) const { return decoratee->CaveSizeDerivative(iEdge); }
 	double CaveSizeCurvature(size_t iEdge) const { return decoratee->CaveSizeCurvature(iEdge); }
+	void SetVerbose(bool verbose) { decoratee->SetVerbose(verbose); }
 
 	//IGraph forwarded functions
 	const std::vector<int>& AdjacentNodes(size_t skeletonVertex) const { return decoratee->AdjacentNodes(skeletonVertex); }
