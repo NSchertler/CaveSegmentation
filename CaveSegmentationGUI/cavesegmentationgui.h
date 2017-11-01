@@ -56,7 +56,8 @@ private slots:
 	void resetToDefaults();
 
 	void saveSegmentation();
-
+	void saveSegmentationSurface();
+	
 	void saveSegmentedMesh();
 
 	void glViewInited();

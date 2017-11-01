@@ -30,6 +30,7 @@ public:
 	//ICaveData forwarded functions
 	void WriteMesh(const std::string& offFile, std::function<void(int i, int& r, int& g, int& b)> colorFunc) const { decoratee->WriteMesh(offFile, colorFunc); }
 	void WriteSegmentationColoredOff(const std::string& path, const std::vector<int32_t>& segmentation) const { decoratee->WriteSegmentationColoredOff(path, segmentation); }
+	void WriteSurfaceSegmentation(const std::string& path, const std::vector<int32_t>& segmentation) const { decoratee->WriteSurfaceSegmentation(path, segmentation); }
 	bool CalculateDistances(float exponent = 1.0f) { return decoratee->CalculateDistances(exponent); }
 	bool CalculateDistancesSingleVertexWithDebugOutput(int iVert, float exponent = 1.0f) { return decoratee->CalculateDistancesSingleVertexWithDebugOutput(iVert, exponent); }
 	void LoadDistances(const std::string& file) { decoratee->LoadDistances(file); }

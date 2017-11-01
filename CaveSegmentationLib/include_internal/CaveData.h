@@ -22,6 +22,7 @@ struct CaveData : public virtual ICaveData, public BoundingBoxAccumulator
 	void LoadMesh(const std::string& offFile);
 	void WriteMesh(const std::string& offFile, std::function<void(int i, int& r, int& g, int& b)> colorFunc) const;
 	void WriteSegmentationColoredOff(const std::string& path, const std::vector<int32_t>& segmentation) const;
+	void WriteSurfaceSegmentation(const std::string& path, const std::vector<int32_t>& segmentation) const;
 	void SetSkeleton(CurveSkeleton* skeleton);
 
 	bool CalculateDistances(float exponent = 1.0f);

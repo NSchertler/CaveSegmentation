@@ -309,6 +309,17 @@ void CaveData::WriteSegmentationColoredOff(const std::string & path, const std::
 	WriteMesh(path.c_str(), [&](int i, int& r, int& g, int& b) {colorFunc(meshVertexCorrespondsTo[i], r, g, b); });
 }
 
+void CaveData::WriteSurfaceSegmentation(const std::string& path, const std::vector<int32_t>& segmentation) const
+{
+	std::vector<int32_t> surfaceSegmentation(_meshVertices.size());
+	for (size_t skelv = 0; skelv < skeleton->vertices.size(); ++skelv)
+	{
+		for (auto surfv : skeleton->vertices[skelv].correspondingOriginalVertices)
+			surfaceSegmentation[surfv] = segmentation[skelv];
+	}
+	WriteSegmentation(path, surfaceSegmentation);
+}
+
 void CaveData::SetSkeleton(CurveSkeleton * skeleton)
 {
 	this->skeleton = skeleton;

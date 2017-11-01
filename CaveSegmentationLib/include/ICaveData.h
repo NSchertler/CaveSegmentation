@@ -23,6 +23,7 @@ public:
 	virtual void LoadMesh(const std::string& offFile) = 0;
 	virtual void WriteMesh(const std::string& offFile, std::function<void(int i, int& r, int& g, int& b)> colorFunc) const = 0;
 	virtual void WriteSegmentationColoredOff(const std::string& path, const std::vector<int32_t>& segmentation) const = 0;
+	virtual void WriteSurfaceSegmentation(const std::string& path, const std::vector<int32_t>& segmentation) const = 0;
 	virtual void SetSkeleton(CurveSkeleton* skeleton) = 0;
 	
 	//Calculates the cave distances and sizes for every vertex and returns if there are any vertices with invalid sizes.

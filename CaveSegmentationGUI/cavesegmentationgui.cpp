@@ -84,6 +84,7 @@ CaveSegmentationGUI::CaveSegmentationGUI(const AppOptions& o, QWidget *parent)
 	connect(ui.btnLoadSegmentation, &QPushButton::clicked, this, &CaveSegmentationGUI::loadSegmentation);
 	connect(ui.btnResetDefaults, &QPushButton::clicked, this, &CaveSegmentationGUI::resetToDefaults);	
 	connect(ui.btnSaveSegmentation, &QPushButton::clicked, this, &CaveSegmentationGUI::saveSegmentation);
+	connect(ui.btnSaveSegmentationSurface, &QPushButton::clicked, this, &CaveSegmentationGUI::saveSegmentationSurface);
 	connect(ui.btnSaveSegmentedMesh, &QPushButton::clicked, this, &CaveSegmentationGUI::saveSegmentedMesh);
 
 	connect(&skeletonWatcher, &QFutureWatcher<CurveSkeleton*>::finished, this, &CaveSegmentationGUI::skeletonComputationFinished);
@@ -356,6 +357,15 @@ void CaveSegmentationGUI::saveSegmentation()
 	if (!filename.isEmpty())
 	{
 		WriteSegmentation(filename.toStdString(), vm.caveData.segmentation);
+	}
+}
+
+void CaveSegmentationGUI::saveSegmentationSurface()
+{
+	QString filename = QFileDialog::getSaveFileName(this, "Save Segmentation", QString(), "Surface Segmentation file (*.surfseg)");
+	if (!filename.isEmpty())
+	{
+		vm.caveData.WriteSurfaceSegmentation(filename.toStdString(), vm.caveData.segmentation);
 	}
 }
 

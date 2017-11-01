@@ -51,9 +51,9 @@
      <property name="geometry">
       <rect>
        <x>0</x>
-       <y>0</y>
+       <y>-301</y>
        <width>433</width>
-       <height>943</height>
+       <height>972</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="rootLayout">
@@ -476,6 +476,13 @@
           <widget class="QPushButton" name="btnSaveSegmentation">
            <property name="text">
             <string>Save Segmentation</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnSaveSegmentationSurface">
+           <property name="text">
+            <string>Save Segmentation On Surface</string>
            </property>
           </widget>
          </item>
